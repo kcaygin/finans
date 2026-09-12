@@ -91,6 +91,26 @@ h1,h2,h3,.display{font-family:'Fraunces', Georgia, serif;}
   display:flex;align-items:center;justify-content:space-between;
   padding:16px 20px 10px;
 }
+.topbar .icon-btn{width:36px;height:36px;}
+.topbar .icon-btn svg{width:18px;height:18px;}
+
+.lock-screen{
+  position:fixed;inset:0;background:var(--bg);z-index:999;
+  display:none;align-items:center;justify-content:center;padding:20px;
+}
+.lock-screen.show{display:flex;}
+.lock-card{width:100%;max-width:300px;text-align:center;}
+.lock-title{font-family:'Fraunces',serif;font-weight:600;font-size:20px;}
+.lock-sub{font-size:13px;color:var(--ink-faint);margin-top:4px;}
+.lock-error{font-size:12.5px;color:var(--expense);margin-top:10px;min-height:16px;}
+.settings-section{margin-top:8px;}
+.settings-row{display:flex;flex-direction:column;gap:10px;background:var(--surface);border:1px solid var(--hairline);border-radius:var(--radius-sm);padding:16px;box-shadow:var(--shadow);}
+.settings-row .field{margin-top:0;}
+.settings-row input[type="text"], .settings-row input[type="password"]{
+  width:100%;background:var(--bg);border:1px solid var(--hairline);border-radius:10px;
+  padding:11px 12px;font-family:'IBM Plex Sans',sans-serif;font-size:14px;color:var(--ink);
+}
+.settings-section + .settings-section{margin-top:22px;}
 .brand{display:flex;align-items:center;gap:9px;}
 .brand-mark{
   width:34px;height:34px;border-radius:10px;background:var(--ink);color:var(--bg);
@@ -287,12 +307,26 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
 <body>
 
 
+<div id="lockScreen" class="lock-screen">
+  <div class="lock-card">
+    <div class="brand-mark" style="margin:0 auto 16px;">KF</div>
+    <div class="lock-title">Kelo Finans Kilitli</div>
+    <div class="lock-sub">Devam etmek için PIN gir</div>
+    <input type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" id="lockInput" class="num-input" placeholder="••••" autocomplete="off" style="text-align:center;letter-spacing:6px;margin-top:16px;">
+    <button type="button" id="lockSubmit" class="btn-primary" style="margin-top:14px;">Aç</button>
+    <div class="lock-error" id="lockError"></div>
+  </div>
+</div>
+
 <div id="app">
   <div class="topbar">
     <div class="brand">
       <div class="brand-mark">KF</div>
       <div class="brand-name">Kelo Finans</div>
     </div>
+    <button type="button" class="icon-btn" id="settingsBtn" title="Ayarlar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 13.5c.04-.5.04-1 0-1.5l1.9-1.4-2-3.4-2.2.8c-.4-.3-.8-.6-1.3-.8l-.3-2.3H9.5l-.3 2.3c-.5.2-.9.5-1.3.8l-2.2-.8-2 3.4L5.6 12c-.04.5-.04 1 0 1.5l-1.9 1.4 2 3.4 2.2-.8c.4.3.8.6 1.3.8l.3 2.3h4.9l.3-2.3c.5-.2.9-.5 1.3-.8l2.2.8 2-3.4-1.9-1.4Z"/></svg>
+    </button>
   </div>
 
   <main>
@@ -458,10 +492,77 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
 
   // ---------- storage layer ----------
   var LOCAL_PREFIX = 'kf_v1_';
-  function StoreLayer(db){
+  var GH_CFG_KEY = 'kf_github_cfg_v1';
+
+  function getGithubConfig(){
+    try{ var raw = window.localStorage.getItem(GH_CFG_KEY); return raw ? JSON.parse(raw) : null; }catch(e){ return null; }
+  }
+  function setGithubConfig(cfg){ try{ window.localStorage.setItem(GH_CFG_KEY, JSON.stringify(cfg)); }catch(e){} }
+  function clearGithubConfig(){ try{ window.localStorage.removeItem(GH_CFG_KEY); }catch(e){} }
+
+  function utf8ToB64(str){ return btoa(unescape(encodeURIComponent(str))); }
+  function b64ToUtf8(b64){ return decodeURIComponent(escape(atob(b64.replace(/\n/g,'')))); }
+
+  function GithubApi(cfg){
+    this.cfg = cfg; // {owner, repo, token, path}
+    this.sha = null;
+  }
+  GithubApi.prototype._url = function(){
+    return 'https://api.github.com/repos/'+encodeURIComponent(this.cfg.owner)+'/'+encodeURIComponent(this.cfg.repo)+'/contents/'+encodeURIComponent(this.cfg.path || 'data.json');
+  };
+  GithubApi.prototype._headers = function(){
+    return {
+      'Authorization': 'Bearer '+this.cfg.token,
+      'Accept': 'application/vnd.github+json',
+      'X-GitHub-Api-Version': '2022-11-28'
+    };
+  };
+  GithubApi.prototype.testConnection = async function(){
+    let res;
+    try{
+      res = await fetch('https://api.github.com/repos/'+encodeURIComponent(this.cfg.owner)+'/'+encodeURIComponent(this.cfg.repo), {headers: this._headers()});
+    }catch(e){ return {ok:false, error:'Bağlantı kurulamadı (internet?)'}; }
+    if(res.status===404) return {ok:false, error:'Repo bulunamadı — kullanıcı adı/repo adını kontrol et'};
+    if(res.status===401) return {ok:false, error:'Token geçersiz'};
+    if(!res.ok) return {ok:false, error:'Hata: '+res.status};
+    const json = await res.json();
+    const perms = json.permissions || {};
+    if(perms.push === false) return {ok:false, error:'Token bu repoya yazma izni vermiyor'};
+    return {ok:true};
+  };
+  GithubApi.prototype.fetchData = async function(){
+    const res = await fetch(this._url(), {headers: this._headers()});
+    if(res.status === 404){ this.sha = null; return null; }
+    if(!res.ok){ throw new Error('GitHub okuma hatası: '+res.status); }
+    const json = await res.json();
+    this.sha = json.sha;
+    if(!json.content) return null;
+    const text = b64ToUtf8(json.content);
+    try{ return JSON.parse(text); }catch(e){ throw new Error('data.json bozuk görünüyor'); }
+  };
+  GithubApi.prototype.saveData = async function(dataObj){
+    const body = { message: 'KF güncelleme '+new Date().toISOString(), content: utf8ToB64(JSON.stringify(dataObj, null, 2)) };
+    if(this.sha) body.sha = this.sha;
+    const res = await fetch(this._url(), {
+      method: 'PUT',
+      headers: Object.assign({'Content-Type':'application/json'}, this._headers()),
+      body: JSON.stringify(body)
+    });
+    if(res.status === 409){ const err = new Error('conflict'); err.conflict = true; throw err; }
+    if(!res.ok){
+      let msg = 'GitHub yazma hatası: '+res.status;
+      try{ const j = await res.json(); if(j && j.message) msg += ' — '+j.message; }catch(e){}
+      throw new Error(msg);
+    }
+    const json = await res.json();
+    this.sha = json.content.sha;
+  };
+
+  function StoreLayer(db, gh){
     this.db = db;
+    this.gh = gh || null;
     this.mem = {income_types:[], expense_categories:[], income_entries:[], expense_entries:[]};
-    if(!this.db){
+    if(!this.db && !this.gh){
       var self = this;
       Object.keys(this.mem).forEach(function(col){
         try{
@@ -471,8 +572,30 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
       });
     }
   }
-  StoreLayer.prototype._persist = function(col){
+  StoreLayer.prototype.initFromGithub = async function(){
+    const data = await this.gh.fetchData();
+    var self = this;
+    Object.keys(this.mem).forEach(function(col){
+      self.mem[col] = (data && Array.isArray(data[col])) ? data[col] : [];
+    });
+  };
+  StoreLayer.prototype._persist = async function(col){
     if(this.db) return;
+    if(this.gh){
+      try{
+        await this.gh.saveData(this.mem);
+      }catch(e){
+        if(e && e.conflict){
+          toast('Başka bir cihazdan güncelleme geldi, senkronize ediliyor…');
+          try{ await this.initFromGithub(); renderView(S.view); }catch(e2){}
+        } else {
+          console.error('github save failed', e);
+          toast('GitHub\'a kaydedilemedi — bağlantını kontrol et');
+        }
+        throw e;
+      }
+      return;
+    }
     try{ window.localStorage.setItem(LOCAL_PREFIX+col, JSON.stringify(this.mem[col])); }catch(e){ console.error('localStorage save failed', e); }
   };
   StoreLayer.prototype.list = async function(col){
@@ -493,18 +616,18 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
     const id = 'm' + Date.now().toString(36) + Math.random().toString(36).slice(2,8);
     const row = Object.assign({id}, body);
     this.mem[col].push(row);
-    this._persist(col);
+    await this._persist(col);
     return row;
   };
   StoreLayer.prototype.update = async function(col, id, data){
     if(this.db){ await this.db.collection(col).doc(id).update(data); return; }
     const arr = this.mem[col]; const i = arr.findIndex(x=>x.id===id);
-    if(i>-1){ Object.assign(arr[i], data); this._persist(col); }
+    if(i>-1){ Object.assign(arr[i], data); await this._persist(col); }
   };
   StoreLayer.prototype.remove = async function(col, id){
     if(this.db){ await this.db.collection(col).doc(id).delete(); return; }
     this.mem[col] = this.mem[col].filter(x=>x.id!==id);
-    this._persist(col);
+    await this._persist(col);
   };
 
   // ---------- app state ----------
@@ -1014,6 +1137,143 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
       $('#newExpenseCat').value='';
       renderKategoriler();
     });
+
+    $('#settingsBtn').addEventListener('click', openSettingsSheet);
+  }
+
+  // ---------- app lock (PIN) ----------
+  var PIN_KEY = 'kf_pin_hash_v1';
+  async function sha256Hex(str){
+    try{
+      const enc = new TextEncoder().encode(str);
+      const buf = await crypto.subtle.digest('SHA-256', enc);
+      return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+    }catch(e){ return null; }
+  }
+  function getPinHash(){ try{ return window.localStorage.getItem(PIN_KEY); }catch(e){ return null; } }
+  function setPinHash(hash){ try{ window.localStorage.setItem(PIN_KEY, hash); }catch(e){} }
+  function clearPinHash(){ try{ window.localStorage.removeItem(PIN_KEY); }catch(e){} }
+
+  function showLockScreen(onUnlocked){
+    const overlay = $('#lockScreen');
+    const input = $('#lockInput');
+    const err = $('#lockError');
+    overlay.classList.add('show');
+    input.value = '';
+    err.textContent = '';
+    setTimeout(()=>input.focus(), 50);
+
+    async function tryUnlock(){
+      const val = input.value.trim();
+      if(!val){ return; }
+      const hash = await sha256Hex(val);
+      if(hash && hash === getPinHash()){
+        overlay.classList.remove('show');
+        onUnlocked();
+      } else {
+        err.textContent = 'Yanlış PIN, tekrar dene';
+        input.value = '';
+        input.focus();
+      }
+    }
+    $('#lockSubmit').onclick = tryUnlock;
+    input.onkeydown = (e)=>{ if(e.key==='Enter') tryUnlock(); };
+  }
+
+  function openSettingsSheet(){
+    const overlay = $('#sheetOverlay');
+    const content = $('#sheetContent');
+    const hasPin = !!getPinHash();
+    const ghCfg = getGithubConfig();
+
+    content.innerHTML =
+      '<div class="sheet-handle"></div>'
+      + '<div class="sheet-title">Ayarlar</div>'
+
+      + '<div class="settings-section">'
+      + '<div class="field"><label>GitHub Senkronizasyonu</label></div>'
+      + (ghCfg
+        ? '<div class="settings-row"><div class="field-hint">Bağlı: <strong>'+esc(ghCfg.owner)+'/'+esc(ghCfg.repo)+'</strong>. Bu cihaz ve diğer cihazlar bu repodaki veriyi paylaşır.</div>'
+          + '<button type="button" class="btn-danger" id="gh_disconnect">Bağlantıyı Kaldır (bu cihazda)</button></div>'
+        : '<div class="settings-row"><div class="field-hint">Telefon ve bilgisayar arasında senkron için, verinin tutulacağı <strong>private</strong> bir GitHub reposu ve o repoya yazma izni olan bir token gir. (Uygulamanın kendi kodunun olduğu public repo değil, ayrı bir repo kullan.)</div>'
+          + '<input type="text" id="gh_repo" placeholder="kullanici-adi/repo-adi (ör. kcaygin/finans-data)">'
+          + '<input type="password" id="gh_token" placeholder="Personal Access Token">'
+          + '<button type="button" class="btn-primary" id="gh_connect" style="margin-top:0;">Bağlan</button></div>')
+      + '<div id="gh_err" class="lock-error"></div>'
+      + '</div>'
+
+      + '<div class="settings-section">'
+      + '<div class="field"><label>Uygulama Kilidi</label></div>'
+      + (hasPin
+        ? '<div class="settings-row"><div class="field-hint">Kilit açık. Kaldırmak için mevcut PIN\'i gir.</div>'
+          + '<input type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" id="st_current" placeholder="Mevcut PIN" class="num-input">'
+          + '<button type="button" class="btn-danger" id="st_removePin">Kilidi Kaldır</button></div>'
+        : '<div class="settings-row"><div class="field-hint">Bir PIN belirlersen, uygulama her açıldığında bu PIN sorulur.</div>'
+          + '<input type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" id="st_new1" placeholder="Yeni PIN (4-6 hane)" class="num-input">'
+          + '<input type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" id="st_new2" placeholder="PIN Tekrar" class="num-input">'
+          + '<button type="button" class="btn-primary" id="st_setPin" style="margin-top:0;">Kilidi Etkinleştir</button></div>')
+      + '<div id="st_err" class="lock-error"></div>'
+      + '</div>';
+
+    overlay.classList.add('open');
+
+    if(ghCfg){
+      $('#gh_disconnect').addEventListener('click', ()=>{
+        clearGithubConfig();
+        closeSheet();
+        toast('GitHub bağlantısı kaldırıldı, sayfa yenileniyor…');
+        setTimeout(()=>location.reload(), 600);
+      });
+    } else {
+      $('#gh_connect').addEventListener('click', async ()=>{
+        const raw = $('#gh_repo').value.trim();
+        const token = $('#gh_token').value.trim();
+        const parts = raw.split('/').map(s=>s.trim()).filter(Boolean);
+        if(parts.length !== 2){ $('#gh_err').textContent = 'Repo adını "kullanici/repo" biçiminde gir'; return; }
+        if(!token){ $('#gh_err').textContent = 'Token gerekli'; return; }
+        const btn = $('#gh_connect');
+        btn.textContent = 'Bağlanıyor…';
+        btn.disabled = true;
+        const cfg = {owner: parts[0], repo: parts[1], token: token, path: 'data.json'};
+        const api = new GithubApi(cfg);
+        const result = await api.testConnection();
+        if(result.ok){
+          setGithubConfig(cfg);
+          closeSheet();
+          toast('GitHub\'a bağlandı, sayfa yenileniyor…');
+          setTimeout(()=>location.reload(), 600);
+        } else {
+          btn.textContent = 'Bağlan';
+          btn.disabled = false;
+          $('#gh_err').textContent = result.error || 'Bağlanılamadı';
+        }
+      });
+    }
+
+    if(hasPin){
+      $('#st_removePin').addEventListener('click', async ()=>{
+        const val = $('#st_current').value.trim();
+        const hash = await sha256Hex(val);
+        if(hash && hash === getPinHash()){
+          clearPinHash();
+          closeSheet();
+          toast('Kilit kaldırıldı');
+        } else {
+          $('#st_err').textContent = 'Mevcut PIN yanlış';
+        }
+      });
+    } else {
+      $('#st_setPin').addEventListener('click', async ()=>{
+        const v1 = $('#st_new1').value.trim();
+        const v2 = $('#st_new2').value.trim();
+        if(v1.length < 4){ $('#st_err').textContent = 'PIN en az 4 haneli olmalı'; return; }
+        if(v1 !== v2){ $('#st_err').textContent = 'PIN\'ler eşleşmiyor'; return; }
+        const hash = await sha256Hex(v1);
+        setPinHash(hash);
+        closeSheet();
+        toast('Kilit etkinleştirildi');
+      });
+    }
   }
 
   // ---------- boot ----------
@@ -1025,8 +1285,38 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
       }
     }catch(err){ console.error('db use failed', err); db = null; }
 
-    S.store = new StoreLayer(db);
-    if(!db) $('#dbBanner').classList.add('show');
+    const banner = $('#dbBanner');
+    let gh = null;
+    if(!db){
+      const ghCfg = getGithubConfig();
+      if(ghCfg){
+        gh = new GithubApi(ghCfg);
+      }
+    }
+
+    S.store = new StoreLayer(db, gh);
+
+    if(db){
+      // db capability mode — no banner
+    } else if(gh){
+      try{
+        await S.store.initFromGithub();
+        banner.textContent = 'Veriler GitHub\'da saklanıyor (' + gh.cfg.owner + '/' + gh.cfg.repo + ') — cihazlar arasında senkron.';
+        banner.classList.add('show');
+      } catch(e){
+        console.error('github init failed', e);
+        S.store.gh = null;
+        S.store.mem = {income_types:[], expense_categories:[], income_entries:[], expense_entries:[]};
+        Object.keys(S.store.mem).forEach(function(col){
+          try{ var raw = window.localStorage.getItem(LOCAL_PREFIX+col); S.store.mem[col] = raw ? JSON.parse(raw) : []; }catch(e2){ S.store.mem[col] = []; }
+        });
+        banner.textContent = 'GitHub\'a bağlanılamadı, bu cihazdaki yerel veriler kullanılıyor. Ayarlar\'dan bağlantıyı kontrol et.';
+        banner.classList.add('show');
+      }
+    } else {
+      banner.textContent = 'Veriler bu cihazda, bu tarayıcıda saklanıyor. Başka bir cihazla senkronize olmaz — GitHub senkronu için Ayarlar\'ı kullan.';
+      banner.classList.add('show');
+    }
 
     await loadAll();
     await seedIfNeeded();
@@ -1036,10 +1326,22 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
     setView('ozet');
   }
 
+  function start(){
+    if(getPinHash()){
+      $('#app').style.display = 'none';
+      showLockScreen(function(){
+        $('#app').style.display = '';
+        boot();
+      });
+    } else {
+      boot();
+    }
+  }
+
   if(document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', boot);
+    document.addEventListener('DOMContentLoaded', start);
   } else {
-    boot();
+    start();
   }
 })();
 </script>
