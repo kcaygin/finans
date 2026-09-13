@@ -1262,7 +1262,9 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
     if(groups.length===0){
       html += '<div class="empty">Önce Birikim\'e en az bir varlık ekle.</div>';
     } else {
-      html += '<div class="field-hint" style="margin-bottom:14px;">Buraya girdiğin fiyat, aynı materyal + banka kombinasyonuna sahip tüm kişilerin tüm alışlarında otomatik kullanılır — her alışı tek tek güncellemene gerek yok.</div>';
+      html += '<div class="field-hint" style="margin-bottom:10px;">Buraya girdiğin fiyat, aynı materyal + banka kombinasyonuna sahip tüm kişilerin tüm alışlarında otomatik kullanılır — her alışı tek tek güncellemene gerek yok.</div>'
+        + '<button type="button" class="btn-ghost" id="fetchPricesBtn" style="margin-top:0;margin-bottom:6px;">↻ Dünya Katılım / Ziraat Katılım\'dan Fiyatları Çek</button>'
+        + '<div id="fetchPricesStatus" class="field-hint" style="margin-bottom:14px;"></div>';
       html += groups.map(function(g, i){
         const cur = getGroupPrice(g.material, g.bank);
         return '<div class="price-row" data-idx="'+i+'" style="display:flex;gap:8px;align-items:flex-end;margin-bottom:12px;">'
@@ -1297,6 +1299,59 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
         }
       });
     });
+
+    const fetchBtn = $('#fetchPricesBtn');
+    if(fetchBtn){
+      fetchBtn.addEventListener('click', async function(){
+        const statusEl = $('#fetchPricesStatus');
+        const originalLabel = fetchBtn.textContent;
+        fetchBtn.textContent = 'Çekiliyor…';
+        fetchBtn.disabled = true;
+        statusEl.textContent = '';
+        try{
+          const res = await fetch('./prices.json?t=' + Date.now(), {cache:'no-store'});
+          if(!res.ok) throw new Error('not_found');
+          const data = await res.json();
+          const filled = applyFetchedPrices(data, content);
+          if(filled === 0){
+            statusEl.textContent = 'Dosya okundu ama eşleşen materyal/banka bulunamadı (Gram Altın/Gümüş veya Fiziki Altın/Gümüş, Dünya Katılım/Ziraat Katılım banka adıyla olmalı).';
+          } else {
+            const when = data.updatedAt ? new Date(data.updatedAt).toLocaleString('tr-TR') : '';
+            statusEl.textContent = filled + ' alan dolduruldu (kaynak güncellemesi: ' + when + '). Kontrol edip her satırın "Kaydet" butonuna basmayı unutma.';
+          }
+        } catch(e){
+          console.error('fetch prices failed', e);
+          statusEl.textContent = 'prices.json okunamadı. Bu özellik için GitHub reponda otomatik fiyat çekme workflow\'unun kurulu olması gerekiyor — henüz kurmadıysan bana söyle, adım adım ekleyelim.';
+        }
+        fetchBtn.textContent = originalLabel;
+        fetchBtn.disabled = false;
+      });
+    }
+  }
+
+  // fills matching .price-input fields from a fetched prices.json payload; returns how many were filled
+  function applyFetchedPrices(data, container){
+    let filled = 0;
+    container.querySelectorAll('.price-input').forEach(function(input){
+      const bank = String(input.dataset.bank||'').toLowerCase();
+      const material = String(input.dataset.material||'').toLowerCase();
+      const isCoin = /çeyrek|ceyrek|yarım|yarim|tam altın|tam altin|cumhuriyet/.test(material);
+      if(isCoin) return;
+      const isGold = /altın|altin/.test(material);
+      const isSilver = /gümüş|gumus/.test(material);
+      if(!isGold && !isSilver) return;
+      let src = null;
+      if(/dünya|dunya/.test(bank)) src = data.dunyaKatilim;
+      else if(/ziraat/.test(bank)) src = data.ziraatKatilim;
+      if(!src) return;
+      const val = isGold ? src.altinAlis : src.gumusAlis;
+      if(val == null || isNaN(val)) return;
+      input.value = Number(val).toFixed(2);
+      input.style.outline = '2px solid var(--gold)';
+      setTimeout(function(){ input.style.outline = ''; }, 2000);
+      filled++;
+    });
+    return filled;
   }
 
   // ---------- render: rapor ----------
