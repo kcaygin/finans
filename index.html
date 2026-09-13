@@ -479,6 +479,8 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
 
     <!-- BİRİKİM -->
     <section id="view-birikim" class="view">
+      <div class="breakdown-card" id="birikimOverviewCard" style="margin-top:14px;"></div>
+
       <div class="segmented" id="birikimSubTabs">
         <button type="button" data-sub="metal" class="active">Kıymetli Maden</button>
         <button type="button" data-sub="fund">Yatırım Fonları</button>
@@ -1550,7 +1552,57 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
   const MATERIAL_PRESETS = ['Gram Altın','Çeyrek Altın','Yarım Altın','Tam Altın','Cumhuriyet Altını','Gümüş (gram)'];
   const FUND_PRESETS = ['EP1'];
 
+  // Birikim'in ana sayfasında (hangi alt-sekme açık olursa olsun görünen), tüm kişilerin
+  // yatırım fonu + kıymetli maden varlıklarını birleştiren özet: toplam güncel değer, ana para, kâr/zarar.
+  function renderBirikimOverview(){
+    const el = $('#birikimOverviewCard');
+    if(!el) return;
+    let fundCost = 0, fundValue = 0;
+    S.fundLots.forEach(function(l){
+      const m = fundLotMetrics(l);
+      fundCost += m.cost; fundValue += m.value;
+    });
+    let metalCost = 0, metalValue = 0;
+    S.savingsHoldings.forEach(function(h){
+      const m = holdingMetrics(h);
+      metalCost += m.cost; metalValue += m.value;
+    });
+    const fundProfit = fundValue - fundCost;
+    const metalProfit = metalValue - metalCost;
+    const totalValue = fundValue + metalValue;
+    const totalCost = fundCost + metalCost;
+    const totalProfit = totalValue - totalCost;
+    const pct = function(part){ return totalValue > 0 ? Math.max(0, part) / totalValue * 100 : 0; };
+    const fundPct = pct(fundValue), metalPct = pct(metalValue);
+
+    const profitSpan = function(v){
+      const cls = v >= 0 ? 'profit-pos' : 'profit-neg';
+      const sign = v >= 0 ? '+' : '';
+      return '<span class="'+cls+'">'+sign+fmt(v)+'</span>';
+    };
+
+    el.innerHTML =
+      '<div class="card-title">Birikim Özeti · Tüm Kişiler</div>'
+      + '<div class="num" style="font-size:25px;font-weight:800;margin-bottom:3px;">'+fmt(totalValue)+'</div>'
+      + '<div style="font-size:12.5px;color:var(--ink-soft);margin-bottom:12px;">Ana Para '+fmt(totalCost)+' · '+profitSpan(totalProfit)+' '+(totalProfit>=0?'kâr':'zarar')+'</div>'
+      + '<div class="breakdown-stack">'
+        + (fundPct > 0 ? '<div class="seg fund" style="width:'+fundPct+'%"></div>' : '')
+        + (metalPct > 0 ? '<div class="seg metal" style="width:'+metalPct+'%"></div>' : '')
+      + '</div>'
+      + '<div class="breakdown-legend">'
+        + '<span><span class="dot fund"></span>Yatırım Fonu · '+fmt(fundValue)+'</span>'
+        + '<span><span class="dot metal"></span>Kıymetli Metal · '+fmt(metalValue)+'</span>'
+      + '</div>'
+      + '<div class="breakdown-rows">'
+        + '<div class="breakdown-row"><div class="label"><span class="dot" style="width:9px;height:9px;border-radius:50%;display:inline-block;background:var(--accent);"></span>Yatırım Fonu</div>'
+          + '<div class="amounts"><div class="main">'+fmt(fundValue)+'</div><div class="sub">Ana Para '+fmt(fundCost)+' · '+profitSpan(fundProfit)+'</div></div></div>'
+        + '<div class="breakdown-row"><div class="label"><span class="dot" style="width:9px;height:9px;border-radius:50%;display:inline-block;background:var(--gold);"></span>Kıymetli Metal</div>'
+          + '<div class="amounts"><div class="main">'+fmt(metalValue)+'</div><div class="sub">Ana Para '+fmt(metalCost)+' · '+profitSpan(metalProfit)+'</div></div></div>'
+      + '</div>';
+  }
+
   function renderBirikim(){
+    renderBirikimOverview();
     $$('#birikimSubTabs button').forEach(function(b){ b.classList.toggle('active', b.dataset.sub===S.birikimSubView); });
     $('#birikimMetalPane').style.display = S.birikimSubView==='fund' ? 'none' : '';
     $('#birikimFundPane').style.display = S.birikimSubView==='fund' ? '' : 'none';
@@ -1645,6 +1697,7 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
 
   // ---------- render: yatırım fonları (Birikim alt-sekmesi) ----------
   function renderFundView(){
+    renderBirikimOverview();
     renderPersonChips('fundPersonChips', S.fundPerson, function(val){ S.fundPerson = val; renderFundView(); });
 
     let lots = S.fundLots.slice();
