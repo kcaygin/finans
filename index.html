@@ -219,6 +219,11 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
   border-radius:99px;padding:7px 14px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;
 }
 .chip.active{background:var(--ink);color:var(--bg);border-color:var(--ink);}
+.chip-manage{
+  flex:none;border:1px dashed var(--hairline);background:transparent;color:var(--ink-faint);
+  border-radius:99px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;
+}
+.chip-manage svg{width:14px;height:14px;}
 
 .stat-row{display:flex;gap:10px;margin-top:2px;}
 .stat-tile{flex:1;background:var(--surface);border:1px solid var(--hairline);border-radius:var(--radius-sm);padding:12px 13px;box-shadow:var(--shadow);}
@@ -366,7 +371,12 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
         </div>
       </div>
 
-      <div class="section-title">Gelir Kaynakları</div>
+      <div class="section-title" style="display:flex;align-items:center;justify-content:space-between;">
+        <span>Gelir Kaynakları</span>
+        <button type="button" class="icon-btn" id="addIncomeTypeQuickBtn" title="Gelir kaynağı ekle" style="margin:0;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+      </div>
       <div class="pot-grid" id="potGrid"></div>
 
       <div class="section-title">Son Hareketler</div>
@@ -451,6 +461,7 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
       <div id="materialBars"></div>
 
       <div class="section-title">Varlıklarım</div>
+      <div class="chips" id="holdingsFilterChips" style="margin-bottom:10px;"></div>
       <div id="holdingsList"></div>
     </section>
 
@@ -667,7 +678,7 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
     people:[], incomeTypes:[], expenseCategories:[], incomeEntries:[], expenseEntries:[], savingsHoldings:[], materialPrices:[],
     view:'ozet', addMode:'gider', addPersonId:null,
     ozetPerson:'all', raporPerson:'all', kayitlarPerson:'all', birikimPerson:'all',
-    reportPeriod:'thisMonth', recordFilter:'all',
+    reportPeriod:'thisMonth', recordFilter:'all', holdingsFilter:'all',
     editing:null // {kind:'gelir'|'gider'|'varlik', id}
   };
 
@@ -916,10 +927,50 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
     const active = S.people.filter(p=>!p.archived);
     let html = '<button type="button" class="chip'+(current==='all'?' active':'')+'" data-pf="all">Tümü</button>';
     html += active.map(p=>'<button type="button" class="chip'+(current===p.id?' active':'')+'" data-pf="'+p.id+'">'+esc(p.name)+'</button>').join('');
+    html += '<button type="button" class="chip-manage" title="Kişileri Yönet (ekle/sil)">'
+      + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>'
+      + '</button>';
     el.innerHTML = html;
     el.querySelectorAll('.chip').forEach(btn=>{
       btn.addEventListener('click', ()=>{ onChange(btn.dataset.pf); });
     });
+    el.querySelector('.chip-manage').addEventListener('click', ()=> openPeopleManageSheet());
+  }
+
+  function openPeopleManageSheet(){
+    const overlay = $('#sheetOverlay');
+    const content = $('#sheetContent');
+
+    function renderInner(){
+      let html = '<div class="sheet-handle"></div><div class="sheet-title">Kişileri Yönet</div>';
+      html += '<div class="field-hint" style="margin-bottom:12px;">Buradaki kişiler; Özet, Ekle, Birikim, Rapor ve Kayıtlar\'da kullanılır.</div>';
+      html += S.people.map(p=>settingsCatRowHtml(p,'people')).join('') || '<div class="empty">Kişi yok.</div>';
+      html += '<div class="add-cat-row"><input type="text" id="pm_newPerson" placeholder="Yeni kişi adı"><button type="button" id="pm_addPersonBtn">Ekle</button></div>';
+      content.innerHTML = html;
+
+      bindSettingsCatRows(content, 'people', function(){
+        renderInner();
+        renderView(S.view);
+      });
+
+      $('#pm_addPersonBtn').addEventListener('click', async ()=>{
+        const input = $('#pm_newPerson');
+        const name = input.value.trim();
+        if(!name) return;
+        try{
+          const row = await S.store.add('people', {name, archived:false});
+          S.people.push(row);
+          renderInner();
+          renderView(S.view);
+        } catch(e){
+          console.error('add person failed', e);
+          toast('Eklenemedi, tekrar dene');
+        }
+      });
+    }
+
+    renderInner();
+    overlay.classList.add('open');
   }
 
   // ---------- navigation ----------
@@ -960,13 +1011,16 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
     if(S.ozetPerson!=='all') types = types.filter(t=>t.personId===S.ozetPerson);
     const grid = $('#potGrid');
     if(types.length===0){
-      grid.innerHTML = '<div class="empty">Henüz gelir türü yok. Ayarlar\'dan ekleyebilirsin.</div>';
+      grid.innerHTML = '<div class="empty">Henüz gelir kaynağı yok. Yukarıdaki + ile ekleyebilirsin.</div>';
     } else {
       grid.innerHTML = types.map(t=>{
         const b = potBalance(t.id);
         const cls = b.balance < 0 ? 'neg' : 'pos';
-        return '<div class="pot-card"><div><div class="pot-name">'+esc(t.name)+' <span class="pot-person">· '+esc(personName(t.personId))+'</span></div><div class="pot-sub">Gelen '+fmt(b.income)+' · Harcanan '+fmt(b.spent)+'</div></div><div class="pot-balance num '+cls+'">'+fmt(b.balance)+'</div></div>';
+        return '<div class="pot-card" data-id="'+t.id+'" style="cursor:pointer;"><div><div class="pot-name">'+esc(t.name)+' <span class="pot-person">· '+esc(personName(t.personId))+'</span></div><div class="pot-sub">Gelen '+fmt(b.income)+' · Harcanan '+fmt(b.spent)+'</div></div><div class="pot-balance num '+cls+'">'+fmt(b.balance)+'</div></div>';
       }).join('');
+      grid.querySelectorAll('.pot-card').forEach(function(card){
+        card.addEventListener('click', ()=> openIncomeTypeSheet(card.dataset.id));
+      });
     }
 
     const recent = unifiedEntries(S.ozetPerson).slice(0,6);
@@ -976,6 +1030,88 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
     } else {
       list.innerHTML = recent.map(e=>txRowHtml(e)).join('');
       bindTxRows(list);
+    }
+  }
+
+  function openIncomeTypeSheet(id){
+    const overlay = $('#sheetOverlay');
+    const content = $('#sheetContent');
+    const isNew = !id;
+    const defaultPersonId = (S.ozetPerson && S.ozetPerson!=='all') ? S.ozetPerson : (S.addPersonId || (S.people[0] && S.people[0].id) || '');
+    const t = isNew ? {personId: defaultPersonId, name:'', archived:false} : S.incomeTypes.find(x=>x.id===id);
+    if(!t) return;
+    const persons = S.people.filter(p=>!p.archived);
+
+    content.innerHTML =
+      '<div class="sheet-handle"></div>'
+      + '<div class="sheet-title">'+(isNew?'Yeni Gelir Kaynağı':'Gelir Kaynağını Düzenle')+'</div>'
+      + '<div class="field"><label>Kişi</label><select id="it_person">'
+        + persons.map(p=>'<option value="'+p.id+'"'+(p.id===t.personId?' selected':'')+'>'+esc(p.name)+'</option>').join('')
+        + '</select></div>'
+      + '<div class="field"><label>Ad</label><input type="text" id="it_name" value="'+esc(t.name)+'" placeholder="Örn: Maaş"></div>'
+      + '<div class="sheet-actions">'
+      + (isNew ? '' : '<button type="button" class="btn-ghost" id="it_archive">'+(t.archived?'Arşivden Çıkar':'Arşivle')+'</button>')
+      + (isNew ? '' : '<button type="button" class="btn-danger" id="it_delete">Sil</button>')
+      + '<button type="button" class="btn-ghost" id="it_save">Kaydet</button>'
+      + '</div>';
+
+    overlay.classList.add('open');
+
+    $('#it_save').addEventListener('click', async ()=>{
+      const personId = $('#it_person').value;
+      const name = $('#it_name').value.trim();
+      if(!personId){ toast('Önce bir kişi ekle'); return; }
+      if(!name){ toast('Ad gir'); return; }
+      try{
+        if(isNew){
+          const row = await S.store.add('income_types', {personId, name, archived:false});
+          S.incomeTypes.push(row);
+          toast('Gelir kaynağı eklendi');
+        } else {
+          await S.store.update('income_types', t.id, {personId, name});
+          Object.assign(t, {personId, name});
+          toast('Güncellendi');
+        }
+        closeSheet();
+        renderOzet();
+      } catch(e){
+        console.error('income type save failed', e);
+        toast('Kaydedilemedi, tekrar dene');
+      }
+    });
+
+    if(!isNew){
+      $('#it_archive').addEventListener('click', async ()=>{
+        const newVal = !t.archived;
+        try{
+          await S.store.update('income_types', t.id, {archived:newVal});
+          t.archived = newVal;
+          closeSheet();
+          toast(newVal ? 'Arşivlendi' : 'Arşivden çıkarıldı');
+          renderOzet();
+        } catch(e){
+          console.error('income type archive failed', e);
+          toast('İşlem başarısız, tekrar dene');
+        }
+      });
+      $('#it_delete').addEventListener('click', async ()=>{
+        const btn = $('#it_delete');
+        if(btn.dataset.confirm !== '1'){
+          btn.dataset.confirm = '1';
+          btn.textContent = 'Emin misin? Tekrar dokun';
+          return;
+        }
+        try{
+          await S.store.remove('income_types', t.id);
+          S.incomeTypes = S.incomeTypes.filter(x=>x.id!==t.id);
+          closeSheet();
+          toast('Silindi');
+          renderOzet();
+        } catch(e){
+          console.error('income type delete failed', e);
+          toast('Silinemedi, tekrar dene');
+        }
+      });
     }
   }
 
@@ -1120,12 +1256,32 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
       }).join('');
     }
 
+    // kâr/zarar filtresi (sadece "Varlıklarım" listesini etkiler)
+    const profitCount = holdings.filter(h=>holdingMetrics(h).profit>0).length;
+    const lossCount = holdings.filter(h=>holdingMetrics(h).profit<0).length;
+    const hfOptions = [
+      {key:'all', label:'Tümü ('+holdings.length+')'},
+      {key:'profit', label:'Kârda ('+profitCount+')'},
+      {key:'loss', label:'Zararda ('+lossCount+')'}
+    ];
+    const hfEl = $('#holdingsFilterChips');
+    hfEl.innerHTML = hfOptions.map(o=>'<button type="button" class="chip'+(S.holdingsFilter===o.key?' active':'')+'" data-hf="'+o.key+'">'+esc(o.label)+'</button>').join('');
+    hfEl.querySelectorAll('.chip').forEach(btn=>{
+      btn.addEventListener('click', ()=>{ S.holdingsFilter = btn.dataset.hf; renderBirikim(); });
+    });
+
+    let listHoldings = holdings.slice();
+    if(S.holdingsFilter==='profit') listHoldings = listHoldings.filter(h=>holdingMetrics(h).profit>0);
+    else if(S.holdingsFilter==='loss') listHoldings = listHoldings.filter(h=>holdingMetrics(h).profit<0);
+
     const listEl = $('#holdingsList');
-    if(holdings.length===0){
-      listEl.innerHTML = '<div class="empty">Henüz varlık eklenmedi. Altın, gümüş gibi birikimlerini "+ Yeni Varlık Ekle" ile gir.</div>';
+    if(listHoldings.length===0){
+      listEl.innerHTML = holdings.length===0
+        ? '<div class="empty">Henüz varlık eklenmedi. Altın, gümüş gibi birikimlerini "+ Yeni Varlık Ekle" ile gir.</div>'
+        : '<div class="empty">Bu filtreye uyan varlık yok.</div>';
     } else {
-      holdings.sort((a,b)=> (b.createdAt||'').localeCompare(a.createdAt||''));
-      listEl.innerHTML = holdings.map(h=>{
+      listHoldings.sort((a,b)=> (b.createdAt||'').localeCompare(a.createdAt||''));
+      listEl.innerHTML = listHoldings.map(h=>{
         const m = holdingMetrics(h);
         const cls = m.profit >= 0 ? 'pos' : 'neg';
         const sign = m.profit >= 0 ? '+' : '';
@@ -1826,6 +1982,7 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
 
     $('#addHoldingBtn').addEventListener('click', ()=> openHoldingSheet(null));
     $('#updatePricesBtn').addEventListener('click', ()=> openPricesSheet());
+    $('#addIncomeTypeQuickBtn').addEventListener('click', ()=> openIncomeTypeSheet(null));
 
     $('#settingsBtn').addEventListener('click', openSettingsSheet);
   }
