@@ -1432,10 +1432,11 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
     holdings.forEach(h=>{
       const m = holdingMetrics(h);
       const key = h.material || '—';
-      if(!byMat[key]) byMat[key] = 0;
-      byMat[key] += m.value;
+      if(!byMat[key]) byMat[key] = {qty:0, unit:h.unit||'', total:0};
+      byMat[key].qty += Number(h.quantity||0);
+      byMat[key].total += m.value;
     });
-    const matArr = Object.keys(byMat).map(k=>({name:k, total:byMat[k]})).sort((a,b)=>b.total-a.total);
+    const matArr = Object.keys(byMat).map(k=>({name:k, qty:byMat[k].qty, unit:byMat[k].unit, total:byMat[k].total})).sort((a,b)=>b.total-a.total);
     const maxMat = matArr.length ? matArr[0].total : 0;
     const matEl = $('#materialBars');
     if(matArr.length===0){
@@ -1443,7 +1444,7 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
     } else {
       matEl.innerHTML = matArr.map(m=>{
         const p = maxMat ? Math.max(4, Math.round(m.total/maxMat*100)) : 0;
-        return '<div class="bar-row"><div class="bar-top"><span class="name">'+esc(m.name)+'</span><span class="amt num">'+fmt(m.total)+'</span></div><div class="bar-track"><div class="bar-fill gold" style="width:'+p+'%"></div></div></div>';
+        return '<div class="bar-row"><div class="bar-top"><span class="name">'+esc(m.name)+'</span><span class="amt num">'+fmtNum(m.qty)+' '+esc(m.unit)+' · '+fmt(m.total)+'</span></div><div class="bar-track"><div class="bar-fill gold" style="width:'+p+'%"></div></div></div>';
       }).join('');
     }
 
@@ -1529,10 +1530,11 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
     lots.forEach(l=>{
       const m = fundLotMetrics(l);
       const key = l.fundName || '—';
-      if(!byFund[key]) byFund[key] = 0;
-      byFund[key] += m.value;
+      if(!byFund[key]) byFund[key] = {qty:0, total:0};
+      byFund[key].qty += m.remaining;
+      byFund[key].total += m.value;
     });
-    const fundArr = Object.keys(byFund).map(k=>({name:k, total:byFund[k]})).sort((a,b)=>b.total-a.total);
+    const fundArr = Object.keys(byFund).map(k=>({name:k, qty:byFund[k].qty, total:byFund[k].total})).sort((a,b)=>b.total-a.total);
     const maxFund = fundArr.length ? fundArr[0].total : 0;
     const fundBarsEl = $('#fundBars');
     if(fundArr.length===0){
@@ -1540,7 +1542,7 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
     } else {
       fundBarsEl.innerHTML = fundArr.map(f=>{
         const p = maxFund ? Math.max(4, Math.round(f.total/maxFund*100)) : 0;
-        return '<div class="bar-row"><div class="bar-top"><span class="name">'+esc(f.name)+'</span><span class="amt num">'+fmt(f.total)+'</span></div><div class="bar-track"><div class="bar-fill gold" style="width:'+p+'%"></div></div></div>';
+        return '<div class="bar-row"><div class="bar-top"><span class="name">'+esc(f.name)+'</span><span class="amt num">'+fmtNum(f.qty,4)+' adet · '+fmt(f.total)+'</span></div><div class="bar-track"><div class="bar-fill gold" style="width:'+p+'%"></div></div></div>';
       }).join('');
     }
 
