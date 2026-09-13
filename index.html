@@ -136,9 +136,10 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
   background:radial-gradient(closest-side, rgba(255,255,255,0.16), rgba(255,255,255,0) 70%);
   pointer-events:none; z-index:0;
 }
-.hero-label,.hero-amount,.hero-row{position:relative; z-index:1;}
+.hero-label,.hero-amount,.hero-row,.hero-breakdown{position:relative; z-index:1;}
 .hero-label{font-size:12.5px;color:rgba(255,255,255,0.78);letter-spacing:0.04em;text-transform:uppercase;font-weight:600;}
 .hero-amount{font-size:35px;font-weight:700;margin-top:6px;line-height:1.1;letter-spacing:-0.01em;font-family:'Plus Jakarta Sans',sans-serif;}
+.hero-breakdown{font-size:13px;color:rgba(255,255,255,0.85);margin-top:7px;font-weight:600;}
 .hero-row{display:flex;gap:10px;margin-top:18px;}
 .hero-stat{
   flex:1;background:rgba(255,255,255,0.14);border:1px solid rgba(255,255,255,0.18);
@@ -364,8 +365,9 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
       <div class="chips" id="ozetPersonChips"></div>
 
       <div class="hero" style="margin-top:14px;">
-        <div class="hero-label">Toplam Bakiye</div>
+        <div class="hero-label">Genel Toplam</div>
         <div class="hero-amount num" id="heroTotal">₺0,00</div>
+        <div class="hero-breakdown num" id="heroBreakdown">Nakit ₺0,00 · Yatırım ₺0,00</div>
         <div class="hero-row">
           <div class="hero-stat"><div class="l">Bu Ay Gelir</div><div class="v num" id="heroIncomeMonth">₺0,00</div></div>
           <div class="hero-stat"><div class="l">Bu Ay Gider</div><div class="v num" id="heroExpenseMonth">₺0,00</div></div>
@@ -898,6 +900,20 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
     const expense = S.expenseEntries.filter(e=>ids.includes(e.paidFromTypeId)).reduce((a,e)=>a+Number(e.amount||0),0);
     return {income, expense, balance: income-expense};
   }
+  // current value of every investment (precious-metal holding + remaining fund lot) owned by this person
+  // (or everyone, when personFilter is 'all') -- used for the Özet hero's "Genel Toplam" (nakit + yatırım).
+  function totalInvestmentValue(personFilter){
+    let value = 0;
+    S.savingsHoldings.forEach(function(h){
+      if(personFilter && personFilter!=='all' && h.personId!==personFilter) return;
+      value += holdingMetrics(h).value;
+    });
+    S.fundLots.forEach(function(l){
+      if(personFilter && personFilter!=='all' && l.personId!==personFilter) return;
+      value += fundLotMetrics(l).value;
+    });
+    return value;
+  }
   function unifiedEntries(personFilter){
     let inc = S.incomeEntries.map(e=>({
       id:e.id, kind:'gelir', label:e.typeName||'—', sub:e.note||'', amount:Number(e.amount||0),
@@ -1165,7 +1181,10 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
     renderPersonChips('ozetPersonChips', S.ozetPerson, function(val){ S.ozetPerson = val; renderOzet(); });
 
     const tot = totalBalance(S.ozetPerson);
-    $('#heroTotal').textContent = fmt(tot.balance);
+    const investTotal = totalInvestmentValue(S.ozetPerson);
+    const grandTotal = tot.balance + investTotal;
+    $('#heroTotal').textContent = fmt(grandTotal);
+    $('#heroBreakdown').textContent = 'Nakit '+fmt(tot.balance)+' · Yatırım '+fmt(investTotal);
     const range = periodRange('thisMonth');
     let incEntries = S.incomeEntries, expEntries = S.expenseEntries;
     if(S.ozetPerson!=='all'){
