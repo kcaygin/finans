@@ -11,6 +11,15 @@ function parseTR(str) {
   // "6.073,9718" -> 6073.9718  (nokta binlik ayraç, virgül ondalık)
   return parseFloat(String(str).replace(/\./g, '').replace(',', '.'));
 }
+function decodeHtmlEntities(str) {
+  // Dünya Katılım'ın ham HTML yanıtı Türkçe karakterleri (ı, ü, ş, ...) sayısal HTML
+  // varlık referansı olarak gönderiyor (örn. "Alt&#x131;n" = "Altın"), tarayıcıda
+  // otomatik çözüldüğü için normalde fark edilmez ama düz metin regex'i bunu
+  // yakalayamaz -- bu yüzden regex uygulamadan önce hepsini çözüyoruz.
+  return String(str)
+    .replace(/&#x([0-9a-fA-F]+);/g, (_, hex) => String.fromCodePoint(parseInt(hex, 16)))
+    .replace(/&#(\d+);/g, (_, dec) => String.fromCodePoint(parseInt(dec, 10)));
+}
 
 async function fetchZiraat() {
   const res = await fetch('https://www.ziraatkatilim.com.tr/ajax/piyasalar', {
@@ -35,7 +44,7 @@ async function fetchDunya() {
     headers: { 'User-Agent': 'Mozilla/5.0 (compatible; KFT-price-fetcher/1.0)' }
   });
   if (!res.ok) throw new Error('Dünya Katılım isteği başarısız: HTTP ' + res.status);
-  const html = await res.text();
+  const html = decodeHtmlEntities(await res.text());
 
   function extractRow(labelPattern) {
     // <span>Altın (XAU)</span> ... <td class="col">ALIŞ</td> <td class="col">SATIŞ</td>
