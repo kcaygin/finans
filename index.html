@@ -717,6 +717,7 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
     view:'ozet', addMode:'gider', addPersonId:null,
     ozetPerson:'all', raporPerson:'all', kayitlarPerson:'all', birikimPerson:'all', fundPerson:'all',
     reportPeriod:'thisMonth', recordFilter:'all', holdingsFilter:'all', birikimSubView:'metal',
+    raporExpandedTypes:{}, // {incomeTypeId: true} -- which "Kaynağa Göre" cards are expanded to show their hareketler
     editing:null // {kind:'gelir'|'gider'|'varlik', id}
   };
 
@@ -912,6 +913,16 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
       if(a.date!==b.date) return a.date < b.date ? 1 : -1;
       return (a.createdAt < b.createdAt) ? 1 : -1;
     });
+  }
+  // all gelir/gider hareketleri for one income source (gelir kaynağı), newest first,
+  // optionally limited to a date range -- used by Rapor's "Kaynağa Göre" cards to show
+  // the actual transactions behind a source's dönem geliri/gideri figures.
+  function entriesForIncomeType(typeId, range){
+    let rows = unifiedEntries('all').filter(function(e){
+      return (e.kind==='gelir' && e.raw.typeId===typeId) || (e.kind==='gider' && e.raw.paidFromTypeId===typeId);
+    });
+    if(range && range[0]) rows = rows.filter(function(e){ return inRange(e.date, range); });
+    return rows;
   }
   // ---------- shared material/bank current prices ----------
   function materialPriceKey(material, bank){
@@ -2140,12 +2151,44 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
         const periodInc = inc.filter(e=>e.typeId===t.id).reduce((a,e)=>a+Number(e.amount||0),0);
         const periodExp = exp.filter(e=>e.paidFromTypeId===t.id).reduce((a,e)=>a+Number(e.amount||0),0);
         const allTime = potBalance(t.id);
-        return '<div class="source-card"><div class="name">'+esc(t.name)+' · '+esc(personName(t.personId))+'</div><div class="source-grid">'
+        const isOpen = !!S.raporExpandedTypes[t.id];
+        const typeEntries = entriesForIncomeType(t.id, range);
+        let txHtml = '';
+        if(isOpen){
+          txHtml = '<div class="source-tx-list" style="margin-top:10px;border-top:1px solid var(--hairline);padding-top:8px;">'
+            + (typeEntries.length===0
+              ? '<div class="empty">Bu dönemde hareket yok.</div>'
+              : '<div class="tx-list">'+typeEntries.map(e=>txRowHtml(e)).join('')+'</div>')
+            + '</div>';
+        }
+        return '<div class="source-card" data-type="'+t.id+'">'
+          + '<div class="name source-card-header" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between;">'
+            + '<span>'+esc(t.name)+' · '+esc(personName(t.personId))+'</span>'
+            + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width:16px;height:16px;flex:none;transform:rotate('+(isOpen?'180deg':'0deg')+');transition:transform .15s;"><path d="M6 9l6 6 6-6"/></svg>'
+          + '</div>'
+          + '<div class="source-grid">'
           + '<div class="cell"><div class="l">Dönem Geliri</div><div class="v num">'+fmt(periodInc)+'</div></div>'
           + '<div class="cell"><div class="l">Dönem Gideri</div><div class="v num">'+fmt(periodExp)+'</div></div>'
           + '<div class="cell"><div class="l">Güncel Bakiye</div><div class="v num">'+fmt(allTime.balance)+'</div></div>'
-          + '</div></div>';
+          + '</div>'
+          + txHtml
+          + '</div>';
       }).join('');
+      srcEl.querySelectorAll('.source-card-header').forEach(function(header){
+        header.addEventListener('click', function(){
+          const card = header.closest('.source-card');
+          const typeId = card.dataset.type;
+          if(S.raporExpandedTypes[typeId]) delete S.raporExpandedTypes[typeId];
+          else S.raporExpandedTypes[typeId] = true;
+          renderRapor();
+        });
+      });
+      srcEl.querySelectorAll('.source-tx-list .tx-row').forEach(function(row){
+        row.addEventListener('click', function(e){
+          e.stopPropagation();
+          openEditSheet(row.dataset.kind, row.dataset.id);
+        });
+      });
     }
   }
 
