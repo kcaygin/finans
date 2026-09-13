@@ -277,6 +277,12 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
 .breakdown-totals .t-item{flex:1;}
 .breakdown-totals .t-label{font-size:10.5px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:0.03em;}
 .breakdown-totals .t-val{font-size:14.5px;font-weight:700;margin-top:3px;}
+.breakdown-source-title{font-size:10.5px;font-weight:700;color:var(--ink-faint);text-transform:uppercase;letter-spacing:0.03em;margin:14px 0 6px;}
+.breakdown-source-list{display:flex;flex-direction:column;}
+.breakdown-source-row{display:flex;justify-content:space-between;gap:10px;padding:7px 2px;font-size:12.5px;border-bottom:1px solid var(--hairline);}
+.breakdown-source-row:last-child{border-bottom:none;}
+.breakdown-source-row span:first-child{color:var(--ink-soft);}
+.breakdown-source-row span:last-child{font-weight:600;}
 
 .holding-card{background:var(--surface);border:1px solid var(--hairline);border-radius:var(--radius-sm);padding:14px 15px;box-shadow:var(--shadow);margin-bottom:10px;cursor:pointer;}
 .holding-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
@@ -1174,6 +1180,21 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
     });
     return {cost: cost, value: value, profit: value - cost, hasInvestment: cost>0 || value>0};
   }
+  // Dağılım kartındaki "Toplam Ana Para"nın gelir kaynağına göre kırılımı: her kaynağın nakit bakiyesi
+  // + o kaynağın fonladığı yatırımların maliyeti (+ hiçbir kaynağa bağlanmamış yatırımlar için bir satır),
+  // böylece satırların toplamı her zaman Toplam Ana Para'ya tam eşit olur.
+  function principalBySource(personFilter){
+    let types = S.incomeTypes.filter(t=>!t.archived);
+    if(personFilter && personFilter!=='all') types = types.filter(t=>t.personId===personFilter);
+    const rows = types.map(function(t){
+      const cash = potBalance(t.id).balance;
+      const invCost = incomeTypeInvestmentStats(t.id).cost;
+      return {name: t.name+' · '+personName(t.personId), amount: cash + invCost};
+    });
+    const unassigned = unassignedInvestmentStats(personFilter, types);
+    if(Math.abs(unassigned.cost) > 0.005) rows.push({name:'Kaynağı Belirtilmemiş Yatırımlar', amount: unassigned.cost});
+    return rows.filter(function(r){ return Math.abs(r.amount) > 0.005; }).sort(function(a,b){ return b.amount - a.amount; });
+  }
   // <select> options for "which gelir kaynağı funded this investment" pickers, scoped to one person
   function fundingIncomeTypeOptionsHtml(personId, selectedId){
     const types = S.incomeTypes.filter(function(t){ return !t.archived && t.personId===personId; });
@@ -1256,7 +1277,7 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
   // ---------- render: özet ----------
   // Özet hero'nun altındaki "Dağılım" dashboard'u: nakit/fon/metal payları (stacked bar + legend)
   // ve her kategorinin ana para / kâr ayrımı, artı genel ana para/kâr toplamı.
-  function renderBreakdownCard(b){
+  function renderBreakdownCard(b, personFilter){
     const el = $('#breakdownCard');
     if(!el) return;
     const total = Math.max(b.cash, 0) + Math.max(b.fundValue, 0) + Math.max(b.metalValue, 0);
@@ -1293,6 +1314,17 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
         + '<div class="t-item"><div class="t-label">Toplam Ana Para</div><div class="t-val">'+fmt(b.totalPrincipal)+'</div></div>'
         + '<div class="t-item" style="text-align:right;"><div class="t-label">Toplam Kâr/Zarar</div><div class="t-val" style="color:'+(b.investProfit>=0?'var(--income)':'var(--expense)')+';">'+(b.investProfit>=0?'+':'')+fmt(b.investProfit)+'</div></div>'
       + '</div>';
+
+    const sourceRows = principalBySource(personFilter);
+    if(sourceRows.length > 0){
+      el.innerHTML +=
+        '<div class="breakdown-source-title">Ana Para · Kaynağa Göre</div>'
+        + '<div class="breakdown-source-list">'
+          + sourceRows.map(function(r){
+              return '<div class="breakdown-source-row"><span>'+esc(r.name)+'</span><span class="num">'+fmt(r.amount)+'</span></div>';
+            }).join('')
+        + '</div>';
+    }
   }
 
   function renderOzet(){
@@ -1301,7 +1333,7 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
     const b = investmentBreakdown(S.ozetPerson);
     $('#heroTotal').textContent = fmt(b.grandTotal);
     $('#heroBreakdown').textContent = 'Nakit '+fmt(b.cash)+' · Yatırım '+fmt(b.investValue);
-    renderBreakdownCard(b);
+    renderBreakdownCard(b, S.ozetPerson);
     const range = periodRange('thisMonth');
     let incEntries = S.incomeEntries, expEntries = S.expenseEntries;
     if(S.ozetPerson!=='all'){
