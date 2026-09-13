@@ -31,6 +31,8 @@
   --gold:#C99A2E;
   --gold-ink:#8A6A1E;
   --gold-soft:#FBF3DD;
+  --cash:#4A90A4;
+  --cash-soft:#E6F2F5;
   --radius:20px;
   --radius-sm:14px;
   --shadow:0 1px 2px rgba(16,17,28,0.04), 0 8px 24px rgba(16,17,28,0.07);
@@ -55,6 +57,8 @@
     --gold:#E4B94F;
     --gold-ink:#F2CD73;
     --gold-soft:#3A2E12;
+    --cash:#6FC3D9;
+    --cash-soft:#123238;
     --shadow:0 1px 2px rgba(0,0,0,0.35), 0 10px 30px rgba(0,0,0,0.4);
     color-scheme: dark;
   }
@@ -77,6 +81,8 @@
   --gold:#E4B94F;
   --gold-ink:#F2CD73;
   --gold-soft:#3A2E12;
+  --cash:#6FC3D9;
+  --cash-soft:#123238;
   --shadow:0 1px 2px rgba(0,0,0,0.35), 0 10px 30px rgba(0,0,0,0.4);
   color-scheme: dark;
 }
@@ -246,6 +252,32 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
 .source-grid .cell .l{font-size:10px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:0.03em;}
 .source-grid .cell .v{font-size:13px;font-weight:700;margin-top:2px;}
 
+.breakdown-card{background:var(--surface);border:1px solid var(--hairline);border-radius:var(--radius-sm);padding:16px 15px;box-shadow:var(--shadow);margin-top:14px;}
+.breakdown-card .card-title{font-size:12.5px;font-weight:700;color:var(--ink-faint);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:12px;}
+.breakdown-stack{display:flex;height:12px;border-radius:99px;overflow:hidden;background:var(--surface-2);}
+.breakdown-stack .seg{height:100%;}
+.breakdown-stack .seg.cash{background:var(--cash);}
+.breakdown-stack .seg.fund{background:var(--accent);}
+.breakdown-stack .seg.metal{background:var(--gold);}
+.breakdown-legend{display:flex;flex-wrap:wrap;gap:5px 14px;font-size:11.5px;color:var(--ink-soft);margin:9px 0 14px;}
+.breakdown-legend .dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:5px;position:relative;top:0.5px;}
+.breakdown-legend .dot.cash{background:var(--cash);}
+.breakdown-legend .dot.fund{background:var(--accent);}
+.breakdown-legend .dot.metal{background:var(--gold);}
+.breakdown-rows{display:flex;flex-direction:column;gap:8px;}
+.breakdown-row{display:flex;justify-content:space-between;align-items:center;padding:11px 12px;background:var(--surface-2);border-radius:12px;}
+.breakdown-row .label{display:flex;align-items:center;gap:9px;font-weight:600;font-size:13.5px;}
+.breakdown-row .label .dot{width:9px;height:9px;border-radius:50%;flex:none;}
+.breakdown-row .amounts{text-align:right;}
+.breakdown-row .amounts .main{font-weight:700;font-size:14px;}
+.breakdown-row .amounts .sub{font-size:11px;color:var(--ink-faint);margin-top:2px;}
+.breakdown-row .amounts .sub .profit-pos{color:var(--income);font-weight:600;}
+.breakdown-row .amounts .sub .profit-neg{color:var(--expense);font-weight:600;}
+.breakdown-totals{display:flex;justify-content:space-between;gap:10px;margin-top:12px;padding-top:12px;border-top:1px solid var(--hairline);}
+.breakdown-totals .t-item{flex:1;}
+.breakdown-totals .t-label{font-size:10.5px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:0.03em;}
+.breakdown-totals .t-val{font-size:14.5px;font-weight:700;margin-top:3px;}
+
 .holding-card{background:var(--surface);border:1px solid var(--hairline);border-radius:var(--radius-sm);padding:14px 15px;box-shadow:var(--shadow);margin-bottom:10px;cursor:pointer;}
 .holding-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
 .holding-material{font-weight:700;font-size:14.5px;}
@@ -371,6 +403,8 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
           <div class="hero-stat"><div class="l">Bu Ay Gider</div><div class="v num" id="heroExpenseMonth">₺0,00</div></div>
         </div>
       </div>
+
+      <div class="breakdown-card" id="breakdownCard"></div>
 
       <div class="section-title" style="display:flex;align-items:center;justify-content:space-between;">
         <span>Gelir Kaynakları</span>
@@ -901,16 +935,38 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
   // current value of every investment (precious-metal holding + remaining fund lot) owned by this person
   // (or everyone, when personFilter is 'all') -- used for the Özet hero's "Genel Toplam" (nakit + yatırım).
   function totalInvestmentValue(personFilter){
-    let value = 0;
-    S.savingsHoldings.forEach(function(h){
-      if(personFilter && personFilter!=='all' && h.personId!==personFilter) return;
-      value += holdingMetrics(h).value;
-    });
+    return investmentBreakdown(personFilter).investValue;
+  }
+  // full nakit / yatırım fonu / kıymetli metal dağılımı + her birinin ana para / kâr ayrımı
+  // (Özet hero'nun altındaki "Dağılım" dashboard'u için).
+  function investmentBreakdown(personFilter){
+    const cash = totalBalance(personFilter).balance;
+    let fundCost = 0, fundValue = 0;
     S.fundLots.forEach(function(l){
       if(personFilter && personFilter!=='all' && l.personId!==personFilter) return;
-      value += fundLotMetrics(l).value;
+      const m = fundLotMetrics(l);
+      fundCost += m.cost; fundValue += m.value;
     });
-    return value;
+    let metalCost = 0, metalValue = 0;
+    S.savingsHoldings.forEach(function(h){
+      if(personFilter && personFilter!=='all' && h.personId!==personFilter) return;
+      const m = holdingMetrics(h);
+      metalCost += m.cost; metalValue += m.value;
+    });
+    const fundProfit = fundValue - fundCost;
+    const metalProfit = metalValue - metalCost;
+    const investValue = fundValue + metalValue;
+    const investCost = fundCost + metalCost;
+    const investProfit = fundProfit + metalProfit;
+    const grandTotal = cash + investValue;
+    const totalPrincipal = cash + investCost;
+    return {
+      cash,
+      fundCost, fundValue, fundProfit,
+      metalCost, metalValue, metalProfit,
+      investValue, investCost, investProfit,
+      grandTotal, totalPrincipal
+    };
   }
   function unifiedEntries(personFilter){
     let inc = S.incomeEntries.map(e=>({
@@ -1175,14 +1231,54 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
   }
 
   // ---------- render: özet ----------
+  // Özet hero'nun altındaki "Dağılım" dashboard'u: nakit/fon/metal payları (stacked bar + legend)
+  // ve her kategorinin ana para / kâr ayrımı, artı genel ana para/kâr toplamı.
+  function renderBreakdownCard(b){
+    const el = $('#breakdownCard');
+    if(!el) return;
+    const total = Math.max(b.cash, 0) + Math.max(b.fundValue, 0) + Math.max(b.metalValue, 0);
+    const pct = function(part){ return total > 0 ? Math.max(0, part) / total * 100 : 0; };
+    const cashPct = pct(b.cash), fundPct = pct(b.fundValue), metalPct = pct(b.metalValue);
+
+    const profitSpan = function(v){
+      const cls = v >= 0 ? 'profit-pos' : 'profit-neg';
+      const sign = v >= 0 ? '+' : '';
+      return '<span class="'+cls+'">'+sign+fmt(v)+'</span>';
+    };
+
+    el.innerHTML =
+      '<div class="card-title">Dağılım</div>'
+      + '<div class="breakdown-stack">'
+        + (cashPct > 0 ? '<div class="seg cash" style="width:'+cashPct+'%"></div>' : '')
+        + (fundPct > 0 ? '<div class="seg fund" style="width:'+fundPct+'%"></div>' : '')
+        + (metalPct > 0 ? '<div class="seg metal" style="width:'+metalPct+'%"></div>' : '')
+      + '</div>'
+      + '<div class="breakdown-legend">'
+        + '<span><span class="dot cash"></span>Nakit · '+fmt(b.cash)+'</span>'
+        + '<span><span class="dot fund"></span>Yatırım Fonu · '+fmt(b.fundValue)+'</span>'
+        + '<span><span class="dot metal"></span>Kıymetli Metal · '+fmt(b.metalValue)+'</span>'
+      + '</div>'
+      + '<div class="breakdown-rows">'
+        + '<div class="breakdown-row"><div class="label"><span class="dot cash" style="width:9px;height:9px;border-radius:50%;display:inline-block;background:var(--cash);"></span>Nakit</div>'
+          + '<div class="amounts"><div class="main">'+fmt(b.cash)+'</div></div></div>'
+        + '<div class="breakdown-row"><div class="label"><span class="dot fund" style="width:9px;height:9px;border-radius:50%;display:inline-block;background:var(--accent);"></span>Yatırım Fonu</div>'
+          + '<div class="amounts"><div class="main">'+fmt(b.fundValue)+'</div><div class="sub">Ana Para '+fmt(b.fundCost)+' · '+profitSpan(b.fundProfit)+'</div></div></div>'
+        + '<div class="breakdown-row"><div class="label"><span class="dot metal" style="width:9px;height:9px;border-radius:50%;display:inline-block;background:var(--gold);"></span>Kıymetli Metal</div>'
+          + '<div class="amounts"><div class="main">'+fmt(b.metalValue)+'</div><div class="sub">Ana Para '+fmt(b.metalCost)+' · '+profitSpan(b.metalProfit)+'</div></div></div>'
+      + '</div>'
+      + '<div class="breakdown-totals">'
+        + '<div class="t-item"><div class="t-label">Toplam Ana Para</div><div class="t-val">'+fmt(b.totalPrincipal)+'</div></div>'
+        + '<div class="t-item" style="text-align:right;"><div class="t-label">Toplam Kâr/Zarar</div><div class="t-val" style="color:'+(b.investProfit>=0?'var(--income)':'var(--expense)')+';">'+(b.investProfit>=0?'+':'')+fmt(b.investProfit)+'</div></div>'
+      + '</div>';
+  }
+
   function renderOzet(){
     renderPersonChips('ozetPersonChips', S.ozetPerson, function(val){ S.ozetPerson = val; renderOzet(); });
 
-    const tot = totalBalance(S.ozetPerson);
-    const investTotal = totalInvestmentValue(S.ozetPerson);
-    const grandTotal = tot.balance + investTotal;
-    $('#heroTotal').textContent = fmt(grandTotal);
-    $('#heroBreakdown').textContent = 'Nakit '+fmt(tot.balance)+' · Yatırım '+fmt(investTotal);
+    const b = investmentBreakdown(S.ozetPerson);
+    $('#heroTotal').textContent = fmt(b.grandTotal);
+    $('#heroBreakdown').textContent = 'Nakit '+fmt(b.cash)+' · Yatırım '+fmt(b.investValue);
+    renderBreakdownCard(b);
     const range = periodRange('thisMonth');
     let incEntries = S.incomeEntries, expEntries = S.expenseEntries;
     if(S.ozetPerson!=='all'){
