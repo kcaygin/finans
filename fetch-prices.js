@@ -40,8 +40,18 @@ async function fetchZiraat() {
 }
 
 async function fetchDunya() {
+  // Gerçek bir tarayıcıya benzer başlıklar gönderiyoruz: bazı siteler
+  // "bot gibi görünen" User-Agent'ları (ör. "KFT-price-fetcher/1.0") farklı
+  // bir içerikle (ör. bir doğrulama/engelleme sayfasıyla) yanıtlayabiliyor,
+  // bu da GitHub Actions'tan çalışırken -- kullanıcının kendi tarayıcısından
+  // farklı olarak -- satırların bulunamamasını açıklayabilir.
   const res = await fetch('https://dunyakatilim.com.tr/gunluk-kurlar', {
-    headers: { 'User-Agent': 'Mozilla/5.0 (compatible; KFT-price-fetcher/1.0)' }
+    headers: {
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36',
+      'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+      'Accept-Language': 'tr-TR,tr;q=0.9,en-US;q=0.8,en;q=0.7',
+      'Referer': 'https://dunyakatilim.com.tr/'
+    }
   });
   if (!res.ok) throw new Error('Dünya Katılım isteği başarısız: HTTP ' + res.status);
   const html = decodeHtmlEntities(await res.text());
@@ -59,7 +69,21 @@ async function fetchDunya() {
 
   const altin = extractRow('Alt[ıi]n \\(XAU\\)');
   const gumus = extractRow('G[üu]m[üu][şs] \\(XAG\\)');
-  if (!altin || !gumus) throw new Error('Dünya Katılım sayfasında Altın/Gümüş satırları bulunamadı (sayfa yapısı değişmiş olabilir)');
+  if (!altin || !gumus) {
+    // Teşhis bilgisi: bir sonraki hata bu satırları içerecek, böylece asıl
+    // problemin "sayfa yapısı değişti" mi yoksa "farklı bir sayfa döndü"
+    // (ör. engelleme/doğrulama sayfası) mı olduğunu tek seferde anlayabiliriz.
+    const diag = {
+      httpStatus: res.status,
+      htmlLength: html.length,
+      hasXAU: /XAU/i.test(html),
+      hasXAG: /XAG/i.test(html),
+      hasAltinWord: /Alt[ıi]n/i.test(html),
+      hasGumusWord: /G[üu]m[üu][şs]/i.test(html),
+      htmlStart: html.slice(0, 200)
+    };
+    throw new Error('Dünya Katılım sayfasında Altın/Gümüş satırları bulunamadı (sayfa yapısı değişmiş olabilir). Teşhis: ' + JSON.stringify(diag));
+  }
 
   return {
     altinAlis: altin.buy,
