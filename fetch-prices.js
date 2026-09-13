@@ -21,6 +21,23 @@ function decodeHtmlEntities(str) {
     .replace(/&#(\d+);/g, (_, dec) => String.fromCodePoint(parseInt(dec, 10)));
 }
 
+function describeError(e) {
+  // Node'un fetch()'i ağ seviyesinde bir sorun olduğunda (bağlantı reddi, zaman
+  // aşımı, DNS hatası, TLS hatası...) sadece genel "fetch failed" mesajı verir --
+  // asıl sebep e.cause içinde saklı kalır ve normalde loglanmaz. Bunu da
+  // logladığımızda, sorunun "site erişilemez durumda" mı yoksa "bağlantı
+  // GitHub Actions'ın IP'sinden reddediliyor" mu olduğunu ayırt edebiliriz.
+  const parts = [(e && e.message) || String(e)];
+  let cause = e && e.cause;
+  let depth = 0;
+  while (cause && depth < 5) {
+    parts.push('cause: ' + (cause.code ? cause.code + ' - ' : '') + (cause.message || String(cause)));
+    cause = cause.cause;
+    depth++;
+  }
+  return parts.join(' | ');
+}
+
 // Gerçek bir Chrome tarayıcısına benzer istek başlıkları -- bazı siteler bot gibi
 // görünen isteklere (ör. özel bir User-Agent) farklı/eksik içerik döndürebiliyor.
 const BROWSER_HEADERS = {
@@ -150,14 +167,14 @@ async function fetchTefasFund(code) {
   try {
     result.ziraatKatilim = await fetchZiraat();
   } catch (e) {
-    console.error('Ziraat Katılım çekilemedi:', e.message);
+    console.error('Ziraat Katılım çekilemedi:', describeError(e));
     hadError = true;
   }
 
   try {
     result.dunyaKatilim = await fetchDunya();
   } catch (e) {
-    console.error('Dünya Katılım çekilemedi:', e.message);
+    console.error('Dünya Katılım çekilemedi:', describeError(e));
     hadError = true;
   }
 
@@ -166,7 +183,7 @@ async function fetchTefasFund(code) {
     try {
       result.fonFiyatlari[code] = await fetchTefasFund(code);
     } catch (e) {
-      console.error('TEFAS ' + code + ' çekilemedi:', e.message);
+      console.error('TEFAS ' + code + ' çekilemedi:', describeError(e));
       hadError = true;
     }
   }
