@@ -1052,6 +1052,35 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
     S.fundSales = S.fundSales.filter(s=>s.id!==saleId);
   }
 
+  // ---------- which gelir kaynağı (income source) funded which investment ----------
+  // aggregates current cost/value/profit of every precious-metal holding and every
+  // remaining (unsold) fund lot that was recorded as funded by this income type,
+  // so a "gelir kaynağı" card can show what its money is currently doing in Birikim.
+  function incomeTypeInvestmentStats(typeId){
+    let cost = 0, value = 0;
+    S.savingsHoldings.forEach(function(h){
+      if(h.incomeTypeId !== typeId) return;
+      const m = holdingMetrics(h);
+      cost += m.cost; value += m.value;
+    });
+    S.fundLots.forEach(function(l){
+      if(l.incomeTypeId !== typeId) return;
+      const m = fundLotMetrics(l);
+      cost += m.cost; value += m.value;
+    });
+    return {cost: cost, value: value, profit: value - cost, hasInvestment: cost>0 || value>0};
+  }
+  // <select> options for "which gelir kaynağı funded this investment" pickers, scoped to one person
+  function fundingIncomeTypeOptionsHtml(personId, selectedId){
+    const types = S.incomeTypes.filter(function(t){ return !t.archived && t.personId===personId; });
+    let html = '<option value=""'+(!selectedId?' selected':'')+'>— Belirtilmedi —</option>';
+    html += types.map(function(t){
+      const b = potBalance(t.id);
+      return '<option value="'+t.id+'"'+(t.id===selectedId?' selected':'')+'>'+esc(t.name)+' — bakiye '+fmt(b.balance)+'</option>';
+    }).join('');
+    return html;
+  }
+
   // ---------- person chips (shared renderer) ----------
   function renderPersonChips(containerId, current, onChange){
     const el = $('#'+containerId);
@@ -1147,7 +1176,11 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
       grid.innerHTML = types.map(t=>{
         const b = potBalance(t.id);
         const cls = b.balance < 0 ? 'neg' : 'pos';
-        return '<div class="pot-card" data-id="'+t.id+'" style="cursor:pointer;"><div><div class="pot-name">'+esc(t.name)+' <span class="pot-person">· '+esc(personName(t.personId))+'</span></div><div class="pot-sub">Gelen '+fmt(b.income)+' · Harcanan '+fmt(b.spent)+'</div></div><div class="pot-balance num '+cls+'">'+fmt(b.balance)+'</div></div>';
+        const inv = incomeTypeInvestmentStats(t.id);
+        const invLine = inv.hasInvestment
+          ? '<div class="pot-sub">Yatırım '+fmt(inv.value)+' <span style="color:'+(inv.profit>=0?'var(--income)':'var(--expense)')+';font-weight:600;">('+(inv.profit>=0?'+':'')+fmt(inv.profit)+' '+(inv.profit>=0?'kâr':'zarar')+')</span></div>'
+          : '';
+        return '<div class="pot-card" data-id="'+t.id+'" style="cursor:pointer;"><div><div class="pot-name">'+esc(t.name)+' <span class="pot-person">· '+esc(personName(t.personId))+'</span></div><div class="pot-sub">Gelen '+fmt(b.income)+' · Harcanan '+fmt(b.spent)+'</div>'+invLine+'</div><div class="pot-balance num '+cls+'">'+fmt(b.balance)+'</div></div>';
       }).join('');
       grid.querySelectorAll('.pot-card').forEach(function(card){
         card.addEventListener('click', ()=> openIncomeTypeSheet(card.dataset.id));
@@ -1172,6 +1205,8 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
     const t = isNew ? {personId: defaultPersonId, name:'', archived:false} : S.incomeTypes.find(x=>x.id===id);
     if(!t) return;
     const persons = S.people.filter(p=>!p.archived);
+    const inv = isNew ? {hasInvestment:false} : incomeTypeInvestmentStats(t.id);
+    const potB = isNew ? {income:0, spent:0, balance:0} : potBalance(t.id);
 
     content.innerHTML =
       '<div class="sheet-handle"></div>'
@@ -1180,6 +1215,14 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
         + persons.map(p=>'<option value="'+p.id+'"'+(p.id===t.personId?' selected':'')+'>'+esc(p.name)+'</option>').join('')
         + '</select></div>'
       + '<div class="field"><label>Ad</label><input type="text" id="it_name" value="'+esc(t.name)+'" placeholder="Örn: Maaş"></div>'
+      + (!isNew ? '<div class="holding-bottom source-grid" style="grid-template-columns:1fr 1fr;margin:4px 0 14px;"><div class="cell"><div class="l">Nakit Bakiye</div><div class="v num">'+fmt(potB.balance)+'</div></div>'
+          + (inv.hasInvestment
+            ? '<div class="cell"><div class="l">Yatırım (güncel değer)</div><div class="v num">'+fmt(inv.value)+'</div></div>'
+              + '<div class="cell"><div class="l">Yatırım Maliyeti</div><div class="v num">'+fmt(inv.cost)+'</div></div>'
+              + '<div class="cell"><div class="l">Yatırım Kâr/Zarar</div><div class="v num" style="color:'+(inv.profit>=0?'var(--income)':'var(--expense)')+';">'+(inv.profit>=0?'+':'')+fmt(inv.profit)+'</div></div>'
+            : '<div class="cell"><div class="l">Yatırım</div><div class="v num">Yok</div></div>')
+          + '</div>'
+        : '')
       + '<div class="sheet-actions">'
       + (isNew ? '' : '<button type="button" class="btn-ghost" id="it_archive">'+(t.archived?'Arşivden Çıkar':'Arşivle')+'</button>')
       + (isNew ? '' : '<button type="button" class="btn-danger" id="it_delete">Sil</button>')
@@ -1553,7 +1596,7 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
     const overlay = $('#sheetOverlay');
     const content = $('#sheetContent');
     const isNew = !id;
-    const h = isNew ? {personId:S.addPersonId, material:'', bank:'', quantity:'', unit:'gram', purchasePrice:'', purchaseDate:todayStr(), currentPrice:'', note:''} : S.savingsHoldings.find(x=>x.id===id);
+    const h = isNew ? {personId:S.addPersonId, material:'', bank:'', quantity:'', unit:'gram', purchasePrice:'', purchaseDate:todayStr(), currentPrice:'', note:'', incomeTypeId:''} : S.savingsHoldings.find(x=>x.id===id);
     if(!h) return;
 
     const persons = S.people.filter(p=>!p.archived);
@@ -1564,6 +1607,8 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
       + '<div class="field"><label>Kişi</label><select id="h_person">'
         + persons.map(p=>'<option value="'+p.id+'"'+(p.id===h.personId?' selected':'')+'>'+esc(p.name)+'</option>').join('')
         + '</select></div>'
+      + '<div class="field"><label>Gelir Kaynağı (opsiyonel)</label><select id="h_incometype">'+fundingIncomeTypeOptionsHtml(h.personId, h.incomeTypeId)+'</select>'
+        + '<div class="field-hint" style="margin-top:6px;">Bu varlığı hangi gelir kaynağının parasıyla aldıysan seç — o kaynağın kartında bu yatırımın güncel değeri ve kâr/zararı da gösterilir.</div></div>'
       + '<div class="field"><label>Materyal</label><input type="text" id="h_material" list="materialOptions" value="'+esc(h.material)+'" placeholder="Örn: Gram Altın"></div>'
       + '<datalist id="materialOptions">' + MATERIAL_PRESETS.map(m=>'<option value="'+esc(m)+'">').join('') + '</datalist>'
       + '<div class="field"><label>Banka</label><input type="text" id="h_bank" value="'+esc(h.bank)+'" placeholder="Örn: İş Bankası"></div>'
@@ -1596,9 +1641,13 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
     updatePriceHint();
     $('#h_material').addEventListener('input', updatePriceHint);
     $('#h_bank').addEventListener('input', updatePriceHint);
+    $('#h_person').addEventListener('change', ()=>{
+      $('#h_incometype').innerHTML = fundingIncomeTypeOptionsHtml($('#h_person').value, '');
+    });
 
     $('#h_save').addEventListener('click', async ()=>{
       const personId = $('#h_person').value;
+      const incomeTypeId = $('#h_incometype').value || null;
       const material = $('#h_material').value.trim();
       const bank = $('#h_bank').value.trim();
       const quantity = parseFloat($('#h_quantity').value);
@@ -1610,7 +1659,7 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
       if(!material){ toast('Materyal adı gir'); return; }
       if(!quantity || quantity<=0){ toast('Geçerli bir miktar gir'); return; }
       if(!purchasePrice || purchasePrice<0){ toast('Geçerli bir alış fiyatı gir'); return; }
-      const data = {personId, personName: personName(personId), material, bank, quantity, unit, purchasePrice, purchaseDate, currentPrice, note};
+      const data = {personId, personName: personName(personId), incomeTypeId, material, bank, quantity, unit, purchasePrice, purchaseDate, currentPrice, note};
       if(currentPrice > 0 && getGroupPrice(material, bank) == null){
         await setGroupPrice(material, bank, currentPrice);
       }
@@ -1766,7 +1815,7 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
     const content = $('#sheetContent');
     const isNew = !id;
     const l = isNew
-      ? {personId:S.addPersonId, fundName:(FUND_PRESETS[0]||''), quantity:'', purchasePrice:'', purchaseDate:todayStr(), note:''}
+      ? {personId:S.addPersonId, fundName:(FUND_PRESETS[0]||''), quantity:'', purchasePrice:'', purchaseDate:todayStr(), note:'', incomeTypeId:''}
       : S.fundLots.find(x=>x.id===id);
     if(!l) return;
 
@@ -1780,6 +1829,8 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
       + '<div class="field"><label>Kişi</label><select id="fl_person"'+(locked?' disabled':'')+'>'
         + persons.map(p=>'<option value="'+p.id+'"'+(p.id===l.personId?' selected':'')+'>'+esc(p.name)+'</option>').join('')
         + '</select></div>'
+      + '<div class="field"><label>Gelir Kaynağı (opsiyonel)</label><select id="fl_incometype"'+(locked?' disabled':'')+'>'+fundingIncomeTypeOptionsHtml(l.personId, l.incomeTypeId)+'</select>'
+        + '<div class="field-hint" style="margin-top:6px;">Bu alışı hangi gelir kaynağının parasıyla yaptıysan seç — o kaynağın kartında bu yatırımın güncel değeri ve kâr/zararı da gösterilir.</div></div>'
       + '<div class="field"><label>Fon Adı</label><input type="text" id="fl_name" list="fundNameOptions" value="'+esc(l.fundName)+'" placeholder="Örn: EP1"'+(locked?' disabled':'')+'></div>'
       + '<datalist id="fundNameOptions">' + fundNameOptionsHtml() + '</datalist>'
       + '<div class="field"><label>Adet</label><input type="number" step="0.0001" min="0" id="fl_quantity" class="num-input" value="'+(l.quantity||'')+'"'+(locked?' disabled':'')+'></div>'
@@ -1793,8 +1844,15 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
 
     overlay.classList.add('open');
 
+    if(!locked){
+      $('#fl_person').addEventListener('change', ()=>{
+        $('#fl_incometype').innerHTML = fundingIncomeTypeOptionsHtml($('#fl_person').value, '');
+      });
+    }
+
     $('#fl_save').addEventListener('click', async ()=>{
       const personId = $('#fl_person').value;
+      const incomeTypeId = $('#fl_incometype').value || null;
       const fundName = $('#fl_name').value.trim();
       const quantity = parseFloat($('#fl_quantity').value);
       const purchasePrice = parseFloat($('#fl_price').value);
@@ -1811,7 +1869,7 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
       if(!fundName){ toast('Fon adı gir'); return; }
       if(!quantity || quantity<=0){ toast('Geçerli bir adet gir'); return; }
       if(!purchasePrice || purchasePrice<0){ toast('Geçerli bir alış fiyatı gir'); return; }
-      const data = {personId, fundName, quantity, remainingQuantity: quantity, purchasePrice, purchaseDate, note};
+      const data = {personId, incomeTypeId, fundName, quantity, remainingQuantity: quantity, purchasePrice, purchaseDate, note};
       if(isNew){
         const row = await S.store.add('fund_lots', data);
         S.fundLots.push(row);
