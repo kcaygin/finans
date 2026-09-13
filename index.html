@@ -479,7 +479,8 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
 
     <!-- BİRİKİM -->
     <section id="view-birikim" class="view">
-      <div class="breakdown-card" id="birikimOverviewCard" style="margin-top:14px;"></div>
+      <div class="chips" id="birikimOverviewPersonChips" style="margin-top:14px;"></div>
+      <div class="breakdown-card" id="birikimOverviewCard" style="margin-top:12px;"></div>
 
       <div class="segmented" id="birikimSubTabs">
         <button type="button" data-sub="metal" class="active">Kıymetli Maden</button>
@@ -751,7 +752,7 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
     people:[], incomeTypes:[], expenseCategories:[], incomeEntries:[], expenseEntries:[], savingsHoldings:[], materialPrices:[],
     fundLots:[], fundSales:[], fundPrices:[],
     view:'ozet', addMode:'gider', addPersonId:null,
-    ozetPerson:'all', raporPerson:'all', kayitlarPerson:'all', birikimPerson:'all', fundPerson:'all',
+    ozetPerson:'all', raporPerson:'all', kayitlarPerson:'all', birikimPerson:'all', fundPerson:'all', birikimOverviewPerson:'all',
     reportPeriod:'thisMonth', recordFilter:'all', holdingsFilter:'all', birikimSubView:'metal',
     raporExpandedTypes:{}, // {incomeTypeId: true} -- which "Kaynağa Göre" cards are expanded to show their hareketler
     editing:null // {kind:'gelir'|'gider'|'varlik', id}
@@ -1557,13 +1558,18 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
   function renderBirikimOverview(){
     const el = $('#birikimOverviewCard');
     if(!el) return;
+    renderPersonChips('birikimOverviewPersonChips', S.birikimOverviewPerson, function(val){ S.birikimOverviewPerson = val; renderBirikimOverview(); });
+    const personFilter = S.birikimOverviewPerson;
+
     let fundCost = 0, fundValue = 0;
     S.fundLots.forEach(function(l){
+      if(personFilter && personFilter!=='all' && l.personId!==personFilter) return;
       const m = fundLotMetrics(l);
       fundCost += m.cost; fundValue += m.value;
     });
     let metalCost = 0, metalValue = 0;
     S.savingsHoldings.forEach(function(h){
+      if(personFilter && personFilter!=='all' && h.personId!==personFilter) return;
       const m = holdingMetrics(h);
       metalCost += m.cost; metalValue += m.value;
     });
@@ -1581,8 +1587,9 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
       return '<span class="'+cls+'">'+sign+fmt(v)+'</span>';
     };
 
+    const scopeLabel = personFilter && personFilter!=='all' ? esc(personName(personFilter)) : 'Tüm Kişiler';
     el.innerHTML =
-      '<div class="card-title">Birikim Özeti · Tüm Kişiler</div>'
+      '<div class="card-title">Birikim Özeti · '+scopeLabel+'</div>'
       + '<div class="num" style="font-size:25px;font-weight:800;margin-bottom:3px;">'+fmt(totalValue)+'</div>'
       + '<div style="font-size:12.5px;color:var(--ink-soft);margin-bottom:12px;">Ana Para '+fmt(totalCost)+' · '+profitSpan(totalProfit)+' '+(totalProfit>=0?'kâr':'zarar')+'</div>'
       + '<div class="breakdown-stack">'
