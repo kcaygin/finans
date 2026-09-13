@@ -2033,6 +2033,37 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
   }
 
   // ---------- fund sale detail / reverse sheet ----------
+  // lots for person+fund with THIS sale's consumption virtually un-done -- lets us preview
+  // "what if I change this sale's numbers" (or check feasibility) without touching the store yet.
+  function lotsWithVirtualRestore(personId, fundName, excludeSale){
+    const restoreMap = {};
+    if(excludeSale){
+      (excludeSale.lotBreakdown||[]).forEach(function(b){ restoreMap[b.lotId] = (restoreMap[b.lotId]||0) + Number(b.qty); });
+    }
+    return S.fundLots
+      .filter(function(l){ return l.personId===personId && fundKey(l.fundName)===fundKey(fundName); })
+      .map(function(l){ return { id:l.id, purchaseDate:l.purchaseDate||'', createdAt:l.createdAt||'', purchasePrice:Number(l.purchasePrice||0), remaining: lotRemaining(l) + (restoreMap[l.id]||0) }; })
+      .filter(function(l){ return l.remaining > 1e-9; })
+      .sort(function(a,b){
+        if(a.purchaseDate !== b.purchaseDate) return a.purchaseDate < b.purchaseDate ? -1 : 1;
+        return a.createdAt < b.createdAt ? -1 : 1;
+      });
+  }
+  // applies an edit to an existing sale: undoes its old lot consumption, then re-applies FIFO
+  // with the new numbers. Throws insufficient_units (without changing anything) if the new
+  // quantity can't be covered once the old sale's units are given back.
+  async function updateFundSale(sale, newQuantity, newSalePrice, newSaleDate, newNote){
+    const virtualLots = lotsWithVirtualRestore(sale.personId, sale.fundName, sale);
+    const available = virtualLots.reduce(function(s,l){ return s+l.remaining; }, 0);
+    if(newQuantity > available + 1e-9){
+      const err = new Error('insufficient_units');
+      err.available = available;
+      throw err;
+    }
+    await reverseFundSale(sale.id);
+    return await recordFundSale(sale.personId, sale.fundName, newQuantity, newSalePrice, newSaleDate, newNote);
+  }
+
   function openFundSaleDetailSheet(id){
     const overlay = $('#sheetOverlay');
     const content = $('#sheetContent');
@@ -2041,23 +2072,67 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
 
     content.innerHTML =
       '<div class="sheet-handle"></div>'
-      + '<div class="sheet-title">Satış Detayı</div>'
-      + '<div class="field-hint" style="margin-bottom:12px;">'+esc(s.fundName)+' · '+esc(personName(s.personId))+' · '+dayLabel(s.saleDate)+'</div>'
-      + '<div class="holding-bottom source-grid" style="grid-template-columns:1fr 1fr;margin-bottom:14px;">'
-      + '<div class="cell"><div class="l">Satış Adedi</div><div class="v num">'+fmtNum(s.quantity,4)+'</div></div>'
-      + '<div class="cell"><div class="l">Satış Fiyatı</div><div class="v num">'+fmt(s.salePrice)+'</div></div>'
-      + '<div class="cell"><div class="l">Maliyet</div><div class="v num">'+fmt(s.costBasis)+'</div></div>'
-      + '<div class="cell"><div class="l">Brüt Kâr</div><div class="v num">'+fmt(s.grossProfit)+'</div></div>'
-      + '<div class="cell"><div class="l">Stopaj (%17,5)</div><div class="v num">'+fmt(s.stopaj)+'</div></div>'
-      + '<div class="cell"><div class="l">Net Kâr</div><div class="v num">'+fmt(s.netProfit)+'</div></div>'
-      + '</div>'
-      + (s.note ? '<div class="field-hint" style="margin-bottom:12px;">Not: '+esc(s.note)+'</div>' : '')
-      + '<div class="field-hint" style="margin-bottom:12px;">Bu satışı silersen, düştüğü alışlara adetleri geri eklenir.</div>'
+      + '<div class="sheet-title">Satışı Düzenle</div>'
+      + '<div class="field-hint" style="margin-bottom:12px;">'+esc(s.fundName)+' · '+esc(personName(s.personId))+' — kişi ve fon adı değiştirilemez.</div>'
+      + '<div class="field"><label>Satış Adedi</label><input type="number" step="0.0001" min="0" id="fsd_quantity" class="num-input" value="'+s.quantity+'"></div>'
+      + '<div class="field"><label>Satış Fiyatı (birim başına, ₺)</label><input type="number" step="0.0001" min="0" id="fsd_price" class="num-input" value="'+s.salePrice+'"></div>'
+      + '<div class="field"><label>Satış Tarihi</label><input type="date" id="fsd_date" value="'+(s.saleDate||todayStr())+'"></div>'
+      + '<div class="field"><label>Not</label><input type="text" id="fsd_note" value="'+esc(s.note||'')+'"></div>'
+      + '<div class="field-hint" id="fsd_preview_hint" style="margin-bottom:4px;"></div>'
+      + '<div class="field-hint" style="margin-bottom:12px;">Değişiklik kaydedersen, bu satış önce geri alınır ve yeni sayılarla FIFO olarak yeniden uygulanır. Silersen düştüğü alışlara adetleri geri eklenir.</div>'
       + '<div class="sheet-actions">'
       + '<button type="button" class="btn-danger" id="fsd_delete">Satışı Sil (Geri Al)</button>'
+      + '<button type="button" class="btn-ghost" id="fsd_save">Kaydet</button>'
       + '</div>';
 
     overlay.classList.add('open');
+
+    function updatePreview(){
+      const qty = parseFloat($('#fsd_quantity').value);
+      const price = parseFloat($('#fsd_price').value);
+      const hint = $('#fsd_preview_hint');
+      if(!qty || qty<=0 || !price || price<=0){ hint.textContent = ''; return; }
+      const virtualLots = lotsWithVirtualRestore(s.personId, s.fundName, s);
+      const available = virtualLots.reduce(function(a,l){ return a+l.remaining; }, 0);
+      if(qty > available + 1e-9){ hint.textContent = 'Yetersiz adet — geri alınca elde sadece '+fmtNum(available,4)+' olur.'; return; }
+      let toSell = qty, costBasis = 0;
+      for(const lot of virtualLots){
+        if(toSell<=1e-9) break;
+        const take = Math.min(lot.remaining, toSell);
+        costBasis += take * lot.purchasePrice;
+        toSell -= take;
+      }
+      const proceeds = qty*price;
+      const grossProfit = proceeds - costBasis;
+      const stopaj = grossProfit>0 ? grossProfit*0.175 : 0;
+      const netProfit = grossProfit - stopaj;
+      hint.textContent = 'Maliyet: '+fmt(costBasis)+' · Brüt Kâr: '+fmt(grossProfit)+' · Stopaj: '+fmt(stopaj)+' · Net Kâr: '+fmt(netProfit);
+    }
+    updatePreview();
+    $('#fsd_quantity').addEventListener('input', updatePreview);
+    $('#fsd_price').addEventListener('input', updatePreview);
+
+    $('#fsd_save').addEventListener('click', async ()=>{
+      const quantity = parseFloat($('#fsd_quantity').value);
+      const salePrice = parseFloat($('#fsd_price').value);
+      const saleDate = $('#fsd_date').value || todayStr();
+      const note = $('#fsd_note').value.trim();
+      if(!quantity || quantity<=0){ toast('Geçerli bir satış adedi gir'); return; }
+      if(!salePrice || salePrice<=0){ toast('Geçerli bir satış fiyatı gir'); return; }
+      try{
+        await updateFundSale(s, quantity, salePrice, saleDate, note);
+        toast('Satış güncellendi');
+        closeSheet();
+        renderFundView();
+      } catch(e){
+        if(e && e.message==='insufficient_units'){
+          toast('Yetersiz adet — geri alınca elde sadece '+fmtNum(e.available,4)+' olur');
+        } else {
+          console.error('fund sale update failed', e);
+          toast('Güncellenemedi, tekrar dene');
+        }
+      }
+    });
 
     $('#fsd_delete').addEventListener('click', async ()=>{
       const btn = $('#fsd_delete');
