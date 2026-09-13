@@ -1151,6 +1151,26 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
     });
     return {cost: cost, value: value, profit: value - cost, hasInvestment: cost>0 || value>0};
   }
+  // investments (holding/fund lot) that aren't tagged to any of the currently-visible income sources
+  // (never tagged, or tagged to an archived/deleted one) -- so Gelir Kaynakları's per-source kâr figures
+  // can always be reconciled against the Dağılım dashboard's overall total.
+  function unassignedInvestmentStats(personFilter, visibleTypes){
+    const validIds = new Set((visibleTypes||[]).map(t=>t.id));
+    let cost = 0, value = 0;
+    S.savingsHoldings.forEach(function(h){
+      if(personFilter && personFilter!=='all' && h.personId!==personFilter) return;
+      if(h.incomeTypeId && validIds.has(h.incomeTypeId)) return;
+      const m = holdingMetrics(h);
+      cost += m.cost; value += m.value;
+    });
+    S.fundLots.forEach(function(l){
+      if(personFilter && personFilter!=='all' && l.personId!==personFilter) return;
+      if(l.incomeTypeId && validIds.has(l.incomeTypeId)) return;
+      const m = fundLotMetrics(l);
+      cost += m.cost; value += m.value;
+    });
+    return {cost: cost, value: value, profit: value - cost, hasInvestment: cost>0 || value>0};
+  }
   // <select> options for "which gelir kaynağı funded this investment" pickers, scoped to one person
   function fundingIncomeTypeOptionsHtml(personId, selectedId){
     const types = S.incomeTypes.filter(function(t){ return !t.archived && t.personId===personId; });
@@ -1294,10 +1314,11 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
     let types = S.incomeTypes.filter(t=>!t.archived);
     if(S.ozetPerson!=='all') types = types.filter(t=>t.personId===S.ozetPerson);
     const grid = $('#potGrid');
-    if(types.length===0){
+    const unassigned = unassignedInvestmentStats(S.ozetPerson, types);
+    if(types.length===0 && !unassigned.hasInvestment){
       grid.innerHTML = '<div class="empty">Henüz gelir kaynağı yok. Yukarıdaki + ile ekleyebilirsin.</div>';
     } else {
-      grid.innerHTML = types.map(t=>{
+      let html = types.map(t=>{
         const b = potBalance(t.id);
         const cls = b.balance < 0 ? 'neg' : 'pos';
         const inv = incomeTypeInvestmentStats(t.id);
@@ -1306,7 +1327,19 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
           : '';
         return '<div class="pot-card" data-id="'+t.id+'" style="cursor:pointer;"><div><div class="pot-name">'+esc(t.name)+' <span class="pot-person">· '+esc(personName(t.personId))+'</span></div><div class="pot-sub">Gelen '+fmt(b.income)+' · Harcanan '+fmt(b.spent)+'</div>'+invLine+'</div><div class="pot-balance num '+cls+'">'+fmt(b.balance)+'</div></div>';
       }).join('');
+      // reconciliation card: any holding/fund lot not tagged to one of the sources above, so the
+      // Gelir Kaynakları kâr toplamı can always be made to match the Dağılım card's toplam kâr.
+      if(unassigned.hasInvestment){
+        html += '<div class="pot-card unassigned" style="cursor:default;border-style:dashed;">'
+          + '<div><div class="pot-name">Kaynağı Belirtilmemiş <span class="pot-person">· yatırım</span></div>'
+          + '<div class="pot-sub">Bir gelir kaynağına bağlanmamış yatırımlar (fon + kıymetli maden)</div>'
+          + '<div class="pot-sub">Yatırım '+fmt(unassigned.value)+' <span style="color:'+(unassigned.profit>=0?'var(--income)':'var(--expense)')+';font-weight:600;">('+(unassigned.profit>=0?'+':'')+fmt(unassigned.profit)+' '+(unassigned.profit>=0?'kâr':'zarar')+')</span></div></div>'
+          + '<div class="pot-balance num" style="color:var(--ink-faint);">'+fmt(unassigned.value)+'</div>'
+          + '</div>';
+      }
+      grid.innerHTML = html;
       grid.querySelectorAll('.pot-card').forEach(function(card){
+        if(!card.dataset.id) return;
         card.addEventListener('click', ()=> openIncomeTypeSheet(card.dataset.id));
       });
     }
