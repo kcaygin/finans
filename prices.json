@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-13T22:36:40.102Z",
+  "updatedAt": "2026-09-13T22:45:11.720Z",
   "ziraatKatilim": {
     "altinAlis": 6073.9718,
     "altinSatis": 7659.3441,
@@ -7,10 +7,10 @@
     "gumusSatis": 113.2542
   },
   "dunyaKatilim": {
-    "altinAlis": 6719.8795,
-    "altinSatis": 6755.4785,
-    "gumusAlis": 99.6493,
-    "gumusSatis": 100.2219
+    "altinAlis": 6722.2975,
+    "altinSatis": 6758.4931,
+    "gumusAlis": 99.6785,
+    "gumusSatis": 100.2499
   },
   "fonFiyatlari": {}
 }
