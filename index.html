@@ -121,15 +121,30 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
 .section-title:first-child{margin-top:6px;}
 
 .hero{
-  background:linear-gradient(155deg, var(--accent-ink), var(--accent));color:#fff;border-radius:var(--radius);padding:22px 22px 20px;
-  box-shadow:var(--shadow);
+  position:relative; overflow:hidden; isolation:isolate;
+  background:
+    radial-gradient(130% 160% at 105% -25%, rgba(255,255,255,0.30), rgba(255,255,255,0) 55%),
+    radial-gradient(90% 130% at -15% 115%, rgba(255,255,255,0.18), rgba(255,255,255,0) 55%),
+    linear-gradient(150deg, var(--accent-ink) 0%, var(--accent) 55%, #8B8FFB 100%);
+  color:#fff;border-radius:calc(var(--radius) + 4px);padding:24px 22px 22px;
+  box-shadow:0 20px 44px -16px rgba(91,95,239,0.55), inset 0 1px 0 rgba(255,255,255,0.25);
 }
-.hero-label{font-size:12.5px;color:rgba(255,255,255,0.75);letter-spacing:0.03em;}
-.hero-amount{font-size:34px;font-weight:600;margin-top:4px;line-height:1.1;}
-.hero-row{display:flex;gap:10px;margin-top:16px;}
-.hero-stat{flex:1;background:rgba(255,255,255,0.14);border-radius:12px;padding:10px 12px;}
-.hero-stat .l{font-size:11px;color:rgba(255,255,255,0.75);}
-.hero-stat .v{font-size:16px;font-weight:600;margin-top:2px;}
+.hero::after{
+  content:'';
+  position:absolute; top:-40%; right:-18%; width:70%; height:140%;
+  background:radial-gradient(closest-side, rgba(255,255,255,0.16), rgba(255,255,255,0) 70%);
+  pointer-events:none; z-index:0;
+}
+.hero-label,.hero-amount,.hero-row{position:relative; z-index:1;}
+.hero-label{font-size:12.5px;color:rgba(255,255,255,0.78);letter-spacing:0.04em;text-transform:uppercase;font-weight:600;}
+.hero-amount{font-size:35px;font-weight:700;margin-top:6px;line-height:1.1;letter-spacing:-0.01em;font-family:'Plus Jakarta Sans',sans-serif;}
+.hero-row{display:flex;gap:10px;margin-top:18px;}
+.hero-stat{
+  flex:1;background:rgba(255,255,255,0.14);border:1px solid rgba(255,255,255,0.18);
+  border-radius:14px;padding:11px 13px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+}
+.hero-stat .l{font-size:11px;color:rgba(255,255,255,0.78);}
+.hero-stat .v{font-size:16.5px;font-weight:700;margin-top:3px;}
 
 .pot-grid{display:flex;flex-direction:column;gap:10px;}
 .pot-card{
@@ -427,7 +442,10 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
         <div class="stat-tile"><div class="l">Kar/Zarar</div><div class="v num" id="bKar">₺0,00</div></div>
       </div>
 
-      <button type="button" class="btn-primary gold" id="addHoldingBtn" style="margin-top:18px;">+ Yeni Varlık Ekle</button>
+      <div style="display:flex;gap:10px;margin-top:18px;">
+        <button type="button" class="btn-primary gold" id="addHoldingBtn" style="flex:1;margin-top:0;">+ Yeni Varlık Ekle</button>
+        <button type="button" class="btn-ghost" id="updatePricesBtn" style="flex:1;margin-top:0;">Fiyatları Güncelle</button>
+      </div>
 
       <div class="section-title">Materyale Göre Dağılım</div>
       <div id="materialBars"></div>
@@ -513,7 +531,7 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
   var LOCAL_PREFIX = 'kft_v1_';
   var GH_CFG_KEY = 'kft_github_cfg_v1';
   var PIN_KEY = 'kft_pin_hash_v1';
-  var COLLECTIONS = ['people','income_types','expense_categories','income_entries','expense_entries','savings_holdings'];
+  var COLLECTIONS = ['people','income_types','expense_categories','income_entries','expense_entries','savings_holdings','material_prices'];
 
   function getGithubConfig(){
     try{ var raw = window.localStorage.getItem(GH_CFG_KEY); return raw ? JSON.parse(raw) : null; }catch(e){ return null; }
@@ -646,7 +664,7 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
   // ---------- app state ----------
   const S = {
     store:null,
-    people:[], incomeTypes:[], expenseCategories:[], incomeEntries:[], expenseEntries:[], savingsHoldings:[],
+    people:[], incomeTypes:[], expenseCategories:[], incomeEntries:[], expenseEntries:[], savingsHoldings:[], materialPrices:[],
     view:'ozet', addMode:'gider', addPersonId:null,
     ozetPerson:'all', raporPerson:'all', kayitlarPerson:'all', birikimPerson:'all',
     reportPeriod:'thisMonth', recordFilter:'all',
@@ -727,6 +745,7 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
     S.incomeEntries = results[3];
     S.expenseEntries = results[4];
     S.savingsHoldings = results[5];
+    S.materialPrices = results[6];
     if(!S.addPersonId || !S.people.find(p=>p.id===S.addPersonId)){
       const active = S.people.find(p=>!p.archived);
       S.addPersonId = active ? active.id : (S.people[0] ? S.people[0].id : null);
@@ -810,6 +829,7 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
       S.savingsHoldings.push(row);
     }
     try{ window.localStorage.setItem(SS_IMPORT_FLAG, '1'); }catch(e){}
+    await migrateMaterialPricesIfNeeded();
   }
 
   // ---------- derived ----------
@@ -842,13 +862,52 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
       return (a.createdAt < b.createdAt) ? 1 : -1;
     });
   }
+  // ---------- shared material/bank current prices ----------
+  function materialPriceKey(material, bank){
+    return String(material||'').trim().toLowerCase() + '||' + String(bank||'').trim().toLowerCase();
+  }
+  function getGroupPrice(material, bank){
+    const key = materialPriceKey(material, bank);
+    const row = S.materialPrices.find(p=>materialPriceKey(p.material, p.bank)===key);
+    return row ? Number(row.price) : null;
+  }
+  async function setGroupPrice(material, bank, price){
+    const key = materialPriceKey(material, bank);
+    const existing = S.materialPrices.find(p=>materialPriceKey(p.material, p.bank)===key);
+    if(existing){
+      await S.store.update('material_prices', existing.id, {price});
+      existing.price = price;
+    } else {
+      const row = await S.store.add('material_prices', {material, bank, price});
+      S.materialPrices.push(row);
+    }
+  }
+  // one-time, safe migration: derive initial shared prices from existing holdings
+  // so previously imported/entered data keeps showing the exact same kar/zarar
+  // until someone explicitly updates a group's price via "Fiyatları Güncelle".
+  async function migrateMaterialPricesIfNeeded(){
+    if(S.materialPrices.length > 0 || S.savingsHoldings.length === 0) return;
+    const seen = {};
+    for(const h of S.savingsHoldings){
+      const key = materialPriceKey(h.material, h.bank);
+      if(seen[key]) continue;
+      seen[key] = true;
+      const price = Number(h.currentPrice||0);
+      if(price > 0){
+        const row = await S.store.add('material_prices', {material: h.material, bank: h.bank, price});
+        S.materialPrices.push(row);
+      }
+    }
+  }
   function holdingMetrics(h){
     const qty = Number(h.quantity||0);
     const cost = Number(h.purchasePrice||0) * qty;
-    const value = Number(h.currentPrice||0) * qty;
+    const groupPrice = getGroupPrice(h.material, h.bank);
+    const effectivePrice = groupPrice != null ? groupPrice : Number(h.currentPrice||0);
+    const value = effectivePrice * qty;
     const profit = value - cost;
     const pct = cost > 0 ? (profit/cost*100) : 0;
-    return {cost, value, profit, pct};
+    return {cost, value, profit, pct, effectivePrice, hasGroupPrice: groupPrice != null};
   }
 
   // ---------- person chips (shared renderer) ----------
@@ -1076,9 +1135,10 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
           + '<div class="holding-sub">'+esc(h.bank||'—')+' · '+fmtNum(h.quantity)+' '+esc(h.unit||'')+'</div></div>'
           + '<div class="holding-profit '+cls+'">'+sign+fmt(m.profit)+'<div class="holding-profit-pct">'+(m.cost>0?(sign+fmtNum(m.pct,1)+'%'):'')+'</div></div>'
           + '</div>'
-          + '<div class="holding-bottom source-grid">'
+          + '<div class="holding-bottom source-grid" style="grid-template-columns:1fr 1fr 1fr 1fr;">'
           + '<div class="cell"><div class="l">Miktar</div><div class="v num">'+fmtNum(h.quantity)+' '+esc(h.unit||'')+'</div></div>'
           + '<div class="cell"><div class="l">Maliyet</div><div class="v num">'+fmt(m.cost)+'</div></div>'
+          + '<div class="cell"><div class="l">Güncel Fiyat'+(m.hasGroupPrice?' · ortak':'')+'</div><div class="v num">'+fmt(m.effectivePrice)+'</div></div>'
           + '<div class="cell"><div class="l">Güncel Değer</div><div class="v num">'+fmt(m.value)+'</div></div>'
           + '</div>'
           + '</div>';
@@ -1111,7 +1171,8 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
       + '<div class="field"><label>Birim</label><select id="h_unit"><option value="gram"'+(h.unit==='gram'?' selected':'')+'>gram</option><option value="adet"'+(h.unit==='adet'?' selected':'')+'>adet</option></select></div>'
       + '<div class="field"><label>Alış Fiyatı (birim başına, ₺)</label><input type="number" step="0.01" min="0" id="h_purchaseprice" class="num-input" value="'+(h.purchasePrice||'')+'"></div>'
       + '<div class="field"><label>Alış Tarihi</label><input type="date" id="h_purchasedate" value="'+(h.purchaseDate||todayStr())+'"></div>'
-      + '<div class="field"><label>Güncel Fiyat (birim başına, ₺)</label><input type="number" step="0.01" min="0" id="h_currentprice" class="num-input" value="'+(h.currentPrice||'')+'"></div>'
+      + '<div class="field"><label>Güncel Fiyat (birim başına, ₺)</label><input type="number" step="0.01" min="0" id="h_currentprice" class="num-input" value="'+(h.currentPrice||'')+'">'
+        + '<div class="field-hint" id="h_price_hint" style="margin-top:6px;"></div></div>'
       + '<div class="field"><label>Not</label><input type="text" id="h_note" value="'+esc(h.note||'')+'"></div>'
       + '<div class="sheet-actions">'
       + (isNew ? '' : '<button type="button" class="btn-danger" id="h_delete">Sil</button>')
@@ -1119,6 +1180,22 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
       + '</div>';
 
     overlay.classList.add('open');
+
+    function updatePriceHint(){
+      const mat = $('#h_material').value.trim();
+      const bank = $('#h_bank').value.trim();
+      const hintEl = $('#h_price_hint');
+      if(!mat){ hintEl.textContent = ''; return; }
+      const gp = getGroupPrice(mat, bank);
+      if(gp != null){
+        hintEl.textContent = 'Bu materyal + banka için ortak güncel fiyat: '+fmt(gp)+' — tüm ilgili varlıklarda otomatik kullanılır. Bu alan sadece ortak fiyat silinirse yedek olarak devreye girer. Fiyatı değiştirmek için "Fiyatları Güncelle"yi kullan.';
+      } else {
+        hintEl.textContent = 'Bu materyal + banka için henüz ortak fiyat yok. Buraya gireceğin değer, bu materyal/bankadaki tüm varlıklar için başlangıç ortak fiyatı olacak.';
+      }
+    }
+    updatePriceHint();
+    $('#h_material').addEventListener('input', updatePriceHint);
+    $('#h_bank').addEventListener('input', updatePriceHint);
 
     $('#h_save').addEventListener('click', async ()=>{
       const personId = $('#h_person').value;
@@ -1134,6 +1211,9 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
       if(!quantity || quantity<=0){ toast('Geçerli bir miktar gir'); return; }
       if(!purchasePrice || purchasePrice<0){ toast('Geçerli bir alış fiyatı gir'); return; }
       const data = {personId, personName: personName(personId), material, bank, quantity, unit, purchasePrice, purchaseDate, currentPrice, note};
+      if(currentPrice > 0 && getGroupPrice(material, bank) == null){
+        await setGroupPrice(material, bank, currentPrice);
+      }
       if(isNew){
         const row = await S.store.add('savings_holdings', data);
         S.savingsHoldings.push(row);
@@ -1162,6 +1242,61 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
         renderBirikim();
       });
     }
+  }
+
+  function openPricesSheet(){
+    const overlay = $('#sheetOverlay');
+    const content = $('#sheetContent');
+
+    const groups = [];
+    const seen = {};
+    S.savingsHoldings.forEach(function(h){
+      const key = materialPriceKey(h.material, h.bank);
+      if(seen[key]) return;
+      seen[key] = true;
+      groups.push({material: h.material, bank: h.bank});
+    });
+    groups.sort(function(a,b){ return (a.material+'|'+a.bank).localeCompare(b.material+'|'+b.bank, 'tr'); });
+
+    let html = '<div class="sheet-handle"></div><div class="sheet-title">Fiyatları Güncelle</div>';
+    if(groups.length===0){
+      html += '<div class="empty">Önce Birikim\'e en az bir varlık ekle.</div>';
+    } else {
+      html += '<div class="field-hint" style="margin-bottom:14px;">Buraya girdiğin fiyat, aynı materyal + banka kombinasyonuna sahip tüm kişilerin tüm alışlarında otomatik kullanılır — her alışı tek tek güncellemene gerek yok.</div>';
+      html += groups.map(function(g, i){
+        const cur = getGroupPrice(g.material, g.bank);
+        return '<div class="price-row" data-idx="'+i+'" style="display:flex;gap:8px;align-items:flex-end;margin-bottom:12px;">'
+          + '<div style="flex:1;min-width:0;"><div style="font-weight:700;font-family:\'Plus Jakarta Sans\',sans-serif;">'+esc(g.material)+'</div><div style="font-size:12.5px;color:var(--ink-faint);">'+esc(g.bank||'Banka belirtilmemiş')+'</div></div>'
+          + '<input type="number" step="0.01" min="0" class="num-input price-input" style="width:110px;flex:none;" data-material="'+esc(g.material)+'" data-bank="'+esc(g.bank||'')+'" value="'+(cur!=null?cur:'')+'" placeholder="₺">'
+          + '<button type="button" class="btn-ghost price-save-btn" style="flex:none;width:auto;padding:12px 14px;margin-top:0;" data-material="'+esc(g.material)+'" data-bank="'+esc(g.bank||'')+'">Kaydet</button>'
+          + '</div>';
+      }).join('');
+    }
+    content.innerHTML = html;
+    overlay.classList.add('open');
+
+    content.querySelectorAll('.price-save-btn').forEach(function(btn){
+      btn.addEventListener('click', async function(){
+        const row = btn.closest('.price-row');
+        const input = row.querySelector('.price-input');
+        const price = parseFloat(input.value);
+        if(!price || price<=0){ toast('Geçerli bir fiyat gir'); return; }
+        const originalLabel = btn.textContent;
+        btn.textContent = '…';
+        btn.disabled = true;
+        try{
+          await setGroupPrice(btn.dataset.material, btn.dataset.bank, price);
+          btn.textContent = 'Kaydedildi ✓';
+          renderBirikim();
+          setTimeout(function(){ if(btn.isConnected){ btn.textContent = originalLabel; btn.disabled = false; } }, 1200);
+        } catch(e){
+          console.error('price save failed', e);
+          btn.textContent = originalLabel;
+          btn.disabled = false;
+          toast('Kaydedilemedi, tekrar dene');
+        }
+      });
+    });
   }
 
   // ---------- render: rapor ----------
@@ -1635,6 +1770,7 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
     $$('#recordChips .chip').forEach(c=>c.addEventListener('click', ()=>{ S.recordFilter = c.dataset.rf; renderKayitlar(); }));
 
     $('#addHoldingBtn').addEventListener('click', ()=> openHoldingSheet(null));
+    $('#updatePricesBtn').addEventListener('click', ()=> openPricesSheet());
 
     $('#settingsBtn').addEventListener('click', openSettingsSheet);
   }
@@ -1665,6 +1801,7 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
 
     await loadAll();
     await seedIfNeeded();
+    await migrateMaterialPricesIfNeeded();
 
     bindStatic();
     $('#f_date').value = todayStr();
