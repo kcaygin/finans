@@ -21,6 +21,19 @@ function decodeHtmlEntities(str) {
     .replace(/&#(\d+);/g, (_, dec) => String.fromCodePoint(parseInt(dec, 10)));
 }
 
+// Gerçek bir Chrome tarayıcısına benzer istek başlıkları -- bazı siteler bot gibi
+// görünen isteklere (ör. özel bir User-Agent) farklı/eksik içerik döndürebiliyor.
+const BROWSER_HEADERS = {
+  'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36',
+  'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+  'Accept-Language': 'tr-TR,tr;q=0.9,en-US;q=0.8,en;q=0.7'
+};
+
+// Uygulamada "Fon Adı" olarak girilen fonlardan otomatik fiyat çekilecek olanlar --
+// buradaki kod TEFAS'taki gerçek fon koduyla birebir aynı olmalı (örn. "EP1").
+// Yeni bir fon eklenirse buraya da eklenmesi gerekir.
+const TEFAS_FUND_CODES = ['EP1'];
+
 async function fetchZiraat() {
   const res = await fetch('https://www.ziraatkatilim.com.tr/ajax/piyasalar', {
     headers: { 'User-Agent': 'Mozilla/5.0 (compatible; KFT-price-fetcher/1.0)' }
@@ -46,12 +59,7 @@ async function fetchDunya() {
   // bu da GitHub Actions'tan çalışırken -- kullanıcının kendi tarayıcısından
   // farklı olarak -- satırların bulunamamasını açıklayabilir.
   const res = await fetch('https://dunyakatilim.com.tr/gunluk-kurlar', {
-    headers: {
-      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36',
-      'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
-      'Accept-Language': 'tr-TR,tr;q=0.9,en-US;q=0.8,en;q=0.7',
-      'Referer': 'https://dunyakatilim.com.tr/'
-    }
+    headers: Object.assign({}, BROWSER_HEADERS, { 'Referer': 'https://dunyakatilim.com.tr/' })
   });
   if (!res.ok) throw new Error('Dünya Katılım isteği başarısız: HTTP ' + res.status);
   const html = decodeHtmlEntities(await res.text());
@@ -93,6 +101,47 @@ async function fetchDunya() {
   };
 }
 
+async function fetchTefasFund(code) {
+  // TEFAS'ın kendi iç API'si (fonFiyatBilgiGetir) tarayıcıdan yapılmayan
+  // isteklerde "Sistem Hatası!!" döndürüyor (muhtemelen bir bot/CSRF koruması) --
+  // ama fon detay sayfası bir gerçek tarayıcı sekmesinde açıldığında sunucu
+  // tarafında (SSR) tam render edilmiş HTML geliyor ve "Son Fiyat (TL)" değeri
+  // düz metin olarak sayfada yer alıyor. Bir tarayıcının fetch()'i (Sec-Fetch-Mode:
+  // cors) ile aynı adrese gidildiğinde ise site daha küçük, verisiz bir "kabuk"
+  // sayfa döndürüyor -- muhtemelen isteğin gerçek bir sayfa açılışı (navigation)
+  // olup olmadığına bakıyor. Node'un fetch()'i tarayıcı gibi bu başlıkları
+  // engellemediği için, gerçek bir sayfa açılışını taklit etmeye çalışıyoruz.
+  const res = await fetch('https://www.tefas.gov.tr/tr/fon-detayli-analiz/' + encodeURIComponent(code), {
+    headers: Object.assign({}, BROWSER_HEADERS, {
+      'Referer': 'https://www.tefas.gov.tr/',
+      'Sec-Fetch-Dest': 'document',
+      'Sec-Fetch-Mode': 'navigate',
+      'Sec-Fetch-Site': 'none',
+      'Sec-Fetch-User': '?1',
+      'Upgrade-Insecure-Requests': '1'
+    })
+  });
+  if (!res.ok) throw new Error('TEFAS (' + code + ') isteği başarısız: HTTP ' + res.status);
+  const html = await res.text();
+
+  const re = /Son Fiyat \(TL\)<\/p>[\s\S]{0,800}?<p class="[^"]*">([\d.,]+)<\/p>/i;
+  const m = html.match(re);
+  if (!m) {
+    const diag = {
+      httpStatus: res.status,
+      htmlLength: html.length,
+      hasLabel: /Son Fiyat/i.test(html),
+      htmlStart: html.slice(0, 200)
+    };
+    // Küçük bir htmlLength (~7KB) + hasLabel:false, sitenin veri içermeyen bir
+    // "kabuk" sayfa döndürdüğünü gösterir -- yani gerçek sayfa içeriğini değil,
+    // muhtemelen bir bot/otomasyon koruması araya girmiş demektir.
+    throw new Error('TEFAS ' + code + ' fon fiyatı sayfada bulunamadı (sayfa yapısı değişmiş, ya da site otomatik isteklere farklı/verisiz bir sayfa döndürüyor olabilir). Teşhis: ' + JSON.stringify(diag));
+  }
+
+  return { fiyat: parseTR(m[1]) };
+}
+
 (async () => {
   const fs = await import('node:fs');
   const result = { updatedAt: new Date().toISOString() };
@@ -112,19 +161,36 @@ async function fetchDunya() {
     hadError = true;
   }
 
+  result.fonFiyatlari = {};
+  for (const code of TEFAS_FUND_CODES) {
+    try {
+      result.fonFiyatlari[code] = await fetchTefasFund(code);
+    } catch (e) {
+      console.error('TEFAS ' + code + ' çekilemedi:', e.message);
+      hadError = true;
+    }
+  }
+
+  const anyFundOk = Object.keys(result.fonFiyatlari).length > 0;
+
   // en az bir kaynak başarılıysa dosyayı yaz (eskisini tamamen boşaltmayalım)
-  if (result.ziraatKatilim || result.dunyaKatilim) {
+  if (result.ziraatKatilim || result.dunyaKatilim || anyFundOk) {
     let previous = {};
     try { previous = JSON.parse(fs.readFileSync('prices.json', 'utf8')); } catch (e) {}
     if (!result.ziraatKatilim && previous.ziraatKatilim) result.ziraatKatilim = previous.ziraatKatilim;
     if (!result.dunyaKatilim && previous.dunyaKatilim) result.dunyaKatilim = previous.dunyaKatilim;
+    if (previous.fonFiyatlari) {
+      for (const code of Object.keys(previous.fonFiyatlari)) {
+        if (!result.fonFiyatlari[code]) result.fonFiyatlari[code] = previous.fonFiyatlari[code];
+      }
+    }
     fs.writeFileSync('prices.json', JSON.stringify(result, null, 2) + '\n');
     console.log(JSON.stringify(result, null, 2));
   } else {
     console.error('Hiçbir kaynaktan veri alınamadı, prices.json değiştirilmedi.');
   }
 
-  if (hadError && !result.ziraatKatilim && !result.dunyaKatilim) {
+  if (hadError && !result.ziraatKatilim && !result.dunyaKatilim && !anyFundOk) {
     process.exit(1);
   }
 })();

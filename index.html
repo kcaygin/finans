@@ -2389,12 +2389,14 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
     if(groups.length===0){
       html += '<div class="empty">Önce en az bir fon alışı ekle.</div>';
     } else {
-      html += '<div class="field-hint" style="margin-bottom:14px;">Buraya girdiğin fiyat, o fondaki tüm kalan (satılmamış) adetlerin güncel değerini ve gerçekleşmemiş kâr/zararını hesaplamak için kullanılır.</div>';
+      html += '<div class="field-hint" style="margin-bottom:10px;">Buraya girdiğin fiyat, o fondaki tüm kalan (satılmamış) adetlerin güncel değerini ve gerçekleşmemiş kâr/zararını hesaplamak için kullanılır.</div>'
+        + '<button type="button" class="btn-ghost" id="fetchFundPricesBtn" style="margin-top:0;margin-bottom:6px;">↻ TEFAS\'tan Fiyat Çek</button>'
+        + '<div id="fetchFundPricesStatus" class="field-hint" style="margin-bottom:14px;"></div>';
       html += groups.map(function(name, i){
         const cur = getFundPrice(name);
         return '<div class="price-row" data-idx="'+i+'" style="display:flex;gap:8px;align-items:flex-end;margin-bottom:12px;">'
           + '<div style="flex:1;min-width:0;font-weight:700;font-family:\'Plus Jakarta Sans\',sans-serif;">'+esc(name)+'</div>'
-          + '<input type="number" step="0.0001" min="0" class="num-input fund-price-input" style="width:110px;flex:none;" data-fund="'+esc(name)+'" value="'+(cur!=null?cur:'')+'" placeholder="₺">'
+          + '<input type="number" step="0.000001" min="0" class="num-input fund-price-input" style="width:110px;flex:none;" data-fund="'+esc(name)+'" value="'+(cur!=null?cur:'')+'" placeholder="₺">'
           + '<button type="button" class="btn-ghost fund-price-save-btn" style="flex:none;width:auto;padding:12px 14px;margin-top:0;" data-fund="'+esc(name)+'">Kaydet</button>'
           + '</div>';
       }).join('');
@@ -2424,6 +2426,51 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
         }
       });
     });
+
+    const fetchFundBtn = $('#fetchFundPricesBtn');
+    if(fetchFundBtn){
+      fetchFundBtn.addEventListener('click', async function(){
+        const statusEl = $('#fetchFundPricesStatus');
+        const originalLabel = fetchFundBtn.textContent;
+        fetchFundBtn.textContent = 'Çekiliyor…';
+        fetchFundBtn.disabled = true;
+        statusEl.textContent = '';
+        try{
+          const res = await fetch('./prices.json?t=' + Date.now(), {cache:'no-store'});
+          if(!res.ok) throw new Error('not_found');
+          const data = await res.json();
+          const filled = applyFetchedFundPrices(data, content);
+          if(filled === 0){
+            statusEl.textContent = 'Dosya okundu ama eşleşen fon bulunamadı (fon adı TEFAS fon koduyla aynı olmalı, örn. "EP1").';
+          } else {
+            const when = data.updatedAt ? new Date(data.updatedAt).toLocaleString('tr-TR') : '';
+            statusEl.textContent = filled + ' fon dolduruldu (kaynak güncellemesi: ' + when + '). Kontrol edip her satırın "Kaydet" butonuna basmayı unutma.';
+          }
+        } catch(e){
+          console.error('fetch fund prices failed', e);
+          statusEl.textContent = 'prices.json okunamadı. Bu özellik için GitHub reponda otomatik fiyat çekme workflow\'unun kurulu olması gerekiyor — henüz kurmadıysan bana söyle, adım adım ekleyelim.';
+        }
+        fetchFundBtn.textContent = originalLabel;
+        fetchFundBtn.disabled = false;
+      });
+    }
+  }
+
+  // fills matching .fund-price-input fields from a fetched prices.json payload (TEFAS fon fiyatları); returns how many were filled
+  function applyFetchedFundPrices(data, container){
+    let filled = 0;
+    if(!data.fonFiyatlari) return filled;
+    const byKey = {};
+    Object.keys(data.fonFiyatlari).forEach(function(code){ byKey[fundKey(code)] = data.fonFiyatlari[code]; });
+    container.querySelectorAll('.fund-price-input').forEach(function(input){
+      const src = byKey[fundKey(input.dataset.fund)];
+      if(!src || src.fiyat == null || isNaN(src.fiyat)) return;
+      input.value = Number(src.fiyat);
+      input.style.outline = '2px solid var(--accent)';
+      setTimeout(function(){ input.style.outline = ''; }, 2000);
+      filled++;
+    });
+    return filled;
   }
 
   // ---------- render: rapor ----------
@@ -2994,5 +3041,4 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
   }
 })();
 </script>
-
 </html>
