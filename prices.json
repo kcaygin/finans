@@ -1,16 +1,15 @@
 {
-  "updatedAt": "2026-09-13T22:45:11.720Z",
+  "updatedAt": "2026-09-14T11:12:31.443Z",
   "ziraatKatilim": {
-    "altinAlis": 6073.9718,
-    "altinSatis": 7659.3441,
-    "gumusAlis": 89.6204,
-    "gumusSatis": 113.2542
+    "altinAlis": 6633.8733,
+    "altinSatis": 6844.449,
+    "gumusAlis": 97.2294,
+    "gumusSatis": 100.5358
   },
   "dunyaKatilim": {
-    "altinAlis": 6722.2975,
-    "altinSatis": 6758.4931,
-    "gumusAlis": 99.6785,
-    "gumusSatis": 100.2499
-  },
-  "fonFiyatlari": {}
+    "altinAlis": 6656.2493,
+    "altinSatis": 6688.1366,
+    "gumusAlis": 98.0095,
+    "gumusSatis": 98.5141
+  }
 }
