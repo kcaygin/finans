@@ -192,8 +192,18 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
 .segmented button{
   flex:1;border:none;background:transparent;padding:9px 0;border-radius:9px;font-family:inherit;
   font-size:14px;font-weight:700;color:var(--ink-soft);cursor:pointer;
+  transition:background .18s ease,color .18s ease,box-shadow .18s ease,transform .18s ease;
 }
 .segmented button.active{background:var(--surface);color:var(--ink);box-shadow:var(--shadow);}
+
+#birikimSubTabs{padding:4px;border-radius:16px;background:var(--surface-2);border:1px solid var(--hairline);}
+#birikimSubTabs button{
+  padding:12px 0;border-radius:12px;font-size:14.5px;display:flex;align-items:center;justify-content:center;gap:7px;
+}
+#birikimSubTabs button .sub-dot{width:8px;height:8px;border-radius:50%;background:currentColor;opacity:0.35;flex:none;transition:opacity .18s ease;}
+#birikimSubTabs button.active .sub-dot{opacity:1;}
+#birikimSubTabs button[data-sub="metal"].active{background:var(--gold-soft);color:var(--gold-ink);box-shadow:var(--shadow);transform:translateY(-1px);}
+#birikimSubTabs button[data-sub="fund"].active{background:var(--accent-soft);color:var(--accent-ink);box-shadow:var(--shadow);transform:translateY(-1px);}
 
 .field{margin-top:16px;}
 .field label{display:block;font-size:12.5px;font-weight:700;color:var(--ink-soft);margin-bottom:6px;}
@@ -202,6 +212,9 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
   padding:12px 13px;font-family:'IBM Plex Sans',sans-serif;font-size:15px;color:var(--ink);
 }
 .field input.num-input{font-family:'IBM Plex Mono',monospace;font-size:19px;font-weight:600;}
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0;}
+input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
 .field select{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%236B6F86' stroke-width='2'%3E%3Cpath d='M6 8l4 4 4-4'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:34px;}
 .field-hint{font-size:11.5px;color:var(--ink-faint);margin-top:5px;}
 .quickadd-toggle{background:none;border:none;color:var(--accent-ink);font-size:12px;font-weight:700;padding:6px 0 0;cursor:pointer;font-family:inherit;}
@@ -349,14 +362,6 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
 }
 .banner.show{display:block;}
 
-.lock-screen{
-  position:fixed;inset:0;background:var(--bg);z-index:999;
-  display:none;align-items:center;justify-content:center;padding:20px;
-}
-.lock-screen.show{display:flex;}
-.lock-card{width:100%;max-width:300px;text-align:center;}
-.lock-title{font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:20px;}
-.lock-sub{font-size:13px;color:var(--ink-faint);margin-top:4px;}
 .lock-error{font-size:12.5px;color:var(--expense);margin-top:10px;min-height:16px;}
 
 .settings-section{margin-top:8px;}
@@ -370,17 +375,6 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
 .settings-subhead{font-size:12px;font-weight:700;color:var(--accent-ink);margin:14px 0 8px;}
 .settings-subhead:first-child{margin-top:0;}
 </style>
-
-<div id="lockScreen" class="lock-screen">
-  <div class="lock-card">
-    <div class="brand-mark" style="margin:0 auto 16px;">KFT</div>
-    <div class="lock-title">Uygulama Kilitli</div>
-    <div class="lock-sub">Devam etmek için PIN gir</div>
-    <input type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" id="lockInput" class="num-input" placeholder="••••" autocomplete="off" style="text-align:center;letter-spacing:6px;margin-top:16px;">
-    <button type="button" id="lockSubmit" class="btn-primary" style="margin-top:14px;">Aç</button>
-    <div class="lock-error" id="lockError"></div>
-  </div>
-</div>
 
 <div id="app">
   <div class="topbar">
@@ -489,8 +483,8 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
       <div class="breakdown-card" id="birikimOverviewCard" style="margin-top:12px;"></div>
 
       <div class="segmented" id="birikimSubTabs">
-        <button type="button" data-sub="metal" class="active">Kıymetli Maden</button>
-        <button type="button" data-sub="fund">Yatırım Fonları</button>
+        <button type="button" data-sub="metal" class="active"><span class="sub-dot"></span>Kıymetli Maden</button>
+        <button type="button" data-sub="fund"><span class="sub-dot"></span>Yatırım Fonları</button>
       </div>
 
       <div id="birikimMetalPane">
@@ -621,7 +615,6 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
   // ---------- storage layer ----------
   var LOCAL_PREFIX = 'kft_v1_';
   var GH_CFG_KEY = 'kft_github_cfg_v1';
-  var PIN_KEY = 'kft_pin_hash_v1';
   var COLLECTIONS = ['people','income_types','expense_categories','income_entries','expense_entries','savings_holdings','material_prices','fund_lots','fund_sales','fund_prices'];
 
   function getGithubConfig(){
@@ -874,57 +867,6 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
       }
     }
     if(!S.addPersonId && S.people[0]) S.addPersonId = S.people[0].id;
-  }
-
-  // ---------- one-time screenshot import (Birikim tablosu) ----------
-  var SS_IMPORT_FLAG = 'kft_ss_import_v1';
-  var SS_IMPORT_DATA = [
-    {owner:'Kürşat', material:'Gram Gümüş', bank:'Dünya Katılım', quantity:238.6, unit:'gram', purchasePrice:130.00, purchaseDate:'2026-01-19', currentPrice:106.00},
-    {owner:'Kürşat', material:'Gram Gümüş', bank:'Dünya Katılım', quantity:37.2, unit:'gram', purchasePrice:137.00, purchaseDate:'2026-01-23', currentPrice:106.00},
-    {owner:'Feray', material:'Gram Gümüş', bank:'Dünya Katılım', quantity:14.19, unit:'gram', purchasePrice:141.00, purchaseDate:'2026-01-23', currentPrice:106.00},
-    {owner:'Feray', material:'Gram Gümüş', bank:'Dünya Katılım', quantity:14.23, unit:'gram', purchasePrice:105.00, purchaseDate:'2026-03-31', currentPrice:106.00},
-    {owner:'Emoş', material:'Gram Gümüş', bank:'Dünya Katılım', quantity:8.51, unit:'gram', purchasePrice:141.00, purchaseDate:'2026-01-23', currentPrice:106.00},
-    {owner:'Emoş', material:'Gram Gümüş', bank:'Dünya Katılım', quantity:23.7, unit:'gram', purchasePrice:105.00, purchaseDate:'2026-03-31', currentPrice:106.00},
-    {owner:'Kürşat', material:'Gram Altın', bank:'Dünya Katılım', quantity:1.07, unit:'gram', purchasePrice:6290.00, purchaseDate:'2026-07-23', currentPrice:7135.00},
-    {owner:'Kürşat', material:'Gram Altın', bank:'Dünya Katılım', quantity:2.95, unit:'gram', purchasePrice:6770.00, purchaseDate:'2026-04-27', currentPrice:7135.00},
-    {owner:'Baba', material:'Gram Altın', bank:'Dünya Katılım', quantity:7.71, unit:'gram', purchasePrice:6465.00, purchaseDate:'2026-03-30', currentPrice:7135.00},
-    {owner:'Baba', material:'Gram Altın', bank:'Dünya Katılım', quantity:5.99, unit:'gram', purchasePrice:6781.00, purchaseDate:'2026-04-27', currentPrice:7135.00},
-    {owner:'Baba', material:'Gram Gümüş', bank:'Ziraat Katılım', quantity:66.36, unit:'gram', purchasePrice:75.00, purchaseDate:'2025-11-13', currentPrice:104.00},
-    {owner:'Baba', material:'Gram Gümüş', bank:'Ziraat Katılım', quantity:62.63, unit:'gram', purchasePrice:80.00, purchaseDate:'2025-12-02', currentPrice:104.00},
-    {owner:'Baba', material:'Gram Gümüş', bank:'Ziraat Katılım', quantity:60.11, unit:'gram', purchasePrice:87.00, purchaseDate:'2025-12-11', currentPrice:104.00},
-    {owner:'Baba', material:'Gram Altın', bank:'Ziraat Katılım', quantity:5.94, unit:'gram', purchasePrice:5894.00, purchaseDate:'2025-11-13', currentPrice:7100.00},
-    {owner:'Baba', material:'Gram Altın', bank:'Ziraat Katılım', quantity:1.71, unit:'gram', purchasePrice:5855.00, purchaseDate:'2025-12-02', currentPrice:7100.00},
-    {owner:'Kürşat', material:'Fiziki Altın', bank:'Evde', quantity:11, unit:'gram', purchasePrice:5359.00, purchaseDate:'2005-01-01', currentPrice:7100.00},
-    {owner:'Baba', material:'Fiziki Gümüş', bank:'Evde', quantity:1000, unit:'gram', purchasePrice:103.00, purchaseDate:'2005-01-02', currentPrice:104.00},
-    {owner:'Baba', material:'Fiziki Altın', bank:'Evde', quantity:3, unit:'gram', purchasePrice:7055.00, purchaseDate:'2005-01-01', currentPrice:7100.00}
-  ];
-  async function importScreenshotHoldings(){
-    var uniqueOwners = [];
-    SS_IMPORT_DATA.forEach(function(r){ if(uniqueOwners.indexOf(r.owner)===-1) uniqueOwners.push(r.owner); });
-    var ownerIdMap = {};
-    for(var i=0;i<uniqueOwners.length;i++){
-      var name = uniqueOwners[i];
-      var existing = S.people.find(function(p){ return p.name.trim().toLowerCase()===name.trim().toLowerCase(); });
-      if(!existing){
-        existing = await S.store.add('people', {name:name, archived:false});
-        S.people.push(existing);
-      }
-      ownerIdMap[name] = existing.id;
-    }
-    for(var j=0;j<SS_IMPORT_DATA.length;j++){
-      var r = SS_IMPORT_DATA[j];
-      var personId = ownerIdMap[r.owner];
-      var data = {
-        personId: personId, personName: personName(personId),
-        material: r.material, bank: r.bank, quantity: r.quantity, unit: r.unit,
-        purchasePrice: r.purchasePrice, purchaseDate: r.purchaseDate, currentPrice: r.currentPrice,
-        note: 'Ekran görüntüsünden içe aktarıldı'
-      };
-      var row = await S.store.add('savings_holdings', data);
-      S.savingsHoldings.push(row);
-    }
-    try{ window.localStorage.setItem(SS_IMPORT_FLAG, '1'); }catch(e){}
-    await migrateMaterialPricesIfNeeded();
   }
 
   // ---------- derived ----------
@@ -1971,35 +1913,44 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
         return '<div class="price-row" data-idx="'+i+'" style="display:flex;gap:8px;align-items:flex-end;margin-bottom:12px;">'
           + '<div style="flex:1;min-width:0;"><div style="font-weight:700;font-family:\'Plus Jakarta Sans\',sans-serif;">'+esc(g.material)+'</div><div style="font-size:12.5px;color:var(--ink-faint);">'+esc(g.bank||'Banka belirtilmemiş')+'</div></div>'
           + '<input type="number" step="0.01" min="0" class="num-input price-input" style="width:110px;flex:none;" data-material="'+esc(g.material)+'" data-bank="'+esc(g.bank||'')+'" value="'+(cur!=null?cur:'')+'" placeholder="₺">'
-          + '<button type="button" class="btn-ghost price-save-btn" style="flex:none;width:auto;padding:12px 14px;margin-top:0;" data-material="'+esc(g.material)+'" data-bank="'+esc(g.bank||'')+'">Kaydet</button>'
           + '</div>';
       }).join('');
+      html += '<button type="button" class="btn-primary gold" id="savePricesBtn" style="margin-top:6px;">Kaydet</button>';
     }
     content.innerHTML = html;
     overlay.classList.add('open');
 
-    content.querySelectorAll('.price-save-btn').forEach(function(btn){
-      btn.addEventListener('click', async function(){
-        const row = btn.closest('.price-row');
-        const input = row.querySelector('.price-input');
-        const price = parseFloat(input.value);
-        if(!price || price<=0){ toast('Geçerli bir fiyat gir'); return; }
-        const originalLabel = btn.textContent;
-        btn.textContent = '…';
-        btn.disabled = true;
+    const saveBtn = $('#savePricesBtn');
+    if(saveBtn){
+      saveBtn.addEventListener('click', async function(){
+        const inputs = Array.from(content.querySelectorAll('.price-input'));
+        const originalLabel = saveBtn.textContent;
+        saveBtn.textContent = 'Kaydediliyor…';
+        saveBtn.disabled = true;
         try{
-          await setGroupPrice(btn.dataset.material, btn.dataset.bank, price);
-          btn.textContent = 'Kaydedildi ✓';
+          let count = 0;
+          for(const input of inputs){
+            const price = parseFloat(input.value);
+            if(!price || price<=0) continue;
+            await setGroupPrice(input.dataset.material, input.dataset.bank, price);
+            count++;
+          }
           renderBirikim();
-          setTimeout(function(){ if(btn.isConnected){ btn.textContent = originalLabel; btn.disabled = false; } }, 1200);
+          if(count > 0){
+            saveBtn.textContent = 'Kaydedildi ✓';
+            toast(count + ' fiyat güncellendi');
+          } else {
+            toast('Geçerli bir fiyat gir');
+          }
+          setTimeout(function(){ if(saveBtn.isConnected){ saveBtn.textContent = originalLabel; saveBtn.disabled = false; } }, 1200);
         } catch(e){
           console.error('price save failed', e);
-          btn.textContent = originalLabel;
-          btn.disabled = false;
+          saveBtn.textContent = originalLabel;
+          saveBtn.disabled = false;
           toast('Kaydedilemedi, tekrar dene');
         }
       });
-    });
+    }
 
     const fetchBtn = $('#fetchPricesBtn');
     if(fetchBtn){
@@ -2018,7 +1969,7 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
             statusEl.textContent = 'Dosya okundu ama eşleşen materyal/banka bulunamadı (Gram Altın/Gümüş veya Fiziki Altın/Gümüş, Dünya Katılım/Ziraat Katılım banka adıyla olmalı).';
           } else {
             const when = data.updatedAt ? new Date(data.updatedAt).toLocaleString('tr-TR') : '';
-            statusEl.textContent = filled + ' alan dolduruldu (kaynak güncellemesi: ' + when + '). Kontrol edip her satırın "Kaydet" butonuna basmayı unutma.';
+            statusEl.textContent = filled + ' alan dolduruldu (kaynak güncellemesi: ' + when + '). Kontrol edip aşağıdaki tek "Kaydet" butonuna basman yeterli.';
           }
         } catch(e){
           console.error('fetch prices failed', e);
@@ -2041,8 +1992,12 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
       const isGold = /altın|altin/.test(material);
       const isSilver = /gümüş|gumus/.test(material);
       if(!isGold && !isSilver) return;
+      const isFiziki = /fiziki/.test(material);
       let src = null;
-      if(/dünya|dunya/.test(bank)) src = data.dunyaKatilim;
+      if(isFiziki){
+        // physical/home-held holdings have no market feed of their own -- use Dünya Katılım as a proxy
+        src = data.dunyaKatilim;
+      } else if(/dünya|dunya/.test(bank)) src = data.dunyaKatilim;
       else if(/ziraat/.test(bank)) src = data.ziraatKatilim;
       if(!src) return;
       const val = isGold ? src.altinAlis : src.gumusAlis;
@@ -2091,6 +2046,7 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
       + '<datalist id="fundNameOptions">' + fundNameOptionsHtml() + '</datalist>'
       + '<div class="field"><label>Adet</label><input type="number" step="0.0001" min="0" id="fl_quantity" class="num-input" value="'+(l.quantity||'')+'"></div>'
       + '<div class="field"><label>Alış Fiyatı (birim başına, ₺)</label><input type="number" step="0.0001" min="0" id="fl_price" class="num-input" value="'+(l.purchasePrice||'')+'"></div>'
+      + '<div class="field-hint" id="fl_total_hint" style="display:none;">Toplam tutar: <strong id="fl_total_val"></strong></div>'
       + '<div class="field"><label>Alış Tarihi</label><input type="date" id="fl_date" value="'+(l.purchaseDate||todayStr())+'"></div>'
       + '<div class="field"><label>Not</label><input type="text" id="fl_note" value="'+esc(l.note||'')+'"></div>'
       + '<div class="sheet-actions">'
@@ -2105,6 +2061,21 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
         $('#fl_incometype').innerHTML = fundingIncomeTypeOptionsHtml($('#fl_person').value, '');
       });
     }
+
+    function updateFlTotal(){
+      const q = parseFloat($('#fl_quantity').value);
+      const p = parseFloat($('#fl_price').value);
+      const hint = $('#fl_total_hint');
+      if(q > 0 && p >= 0){
+        $('#fl_total_val').textContent = fmt(q * p);
+        hint.style.display = '';
+      } else {
+        hint.style.display = 'none';
+      }
+    }
+    $('#fl_quantity').addEventListener('input', updateFlTotal);
+    $('#fl_price').addEventListener('input', updateFlTotal);
+    updateFlTotal();
 
     $('#fl_save').addEventListener('click', async ()=>{
       const incomeTypeId = $('#fl_incometype').value || null;
@@ -2622,44 +2593,6 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
   }
 
   // ---------- settings sheet ----------
-  var PIN_LOCAL = {}; // scratch namespace not used, placeholder removed below
-
-  async function sha256Hex(str){
-    try{
-      const enc = new TextEncoder().encode(str);
-      const buf = await crypto.subtle.digest('SHA-256', enc);
-      return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
-    }catch(e){ return null; }
-  }
-  function getPinHash(){ try{ return window.localStorage.getItem(PIN_KEY); }catch(e){ return null; } }
-  function setPinHash(hash){ try{ window.localStorage.setItem(PIN_KEY, hash); }catch(e){} }
-  function clearPinHash(){ try{ window.localStorage.removeItem(PIN_KEY); }catch(e){} }
-
-  function showLockScreen(onUnlocked){
-    const overlay = $('#lockScreen');
-    const input = $('#lockInput');
-    const err = $('#lockError');
-    overlay.classList.add('show');
-    input.value = '';
-    err.textContent = '';
-    setTimeout(()=>input.focus(), 50);
-
-    async function tryUnlock(){
-      const val = input.value.trim();
-      if(!val){ return; }
-      const hash = await sha256Hex(val);
-      if(hash && hash === getPinHash()){
-        overlay.classList.remove('show');
-        onUnlocked();
-      } else {
-        err.textContent = 'Yanlış PIN, tekrar dene';
-        input.value = '';
-        input.focus();
-      }
-    }
-    $('#lockSubmit').onclick = tryUnlock;
-    input.onkeydown = (e)=>{ if(e.key==='Enter') tryUnlock(); };
-  }
 
   function settingsCatRowHtml(item, kind, extra){
     return '<div class="cat-row" data-kind="'+kind+'" data-id="'+item.id+'">'
@@ -2711,7 +2644,6 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
 
   function renderSettingsSheet(){
     const content = $('#sheetContent');
-    const hasPin = !!getPinHash();
     const ghCfg = getGithubConfig();
 
     let html = '<div class="sheet-handle"></div><div class="sheet-title">Ayarlar</div>';
@@ -2743,16 +2675,6 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
     html += '<div class="add-cat-row"><input type="text" id="newExpenseCat" placeholder="Yeni kategori adı"><button type="button" id="addExpenseCatBtn">Ekle</button></div>';
     html += '</div>';
 
-    // One-time screenshot import
-    var ssImported = false;
-    try{ ssImported = window.localStorage.getItem(SS_IMPORT_FLAG) === '1'; }catch(e){}
-    if(!ssImported){
-      html += '<div class="settings-section"><div class="field"><label>Veri İçe Aktarımı</label></div>'
-        + '<div class="settings-row"><div class="field-hint">Paylaştığın birikim tablosundaki '+SS_IMPORT_DATA.length+' kaydı (Kürşat, Feray, Emoş, Baba) tek seferde Birikim bölümüne ekle. Gerekli kişiler otomatik oluşturulur.</div>'
-        + '<button type="button" class="btn-primary gold" id="importSsBtn" style="margin-top:0;">Tabloyu İçe Aktar</button></div>'
-        + '<div id="import_err" class="lock-error"></div></div>';
-    }
-
     // GitHub sync
     html += '<div class="settings-section"><div class="field"><label>GitHub Senkronizasyonu</label></div>';
     if(ghCfg){
@@ -2765,20 +2687,6 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
         + '<button type="button" class="btn-primary" id="gh_connect" style="margin-top:0;">Bağlan</button></div>';
     }
     html += '<div id="gh_err" class="lock-error"></div></div>';
-
-    // PIN
-    html += '<div class="settings-section"><div class="field"><label>Uygulama Kilidi</label></div>';
-    if(hasPin){
-      html += '<div class="settings-row"><div class="field-hint">Kilit açık. Kaldırmak için mevcut PIN\'i gir.</div>'
-        + '<input type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" id="st_current" placeholder="Mevcut PIN" class="num-input">'
-        + '<button type="button" class="btn-danger" id="st_removePin">Kilidi Kaldır</button></div>';
-    } else {
-      html += '<div class="settings-row"><div class="field-hint">Bir PIN belirlersen, uygulama her açıldığında bu PIN sorulur.</div>'
-        + '<input type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" id="st_new1" placeholder="Yeni PIN (4-6 hane)" class="num-input">'
-        + '<input type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" id="st_new2" placeholder="PIN Tekrar" class="num-input">'
-        + '<button type="button" class="btn-primary" id="st_setPin" style="margin-top:0;">Kilidi Etkinleştir</button></div>';
-    }
-    html += '<div id="st_err" class="lock-error"></div></div>';
 
     content.innerHTML = html;
 
@@ -2817,26 +2725,6 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
       renderSettingsSheet();
     });
 
-    // one-time screenshot import
-    if(!ssImported){
-      $('#importSsBtn').addEventListener('click', async ()=>{
-        const btn = $('#importSsBtn');
-        btn.textContent = 'İçe aktarılıyor…';
-        btn.disabled = true;
-        try{
-          await importScreenshotHoldings();
-          toast(SS_IMPORT_DATA.length + ' kayıt içe aktarıldı');
-          renderSettingsSheet();
-          renderBirikim();
-        } catch(e){
-          console.error('screenshot import failed', e);
-          $('#import_err').textContent = 'İçe aktarma başarısız oldu, tekrar dene';
-          btn.textContent = 'Tabloyu İçe Aktar';
-          btn.disabled = false;
-        }
-      });
-    }
-
     // GitHub
     if(ghCfg){
       $('#gh_disconnect').addEventListener('click', ()=>{
@@ -2868,32 +2756,6 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
           btn.disabled = false;
           $('#gh_err').textContent = result.error || 'Bağlanılamadı';
         }
-      });
-    }
-
-    // PIN
-    if(hasPin){
-      $('#st_removePin').addEventListener('click', async ()=>{
-        const val = $('#st_current').value.trim();
-        const hash = await sha256Hex(val);
-        if(hash && hash === getPinHash()){
-          clearPinHash();
-          closeSheet();
-          toast('Kilit kaldırıldı');
-        } else {
-          $('#st_err').textContent = 'Mevcut PIN yanlış';
-        }
-      });
-    } else {
-      $('#st_setPin').addEventListener('click', async ()=>{
-        const v1 = $('#st_new1').value.trim();
-        const v2 = $('#st_new2').value.trim();
-        if(v1.length < 4){ $('#st_err').textContent = 'PIN en az 4 haneli olmalı'; return; }
-        if(v1 !== v2){ $('#st_err').textContent = 'PIN\'ler eşleşmiyor'; return; }
-        const hash = await sha256Hex(v1);
-        setPinHash(hash);
-        closeSheet();
-        toast('Kilit etkinleştirildi');
       });
     }
   }
@@ -2976,15 +2838,7 @@ main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
   }
 
   function start(){
-    if(getPinHash()){
-      $('#app').style.display = 'none';
-      showLockScreen(function(){
-        $('#app').style.display = '';
-        boot();
-      });
-    } else {
-      boot();
-    }
+    boot();
   }
 
   if(document.readyState === 'loading'){
