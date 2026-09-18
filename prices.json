@@ -1,15 +1,15 @@
 {
-  "updatedAt": "2026-09-17T17:50:47.387Z",
+  "updatedAt": "2026-09-18T10:13:45.190Z",
   "ziraatKatilim": {
-    "altinAlis": 6059.4407,
-    "altinSatis": 7641.1581,
-    "gumusAlis": 91.2997,
-    "gumusSatis": 115.3684
+    "altinAlis": 6789.6964,
+    "altinSatis": 7005.1784,
+    "gumusAlis": 103.8152,
+    "gumusSatis": 107.3335
   },
   "dunyaKatilim": {
-    "altinAlis": 6762.4103,
-    "altinSatis": 6799.1879,
-    "gumusAlis": 102.2215,
-    "gumusSatis": 102.8969
+    "altinAlis": 6794.9823,
+    "altinSatis": 6831.0377,
+    "gumusAlis": 104.3997,
+    "gumusSatis": 104.9831
   }
 }
