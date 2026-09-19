@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-18T17:21:44.828Z",
+  "updatedAt": "2026-09-19T09:55:19.985Z",
   "ziraatKatilim": {
     "altinAlis": 6075.016,
     "altinSatis": 7660.4712,
@@ -7,9 +7,9 @@
     "gumusSatis": 116.9676
   },
   "dunyaKatilim": {
-    "altinAlis": 6802.8215,
-    "altinSatis": 6839.413,
-    "gumusAlis": 103.8909,
-    "gumusSatis": 104.4668
+    "altinAlis": 6789.7087,
+    "altinSatis": 6834.634,
+    "gumusAlis": 103.247,
+    "gumusSatis": 103.9687
   }
 }
