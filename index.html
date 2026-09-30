@@ -958,12 +958,32 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
     const key = materialPriceKey(material, bank);
     const existing = S.materialPrices.find(p=>materialPriceKey(p.material, p.bank)===key);
     if(existing){
-      await S.store.update('material_prices', existing.id, {price});
-      existing.price = price;
+      const oldPrice = Number(existing.price);
+      const data = {price};
+      // only move the "previous price" baseline when the price actually changes -- re-saving
+      // an unchanged row (e.g. via the single "Kaydet" that saves every row at once) must not
+      // reset it, or the son-güncelleme delta would silently disappear.
+      if(oldPrice > 0 && oldPrice !== Number(price)){
+        data.previousPrice = oldPrice;
+        data.previousPriceAt = new Date().toISOString();
+      }
+      await S.store.update('material_prices', existing.id, data);
+      Object.assign(existing, data);
     } else {
       const row = await S.store.add('material_prices', {material, bank, price});
       S.materialPrices.push(row);
     }
+  }
+  // returns {prev, cur, diff, pct, at} for the last time this material+bank group's shared
+  // price actually changed, or null if there's no previous value recorded yet.
+  function getGroupPriceDelta(material, bank){
+    const key = materialPriceKey(material, bank);
+    const row = S.materialPrices.find(p=>materialPriceKey(p.material, p.bank)===key);
+    if(!row || row.previousPrice==null) return null;
+    const prev = Number(row.previousPrice), cur = Number(row.price);
+    if(!(prev > 0)) return null;
+    const diff = cur - prev;
+    return {prev, cur, diff, pct: diff/prev*100, at: row.previousPriceAt};
   }
   // one-time, safe migration: derive initial shared prices from existing holdings
   // so previously imported/entered data keeps showing the exact same kar/zarar
@@ -990,7 +1010,9 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
     const value = effectivePrice * qty;
     const profit = value - cost;
     const pct = cost > 0 ? (profit/cost*100) : 0;
-    return {cost, value, profit, pct, effectivePrice, hasGroupPrice: groupPrice != null};
+    const priceDelta = getGroupPriceDelta(h.material, h.bank);
+    const valueDelta = priceDelta ? priceDelta.diff * qty : 0;
+    return {cost, value, profit, pct, effectivePrice, hasGroupPrice: groupPrice != null, priceDelta, valueDelta};
   }
 
   // ---------- investment funds (FIFO + %17.5 stopaj) ----------
@@ -1004,12 +1026,29 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
     const key = fundKey(fundName);
     const existing = S.fundPrices.find(p=>fundKey(p.fundName)===key);
     if(existing){
-      await S.store.update('fund_prices', existing.id, {price});
-      existing.price = price;
+      const oldPrice = Number(existing.price);
+      const data = {price};
+      if(oldPrice > 0 && oldPrice !== Number(price)){
+        data.previousPrice = oldPrice;
+        data.previousPriceAt = new Date().toISOString();
+      }
+      await S.store.update('fund_prices', existing.id, data);
+      Object.assign(existing, data);
     } else {
       const row = await S.store.add('fund_prices', {fundName, price});
       S.fundPrices.push(row);
     }
+  }
+  // returns {prev, cur, diff, pct, at} for the last time this fund's price actually changed,
+  // or null if there's no previous value recorded yet.
+  function getFundPriceDelta(fundName){
+    const key = fundKey(fundName);
+    const row = S.fundPrices.find(p=>fundKey(p.fundName)===key);
+    if(!row || row.previousPrice==null) return null;
+    const prev = Number(row.previousPrice), cur = Number(row.price);
+    if(!(prev > 0)) return null;
+    const diff = cur - prev;
+    return {prev, cur, diff, pct: diff/prev*100, at: row.previousPriceAt};
   }
   function lotRemaining(lot){
     return lot.remainingQuantity!=null ? Number(lot.remainingQuantity) : Number(lot.quantity||0);
@@ -1020,7 +1059,18 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
     const curPrice = getFundPrice(lot.fundName);
     const value = curPrice != null ? remaining * curPrice : cost;
     const profit = value - cost;
-    return {remaining, cost, value, profit, curPrice, hasPrice: curPrice != null};
+    const priceDelta = getFundPriceDelta(lot.fundName);
+    const valueDelta = priceDelta ? priceDelta.diff * remaining : 0;
+    return {remaining, cost, value, profit, curPrice, hasPrice: curPrice != null, priceDelta, valueDelta};
+  }
+  // small "son güncellemeye göre değişim" line shown on holding/fund-lot cards when a previous
+  // price is on record for that material+bank group or fund (see getGroupPriceDelta/getFundPriceDelta).
+  function priceDeltaLineHtml(priceDelta, valueDelta){
+    if(!priceDelta) return '';
+    const cls = valueDelta >= 0 ? 'profit-pos' : 'profit-neg';
+    const sign = valueDelta >= 0 ? '+' : '';
+    const pctSign = priceDelta.pct >= 0 ? '+' : '';
+    return '<div style="font-size:11.5px;color:var(--ink-faint);margin-top:8px;">Son fiyat güncellemesine göre: <span class="'+cls+'">'+sign+fmt(valueDelta)+' ('+pctSign+fmtNum(priceDelta.pct,1)+'%)</span></div>';
   }
   function lotIsUntouched(lot){
     return Math.abs(lotRemaining(lot) - Number(lot.quantity||0)) < 1e-9;
@@ -1536,23 +1586,26 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
     renderPersonChips('birikimOverviewPersonChips', S.birikimOverviewPerson, function(val){ S.birikimOverviewPerson = val; renderBirikimOverview(); });
     const personFilter = S.birikimOverviewPerson;
 
-    let fundCost = 0, fundValue = 0;
+    let fundCost = 0, fundValue = 0, fundValueDelta = 0, hasAnyDelta = false;
     S.fundLots.forEach(function(l){
       if(personFilter && personFilter!=='all' && l.personId!==personFilter) return;
       const m = fundLotMetrics(l);
-      fundCost += m.cost; fundValue += m.value;
+      fundCost += m.cost; fundValue += m.value; fundValueDelta += m.valueDelta;
+      if(m.priceDelta) hasAnyDelta = true;
     });
-    let metalCost = 0, metalValue = 0;
+    let metalCost = 0, metalValue = 0, metalValueDelta = 0;
     S.savingsHoldings.forEach(function(h){
       if(personFilter && personFilter!=='all' && h.personId!==personFilter) return;
       const m = holdingMetrics(h);
-      metalCost += m.cost; metalValue += m.value;
+      metalCost += m.cost; metalValue += m.value; metalValueDelta += m.valueDelta;
+      if(m.priceDelta) hasAnyDelta = true;
     });
     const fundProfit = fundValue - fundCost;
     const metalProfit = metalValue - metalCost;
     const totalValue = fundValue + metalValue;
     const totalCost = fundCost + metalCost;
     const totalProfit = totalValue - totalCost;
+    const totalValueDelta = fundValueDelta + metalValueDelta;
     const pct = function(part){ return totalValue > 0 ? Math.max(0, part) / totalValue * 100 : 0; };
     const fundPct = pct(fundValue), metalPct = pct(metalValue);
 
@@ -1566,7 +1619,8 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
     el.innerHTML =
       '<div class="card-title">Birikim Özeti · '+scopeLabel+'</div>'
       + '<div class="num" style="font-size:25px;font-weight:800;margin-bottom:3px;">'+fmt(totalValue)+'</div>'
-      + '<div style="font-size:12.5px;color:var(--ink-soft);margin-bottom:12px;">Ana Para '+fmt(totalCost)+' · '+profitSpan(totalProfit)+' '+(totalProfit>=0?'kâr':'zarar')+'</div>'
+      + '<div style="font-size:12.5px;color:var(--ink-soft);margin-bottom:'+(hasAnyDelta?'4px':'12px')+';">Ana Para '+fmt(totalCost)+' · '+profitSpan(totalProfit)+' '+(totalProfit>=0?'kâr':'zarar')+'</div>'
+      + (hasAnyDelta ? '<div style="font-size:12.5px;margin-bottom:12px;">Son fiyat güncellemesine göre '+profitSpan(totalValueDelta)+'</div>' : '')
       + '<div class="breakdown-stack">'
         + (fundPct > 0 ? '<div class="seg fund" style="width:'+fundPct+'%"></div>' : '')
         + (metalPct > 0 ? '<div class="seg metal" style="width:'+metalPct+'%"></div>' : '')
@@ -1669,6 +1723,7 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
           + '<div class="cell"><div class="l">Güncel Fiyat'+(m.hasGroupPrice?' · ortak':'')+'</div><div class="v num">'+fmt(m.effectivePrice)+'</div></div>'
           + '<div class="cell"><div class="l">Güncel Değer</div><div class="v num">'+fmt(m.value)+'</div></div>'
           + '</div>'
+          + priceDeltaLineHtml(m.priceDelta, m.valueDelta)
           + '</div>';
       }).join('');
       listEl.querySelectorAll('.holding-card').forEach(card=>{
@@ -1750,6 +1805,7 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
           + '<div class="cell"><div class="l">Güncel Fiyat</div><div class="v num">'+(m.hasPrice?fmt(m.curPrice):'—')+'</div></div>'
           + '<div class="cell"><div class="l">Güncel Değer</div><div class="v num">'+fmt(m.value)+'</div></div>'
           + '</div>'
+          + priceDeltaLineHtml(m.priceDelta, m.valueDelta)
           + '</div>';
       }).join('');
       lotsEl.querySelectorAll('.holding-card').forEach(card=>{
