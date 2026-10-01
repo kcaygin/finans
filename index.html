@@ -757,6 +757,7 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
     ozetPerson:'all', raporPerson:'all', kayitlarPerson:'all', birikimPerson:'all', fundPerson:'all', birikimOverviewPerson:'all',
     reportPeriod:'thisMonth', recordFilter:'all', holdingsFilter:'all', birikimSubView:'metal',
     raporExpandedTypes:{}, // {incomeTypeId: true} -- which "Kaynağa Göre" cards are expanded to show their hareketler
+    raporExpandedBanks:{}, // {bankName: true} -- which "Bankaya Göre Dağılım" rows are expanded to show their varlıklar
     editing:null // {kind:'gelir'|'gider'|'varlik', id}
   };
 
@@ -2553,11 +2554,12 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
     bankHoldings.forEach(function(h){
       const key = h.bank || 'Banka belirtilmemiş';
       const m = holdingMetrics(h);
-      if(!byBank[key]) byBank[key] = {count:0, total:0};
+      if(!byBank[key]) byBank[key] = {count:0, total:0, holdings:[]};
       byBank[key].count += 1;
       byBank[key].total += m.value;
+      byBank[key].holdings.push(h);
     });
-    const bankArr = Object.keys(byBank).map(function(k){ return {name:k, count:byBank[k].count, total:byBank[k].total}; }).sort(function(a,b){ return b.total-a.total; });
+    const bankArr = Object.keys(byBank).map(function(k){ return {name:k, count:byBank[k].count, total:byBank[k].total, holdings:byBank[k].holdings}; }).sort(function(a,b){ return b.total-a.total; });
     const maxBank = bankArr.length ? bankArr[0].total : 0;
     const bankEl = $('#bankBars');
     if(bankArr.length===0){
@@ -2565,8 +2567,35 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
     } else {
       bankEl.innerHTML = bankArr.map(function(b){
         const pct = maxBank ? Math.max(4, Math.round(b.total/maxBank*100)) : 0;
-        return '<div class="bar-row"><div class="bar-top"><span class="name">'+esc(b.name)+'</span><span class="amt num">'+b.count+' varlık · '+fmt(b.total)+'</span></div><div class="bar-track"><div class="bar-fill gold" style="width:'+pct+'%"></div></div></div>';
+        const isOpen = !!S.raporExpandedBanks[b.name];
+        // o bankadaki varlıkların kendi dağılımı -- en değerliden en düşüğe
+        const sortedHoldings = b.holdings.slice().sort(function(x,y){ return holdingMetrics(y).value - holdingMetrics(x).value; });
+        const detailHtml = isOpen
+          ? '<div class="breakdown-source-list" style="margin-top:2px;">' + sortedHoldings.map(function(h){
+              const hm = holdingMetrics(h);
+              return '<div class="breakdown-source-row"><span>'+esc(h.material)+' · '+esc(personName(h.personId))+' · '+fmtNum(h.quantity)+' '+esc(h.unit||'')+'</span><span>'+fmt(hm.value)+'</span></div>';
+            }).join('') + '</div>'
+          : '';
+        return '<div class="bar-row" data-bank="'+esc(b.name)+'">'
+          + '<div class="bar-top bank-bar-header" style="cursor:pointer;align-items:center;">'
+            + '<span class="name">'+esc(b.name)+'</span>'
+            + '<span class="amt num" style="display:inline-flex;align-items:center;gap:6px;">'+b.count+' varlık · '+fmt(b.total)
+              + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width:14px;height:14px;flex:none;transform:rotate('+(isOpen?'180deg':'0deg')+');transition:transform .15s;"><path d="M6 9l6 6 6-6"/></svg>'
+            + '</span>'
+          + '</div>'
+          + '<div class="bar-track"><div class="bar-fill gold" style="width:'+pct+'%"></div></div>'
+          + detailHtml
+          + '</div>';
       }).join('');
+      bankEl.querySelectorAll('.bank-bar-header').forEach(function(header){
+        header.addEventListener('click', function(){
+          const row = header.closest('.bar-row');
+          const key = row.dataset.bank;
+          if(S.raporExpandedBanks[key]) delete S.raporExpandedBanks[key];
+          else S.raporExpandedBanks[key] = true;
+          renderRapor();
+        });
+      });
     }
   }
 
