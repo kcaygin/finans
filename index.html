@@ -113,6 +113,24 @@ h1,h2,h3,.display{font-family:'Plus Jakarta Sans', system-ui, sans-serif; font-w
 .brand-name{font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:18px;letter-spacing:-0.01em;}
 .topbar .icon-btn{width:36px;height:36px;}
 .topbar .icon-btn svg{width:18px;height:18px;}
+.topbar-actions{display:flex;align-items:center;gap:8px;}
+
+/* ---------- donut chart ---------- */
+.donut-wrap{display:flex;align-items:center;gap:16px;margin:2px 0 14px;}
+.donut-wrap svg{flex:none;}
+.donut-wrap .num{font-family:'IBM Plex Mono', ui-monospace, monospace;}
+
+/* ---------- micro-interactions ---------- */
+.holding-card,.source-card,.bar-row,.chip,.btn-primary,.btn-ghost,.btn-danger,.icon-btn,.stat-tile{
+  transition:transform .14s ease, box-shadow .14s ease, opacity .14s ease;
+}
+.holding-card:active,.source-card:active{transform:scale(0.98);}
+.chip:active,.icon-btn:active{transform:scale(0.93);}
+.btn-primary:active,.btn-ghost:active,.btn-danger:active{transform:scale(0.97);}
+@media (hover:hover){
+  .holding-card:hover,.source-card:hover{transform:translateY(-1px);}
+  .chip:hover{opacity:0.88;}
+}
 
 main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
 .view{display:none;}
@@ -382,9 +400,12 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
       <div class="brand-mark">KFT</div>
       <div class="brand-name">Kürşat Finans</div>
     </div>
-    <button type="button" class="icon-btn" id="settingsBtn" title="Ayarlar">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 13.5c.04-.5.04-1 0-1.5l1.9-1.4-2-3.4-2.2.8c-.4-.3-.8-.6-1.3-.8l-.3-2.3H9.5l-.3 2.3c-.5.2-.9.5-1.3.8l-2.2-.8-2 3.4L5.6 12c-.04.5-.04 1 0 1.5l-1.9 1.4 2 3.4 2.2-.8c.4.3.8.6 1.3.8l.3 2.3h4.9l.3-2.3c.5-.2.9-.5 1.3-.8l2.2.8 2-3.4-1.9-1.4Z"/></svg>
-    </button>
+    <div class="topbar-actions">
+      <button type="button" class="icon-btn" id="themeToggleBtn" title="Tema"></button>
+      <button type="button" class="icon-btn" id="settingsBtn" title="Ayarlar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 13.5c.04-.5.04-1 0-1.5l1.9-1.4-2-3.4-2.2.8c-.4-.3-.8-.6-1.3-.8l-.3-2.3H9.5l-.3 2.3c-.5.2-.9.5-1.3.8l-2.2-.8-2 3.4L5.6 12c-.04.5-.04 1 0 1.5l-1.9 1.4 2 3.4 2.2-.8c.4.3.8.6 1.3.8l.3 2.3h4.9l.3-2.3c.5-.2.9-.5 1.3-.8l2.2.8 2-3.4-1.9-1.4Z"/></svg>
+      </button>
+    </div>
   </div>
 
   <main>
@@ -772,6 +793,11 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
     n = Number(n)||0;
     return n.toLocaleString('tr-TR', {maximumFractionDigits: digits==null?2:digits, minimumFractionDigits:0});
   }
+  // donut merkez etiketleri gibi dar alanlarda kullanılan, ondalıksız/₺'siz kompakt format
+  function fmtCompact(n){
+    n = Number(n)||0;
+    return '₺' + n.toLocaleString('tr-TR', {maximumFractionDigits:0, minimumFractionDigits:0});
+  }
   function todayStr(){
     const d = new Date();
     const pad = x => String(x).padStart(2,'0');
@@ -1076,6 +1102,80 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
     const pctSign = priceDelta.pct >= 0 ? '+' : '';
     return '<div style="font-size:11.5px;color:var(--ink-faint);margin-top:8px;">Son fiyat güncellemesine göre: <span class="'+cls+'">'+sign+fmt(valueDelta)+' ('+pctSign+fmtNum(priceDelta.pct,1)+'%)</span></div>';
   }
+
+  // ---------- donut chart (dependency-free inline SVG) ----------
+  // segments: [{value:number, color:'var(--x)'}, ...] -- değeri <=0 olanlar atlanır.
+  // opts: {size, stroke, centerLabel, centerSub}
+  const CHART_PALETTE = ['var(--gold)','var(--accent)','var(--cash)','var(--income)','var(--expense)','var(--gold-ink)','var(--accent-ink)'];
+  function donutSvg(segments, opts){
+    opts = opts || {};
+    const size = opts.size || 104;
+    const stroke = opts.stroke || 15;
+    const r = (size - stroke) / 2;
+    const c = size / 2;
+    const circumference = 2 * Math.PI * r;
+    const total = segments.reduce(function(s,x){ return s + Math.max(0, Number(x.value)||0); }, 0);
+    const bg = '<circle cx="'+c+'" cy="'+c+'" r="'+r+'" fill="none" stroke="var(--surface-2)" stroke-width="'+stroke+'"/>';
+    let arcs = '';
+    if(total > 0){
+      let offset = 0;
+      arcs = segments.filter(function(s){ return Number(s.value) > 0; }).map(function(s){
+        const frac = Number(s.value) / total;
+        const len = frac * circumference;
+        const dasharray = len + ' ' + (circumference - len);
+        const dashoffset = -offset;
+        offset += len;
+        return '<circle cx="'+c+'" cy="'+c+'" r="'+r+'" fill="none" stroke="'+s.color+'" stroke-width="'+stroke+'" stroke-dasharray="'+dasharray+'" stroke-dashoffset="'+dashoffset+'" transform="rotate(-90 '+c+' '+c+')"/>';
+      }).join('');
+    }
+    let labelFontSize = opts.centerLabelSize || 13;
+    const labelStr = opts.centerLabel != null ? String(opts.centerLabel) : '';
+    if(labelStr.length > 9) labelFontSize = Math.max(8.5, labelFontSize - (labelStr.length - 9) * 0.9);
+    const centerLabel = opts.centerLabel != null
+      ? '<text x="'+c+'" y="'+(opts.centerSub!=null ? c-4 : c)+'" text-anchor="middle" dominant-baseline="middle" font-size="'+labelFontSize+'" font-weight="800" fill="var(--ink)" class="num">'+esc(labelStr)+'</text>'
+      : '';
+    const centerSub = opts.centerSub != null
+      ? '<text x="'+c+'" y="'+(c+12)+'" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="var(--ink-faint)">'+esc(String(opts.centerSub))+'</text>'
+      : '';
+    return '<svg width="'+size+'" height="'+size+'" viewBox="0 0 '+size+' '+size+'" style="flex:none;">'+bg+arcs+centerLabel+centerSub+'</svg>';
+  }
+
+  // ---------- tema (açık/koyu/sistem) ----------
+  const THEME_KEY = 'kft_theme_v1';
+  const THEME_ICONS = {
+    auto: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 3.5a8.5 8.5 0 0 0 0 17Z" fill="currentColor" stroke="none"/></svg>',
+    light: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M4.2 4.2l1.6 1.6M18.2 18.2l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.2 19.8l1.6-1.6M18.2 5.8l1.6-1.6"/></svg>',
+    dark: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4 6.8 6.8 0 0 0 20 14.5Z"/></svg>'
+  };
+  const THEME_TITLES = {auto:'Tema: Sistem (dokun — Açık)', light:'Tema: Açık (dokun — Koyu)', dark:'Tema: Koyu (dokun — Sistem)'};
+  function getStoredTheme(){
+    try{ return localStorage.getItem(THEME_KEY) || 'auto'; } catch(e){ return 'auto'; }
+  }
+  function applyTheme(mode){
+    const root = document.documentElement;
+    if(mode === 'dark') root.setAttribute('data-theme', 'dark');
+    else if(mode === 'light') root.setAttribute('data-theme', 'light');
+    else root.removeAttribute('data-theme');
+    const btn = $('#themeToggleBtn');
+    if(btn){
+      btn.innerHTML = THEME_ICONS[mode] || THEME_ICONS.auto;
+      btn.title = THEME_TITLES[mode] || THEME_TITLES.auto;
+    }
+  }
+  function initTheme(){
+    try{
+      applyTheme(getStoredTheme());
+      const btn = $('#themeToggleBtn');
+      if(btn){
+        btn.addEventListener('click', function(){
+          const cur = getStoredTheme();
+          const next = cur === 'auto' ? 'light' : (cur === 'light' ? 'dark' : 'auto');
+          try{ localStorage.setItem(THEME_KEY, next); } catch(e){}
+          applyTheme(next);
+        });
+      }
+    } catch(e){ console.error('theme init failed', e); }
+  }
   function lotIsUntouched(lot){
     return Math.abs(lotRemaining(lot) - Number(lot.quantity||0)) < 1e-9;
   }
@@ -1286,8 +1386,13 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
       return '<span class="'+cls+'">'+sign+fmt(v)+'</span>';
     };
 
+    const donut = donutSvg(
+      [{value:b.cash, color:'var(--cash)'}, {value:b.fundValue, color:'var(--accent)'}, {value:b.metalValue, color:'var(--gold)'}],
+      {centerLabel: fmtCompact(total), centerLabelSize: 13, centerSub: 'Toplam'}
+    );
     el.innerHTML =
       '<div class="card-title">Dağılım</div>'
+      + '<div class="donut-wrap">' + donut + '</div>'
       + '<div class="breakdown-stack">'
         + (cashPct > 0 ? '<div class="seg cash" style="width:'+cashPct+'%"></div>' : '')
         + (fundPct > 0 ? '<div class="seg fund" style="width:'+fundPct+'%"></div>' : '')
@@ -1620,12 +1725,21 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
     };
 
     const scopeLabel = personFilter && personFilter!=='all' ? esc(personName(personFilter)) : 'Tüm Kişiler';
+    const ovDonut = donutSvg(
+      [{value:fundValue, color:'var(--accent)'}, {value:metalValue, color:'var(--gold)'}],
+      {size:84, stroke:12, centerLabel: fmtCompact(totalValue), centerLabelSize: 10.5}
+    );
     el.innerHTML =
       '<div class="card-title">Birikim Özeti · '+scopeLabel+'</div>'
-      + '<div class="num" style="font-size:25px;font-weight:800;margin-bottom:3px;">'+fmt(totalValue)+'</div>'
-      + '<div style="font-size:12.5px;color:var(--ink-soft);margin-bottom:'+(hasAnyDelta?'4px':'12px')+';">Ana Para '+fmt(totalCost)+' · '+profitSpan(totalProfit)+' '+(totalProfit>=0?'kâr':'zarar')+'</div>'
-      + (hasAnyDelta ? '<div style="font-size:12.5px;margin-bottom:12px;">Son fiyat güncellemesine göre '+profitSpan(totalValueDelta)+'</div>' : '')
-      + '<div class="breakdown-stack">'
+      + '<div style="display:flex;align-items:center;gap:16px;">'
+        + '<div style="flex:none;">' + ovDonut + '</div>'
+        + '<div style="flex:1;min-width:0;">'
+          + '<div class="num" style="font-size:25px;font-weight:800;margin-bottom:3px;">'+fmt(totalValue)+'</div>'
+          + '<div style="font-size:12.5px;color:var(--ink-soft);margin-bottom:'+(hasAnyDelta?'4px':'0px')+';">Ana Para '+fmt(totalCost)+' · '+profitSpan(totalProfit)+' '+(totalProfit>=0?'kâr':'zarar')+'</div>'
+          + (hasAnyDelta ? '<div style="font-size:12.5px;">Son fiyat güncellemesine göre '+profitSpan(totalValueDelta)+'</div>' : '')
+        + '</div>'
+      + '</div>'
+      + '<div style="margin-top:12px;" class="breakdown-stack">'
         + (fundPct > 0 ? '<div class="seg fund" style="width:'+fundPct+'%"></div>' : '')
         + (metalPct > 0 ? '<div class="seg metal" style="width:'+metalPct+'%"></div>' : '')
       + '</div>'
@@ -1680,7 +1794,11 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
     if(matArr.length===0){
       matEl.innerHTML = '<div class="empty">Henüz varlık eklenmedi.</div>';
     } else {
-      matEl.innerHTML = matArr.map(m=>{
+      const matDonut = donutSvg(
+        matArr.map((m,i)=>({value:m.total, color:CHART_PALETTE[i % CHART_PALETTE.length]})),
+        {size:88, stroke:12, centerLabel: fmtCompact(matArr.reduce((s,m)=>s+m.total,0)), centerLabelSize: 10.5}
+      );
+      matEl.innerHTML = '<div class="donut-wrap">' + matDonut + '</div>' + matArr.map(m=>{
         const p = maxMat ? Math.max(4, Math.round(m.total/maxMat*100)) : 0;
         return '<div class="bar-row"><div class="bar-top"><span class="name">'+esc(m.name)+'</span><span class="amt num">'+fmtNum(m.qty)+' '+esc(m.unit)+' · '+fmt(m.total)+'</span></div><div class="bar-track"><div class="bar-fill gold" style="width:'+p+'%"></div></div></div>';
       }).join('');
@@ -1780,7 +1898,11 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
     if(fundArr.length===0){
       fundBarsEl.innerHTML = '<div class="empty">Henüz fon alışı eklenmedi.</div>';
     } else {
-      fundBarsEl.innerHTML = fundArr.map(f=>{
+      const fundDonut = donutSvg(
+        fundArr.map((f,i)=>({value:f.total, color:CHART_PALETTE[i % CHART_PALETTE.length]})),
+        {size:88, stroke:12, centerLabel: fmtCompact(fundArr.reduce((s,f)=>s+f.total,0)), centerLabelSize: 10.5}
+      );
+      fundBarsEl.innerHTML = '<div class="donut-wrap">' + fundDonut + '</div>' + fundArr.map(f=>{
         const p = maxFund ? Math.max(4, Math.round(f.total/maxFund*100)) : 0;
         return '<div class="bar-row"><div class="bar-top"><span class="name">'+esc(f.name)+'</span><span class="amt num">'+fmtNum(f.qty,4)+' adet · '+fmt(f.total)+'</span></div><div class="bar-track"><div class="bar-fill gold" style="width:'+p+'%"></div></div></div>';
       }).join('');
@@ -2565,7 +2687,11 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
     if(bankArr.length===0){
       bankEl.innerHTML = '<div class="empty">Henüz kıymetli maden varlığı eklenmedi.</div>';
     } else {
-      bankEl.innerHTML = bankArr.map(function(b){
+      const bankDonut = donutSvg(
+        bankArr.map(function(b,i){ return {value:b.total, color:CHART_PALETTE[i % CHART_PALETTE.length]}; }),
+        {size:88, stroke:12, centerLabel: fmtCompact(bankArr.reduce(function(s,b){ return s+b.total; },0)), centerLabelSize: 10.5}
+      );
+      bankEl.innerHTML = '<div class="donut-wrap">' + bankDonut + '</div>' + bankArr.map(function(b){
         const pct = maxBank ? Math.max(4, Math.round(b.total/maxBank*100)) : 0;
         const isOpen = !!S.raporExpandedBanks[b.name];
         // o bankadaki varlıkların kendi dağılımı -- en değerliden en düşüğe
@@ -2918,6 +3044,7 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
 
   // ---------- boot ----------
   async function boot(){
+    initTheme();
     const banner = $('#dbBanner');
     const ghCfg = getGithubConfig();
     let gh = ghCfg ? new GithubApi(ghCfg) : null;
