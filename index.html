@@ -427,16 +427,25 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
 
       <div class="breakdown-card" id="breakdownCard"></div>
 
-      <div class="section-title" style="display:flex;align-items:center;justify-content:space-between;">
-        <span>Gelir Kaynakları</span>
-        <button type="button" class="icon-btn" id="addIncomeTypeQuickBtn" title="Gelir kaynağı ekle" style="margin:0;">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
-        </button>
+      <div class="segmented" id="ozetSubTabs" style="margin-top:4px;">
+        <button type="button" data-sub="kaynaklar" class="active">Gelir Kaynakları</button>
+        <button type="button" data-sub="hareketler">Son Hareketler</button>
       </div>
-      <div class="pot-grid" id="potGrid"></div>
 
-      <div class="section-title">Son Hareketler</div>
-      <div class="tx-list" id="recentList"></div>
+      <div id="ozetKaynaklarPane">
+        <div class="section-title" style="display:flex;align-items:center;justify-content:space-between;">
+          <span>Gelir Kaynakları</span>
+          <button type="button" class="icon-btn" id="addIncomeTypeQuickBtn" title="Gelir kaynağı ekle" style="margin:0;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          </button>
+        </div>
+        <div class="pot-grid" id="potGrid"></div>
+      </div>
+
+      <div id="ozetHareketlerPane" style="display:none;">
+        <div class="section-title">Son Hareketler</div>
+        <div class="tx-list" id="recentList"></div>
+      </div>
     </section>
 
     <!-- EKLE -->
@@ -776,7 +785,7 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
     fundLots:[], fundSales:[], fundPrices:[],
     view:'ozet', addMode:'gider', addPersonId:null,
     ozetPerson:'all', raporPerson:'all', kayitlarPerson:'all', birikimPerson:'all', fundPerson:'all', birikimOverviewPerson:'all',
-    reportPeriod:'thisMonth', recordFilter:'all', holdingsFilter:'all', birikimSubView:'metal',
+    reportPeriod:'thisMonth', recordFilter:'all', holdingsFilter:'all', birikimSubView:'metal', ozetSubView:'kaynaklar',
     raporExpandedTypes:{}, // {incomeTypeId: true} -- which "Kaynağa Göre" cards are expanded to show their hareketler
     raporExpandedBanks:{}, // {bankName: true} -- which "Bankaya Göre Dağılım" rows are expanded to show their varlıklar
     editing:null // {kind:'gelir'|'gider'|'varlik', id}
@@ -1447,6 +1456,10 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
     const expM = expEntries.filter(e=>inRange(e.date, range)).reduce((a,e)=>a+Number(e.amount||0),0);
     $('#heroIncomeMonth').textContent = fmt(incM);
     $('#heroExpenseMonth').textContent = fmt(expM);
+
+    $$('#ozetSubTabs button').forEach(function(b){ b.classList.toggle('active', b.dataset.sub===S.ozetSubView); });
+    $('#ozetKaynaklarPane').style.display = S.ozetSubView==='hareketler' ? 'none' : '';
+    $('#ozetHareketlerPane').style.display = S.ozetSubView==='hareketler' ? '' : 'none';
 
     let types = S.incomeTypes.filter(t=>!t.archived);
     if(S.ozetPerson!=='all') types = types.filter(t=>t.personId===S.ozetPerson);
@@ -3027,6 +3040,10 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
 
     $$('#periodChips .chip').forEach(c=>c.addEventListener('click', ()=>{ S.reportPeriod = c.dataset.period; renderRapor(); }));
     $$('#recordChips .chip').forEach(c=>c.addEventListener('click', ()=>{ S.recordFilter = c.dataset.rf; renderKayitlar(); }));
+
+    $$('#ozetSubTabs button').forEach(function(b){
+      b.addEventListener('click', ()=>{ S.ozetSubView = b.dataset.sub; renderOzet(); });
+    });
 
     $('#addHoldingBtn').addEventListener('click', ()=> openHoldingSheet(null));
     $('#updatePricesBtn').addEventListener('click', ()=> openPricesSheet());
