@@ -142,8 +142,19 @@ h1,h2,h3,.display{font-family:'Plus Jakarta Sans', system-ui, sans-serif; font-w
 .dash-card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px;align-content:start;}
 .dash-narrow{max-width:560px;}
 @media (max-width:1100px){
-  .dash-row.cols-2,.dash-row.cols-2-even,.dash-row.cols-aside{grid-template-columns:1fr;}
+  .dash-row{grid-template-columns:1fr !important;}
 }
+.trend-legend{display:flex;gap:14px;font-size:11.5px;font-weight:700;color:var(--ink-faint);}
+.trend-legend-item{display:inline-flex;align-items:center;gap:5px;}
+.trend-legend-item i{width:9px;height:9px;border-radius:3px;display:inline-block;}
+.trend-chart-card{background:var(--surface);border:1px solid var(--hairline);border-radius:var(--radius-sm);padding:16px 14px 6px;box-shadow:var(--shadow);}
+.person-compare-card{background:var(--surface);border:1px solid var(--hairline);border-radius:var(--radius-sm);padding:16px;box-shadow:var(--shadow);}
+.pcc-name{font-size:13px;font-weight:700;color:var(--ink-faint);text-transform:uppercase;letter-spacing:0.03em;}
+.pcc-total{font-size:22px;font-weight:800;font-family:'Plus Jakarta Sans',sans-serif;margin-top:4px;}
+.pcc-sub{font-size:12px;color:var(--ink-faint);margin-top:2px;}
+.pcc-row{display:flex;align-items:center;justify-content:space-between;font-size:12.5px;padding:8px 0;border-top:1px solid var(--hairline);margin-top:6px;}
+.pcc-row span:first-child{color:var(--ink-faint);font-weight:600;}
+.pcc-row span.num{font-weight:700;}
 #holdingsList,#fundLotsList,#fundSalesList,#sourceCards{
   display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;align-items:start;
 }
@@ -444,6 +455,10 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
         <svg viewBox="0 0 24 24"><path d="M4 20V10M12 20V4M20 20v-7"/><path d="M2.5 20.5h19"/></svg>
         <span>Rapor</span>
       </button>
+      <button class="tab" data-view="analiz">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg>
+        <span>Analiz</span>
+      </button>
       <button class="tab" data-view="kayitlar">
         <svg viewBox="0 0 24 24"><path d="M8 6h12M8 12h12M8 18h12"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/></svg>
         <span>Kayıtlar</span>
@@ -669,6 +684,35 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
 
       <div class="section-title">Bankaya Göre Dağılım (Kıymetli Maden)</div>
       <div id="bankBars"></div>
+    </section>
+
+    <!-- ANALİZ (masaüstüne özel, mobilde yok) -->
+    <section id="view-analiz" class="view">
+      <div class="stat-row" style="margin-top:14px;">
+        <div class="stat-tile"><div class="l">Son 6 Ay Toplam Gelir</div><div class="v num income" id="anSumIncome">₺0,00</div></div>
+        <div class="stat-tile"><div class="l">Son 6 Ay Toplam Gider</div><div class="v num expense" id="anSumExpense">₺0,00</div></div>
+        <div class="stat-tile"><div class="l">Tasarruf Oranı</div><div class="v num" id="anSavingsRate">%0</div></div>
+      </div>
+
+      <div class="dash-row" style="margin-top:18px;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);">
+        <div class="dash-col" style="min-width:0;">
+          <div class="section-title" style="margin-top:0;display:flex;align-items:center;justify-content:space-between;">
+            <span>Aylık Gelir / Gider Trendi (Son 6 Ay)</span>
+            <span class="trend-legend">
+              <span class="trend-legend-item"><i style="background:var(--income);"></i>Gelir</span>
+              <span class="trend-legend-item"><i style="background:var(--expense);"></i>Gider</span>
+            </span>
+          </div>
+          <div class="trend-chart-card" id="monthlyTrendChart"></div>
+        </div>
+        <div class="dash-col">
+          <div class="section-title" style="margin-top:0;">Kişi Karşılaştırması</div>
+          <div class="dash-card-grid" id="personCompareGrid"></div>
+        </div>
+      </div>
+
+      <div class="section-title">Son 6 Ayda Gider Dağılımı (Kategori Payı)</div>
+      <div id="categoryShareBars"></div>
     </section>
 
     <!-- KAYITLAR -->
@@ -1200,6 +1244,128 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
     return '<svg width="'+size+'" height="'+size+'" viewBox="0 0 '+size+' '+size+'" style="flex:none;">'+bg+arcs+centerLabel+centerSub+'</svg>';
   }
 
+  // ---------- Analiz (masaüstüne özel): aylık trend + kişi karşılaştırması ----------
+  const TR_MONTHS_SHORT = ['Oca','Şub','Mar','Nis','May','Haz','Tem','Ağu','Eyl','Eki','Kas','Ara'];
+  function ymd2(y,m,d){ return y+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0'); }
+  // last `count` calendar months (oldest first), each with that person-filter's income/expense totals
+  function computeMonthlyTrend(personFilter, count){
+    let types = S.incomeTypes;
+    if(personFilter && personFilter!=='all') types = types.filter(t=>t.personId===personFilter);
+    const ids = types.map(t=>t.id);
+    const now = new Date();
+    const out = [];
+    for(let i=count-1; i>=0; i--){
+      const d = new Date(now.getFullYear(), now.getMonth()-i, 1);
+      const y = d.getFullYear(), m = d.getMonth();
+      const lastDay = new Date(y, m+1, 0).getDate();
+      const range = [ymd2(y,m,1), ymd2(y,m,lastDay)];
+      const income = S.incomeEntries.filter(e=>ids.includes(e.typeId) && inRange(e.date, range)).reduce((a,e)=>a+Number(e.amount||0),0);
+      const expense = S.expenseEntries.filter(e=>ids.includes(e.paidFromTypeId) && inRange(e.date, range)).reduce((a,e)=>a+Number(e.amount||0),0);
+      const label = TR_MONTHS_SHORT[m] + (y !== now.getFullYear() ? " '"+String(y).slice(2) : '');
+      out.push({label, income, expense, rangeStart: range[0]});
+    }
+    return out;
+  }
+  // gider toplamını son `count` ayda kategoriye göre kırar, yüzdelik pay + işlem sayısıyla
+  function categoryShareLastMonths(count){
+    const now = new Date();
+    const start = new Date(now.getFullYear(), now.getMonth()-(count-1), 1);
+    const range = [ymd2(start.getFullYear(), start.getMonth(), 1), periodRange('thisMonth')[1]];
+    const exp = S.expenseEntries.filter(e=>inRange(e.date, range));
+    const byCat = {};
+    exp.forEach(function(e){
+      const key = e.categoryId || e.categoryName;
+      if(!byCat[key]) byCat[key] = {name: e.categoryName || '—', total:0, count:0};
+      byCat[key].total += Number(e.amount||0);
+      byCat[key].count += 1;
+    });
+    const arr = Object.values(byCat).sort(function(a,b){ return b.total-a.total; });
+    const total = arr.reduce(function(s,c){ return s+c.total; }, 0);
+    arr.forEach(function(c){ c.pct = total > 0 ? (c.total/total*100) : 0; });
+    return {items: arr, total};
+  }
+  // bağımsız inline-SVG gruplu çubuk grafik: her ay için yan yana gelir/gider çubuğu
+  function monthlyTrendSvg(months, opts){
+    opts = opts || {};
+    const w = opts.width || 620, h = opts.height || 230;
+    const padL = 46, padR = 14, padT = 14, padB = 30;
+    const plotW = Math.max(10, w - padL - padR), plotH = Math.max(10, h - padT - padB);
+    const maxVal = Math.max(1, ...months.map(m=>Math.max(m.income, m.expense)));
+    const n = Math.max(1, months.length);
+    const groupW = plotW / n;
+    const barW = Math.min(20, groupW * 0.3);
+    const gap = Math.max(3, barW * 0.25);
+    const gridCount = 4;
+    let grid = '';
+    for(let i=0; i<=gridCount; i++){
+      const y = padT + plotH - (plotH * i / gridCount);
+      const val = maxVal * i / gridCount;
+      grid += '<line x1="'+padL+'" y1="'+y+'" x2="'+(padL+plotW)+'" y2="'+y+'" stroke="var(--hairline)" stroke-width="1"/>';
+      grid += '<text x="'+(padL-8)+'" y="'+(y+3)+'" text-anchor="end" font-size="9.5" fill="var(--ink-faint)">'+esc(fmtCompact(val))+'</text>';
+    }
+    let bars = '';
+    months.forEach(function(mo, i){
+      const cx = padL + i*groupW + groupW/2;
+      const incH = (mo.income/maxVal) * plotH;
+      const expH = (mo.expense/maxVal) * plotH;
+      const incX = cx - barW - gap/2;
+      const expX = cx + gap/2;
+      const incY = padT + plotH - incH;
+      const expY = padT + plotH - expH;
+      bars += '<rect x="'+incX+'" y="'+incY+'" width="'+barW+'" height="'+Math.max(0,incH)+'" rx="3" fill="var(--income)"><title>'+esc(mo.label)+' Gelir: '+esc(fmt(mo.income))+'</title></rect>';
+      bars += '<rect x="'+expX+'" y="'+expY+'" width="'+barW+'" height="'+Math.max(0,expH)+'" rx="3" fill="var(--expense)"><title>'+esc(mo.label)+' Gider: '+esc(fmt(mo.expense))+'</title></rect>';
+      bars += '<text x="'+cx+'" y="'+(padT+plotH+18)+'" text-anchor="middle" font-size="10.5" font-weight="700" fill="var(--ink-faint)">'+esc(mo.label)+'</text>';
+    });
+    return '<svg viewBox="0 0 '+w+' '+h+'" style="width:100%;height:auto;display:block;" preserveAspectRatio="xMidYMid meet">'+grid+bars+'</svg>';
+  }
+  function renderAnaliz(){
+    const months = computeMonthlyTrend('all', 6);
+    const sumIncome = months.reduce((a,m)=>a+m.income,0);
+    const sumExpense = months.reduce((a,m)=>a+m.expense,0);
+    const rate = sumIncome > 0 ? ((sumIncome-sumExpense)/sumIncome*100) : 0;
+    $('#anSumIncome').textContent = fmt(sumIncome);
+    $('#anSumExpense').textContent = fmt(sumExpense);
+    const rateEl = $('#anSavingsRate');
+    rateEl.textContent = '%' + fmtNum(rate, 1);
+    rateEl.classList.toggle('income', rate>=0);
+    rateEl.classList.toggle('expense', rate<0);
+
+    $('#monthlyTrendChart').innerHTML = monthlyTrendSvg(months);
+
+    const people = S.people.filter(p=>!p.archived);
+    const compEl = $('#personCompareGrid');
+    if(people.length===0){
+      compEl.innerHTML = '<div class="empty">Henüz kişi yok.</div>';
+    } else {
+      const range = periodRange('thisMonth');
+      compEl.innerHTML = people.map(function(p){
+        const b = investmentBreakdown(p.id);
+        const ids = S.incomeTypes.filter(t=>t.personId===p.id).map(t=>t.id);
+        const incM = S.incomeEntries.filter(e=>ids.includes(e.typeId) && inRange(e.date, range)).reduce((a,e)=>a+Number(e.amount||0),0);
+        const expM = S.expenseEntries.filter(e=>ids.includes(e.paidFromTypeId) && inRange(e.date, range)).reduce((a,e)=>a+Number(e.amount||0),0);
+        const profitCls = b.investProfit >= 0 ? 'profit-pos' : 'profit-neg';
+        return '<div class="person-compare-card">'
+          + '<div class="pcc-name">'+esc(p.name)+'</div>'
+          + '<div class="pcc-total num">'+fmt(b.grandTotal)+'</div>'
+          + '<div class="pcc-sub">Nakit '+fmt(b.cash)+' · Yatırım '+fmt(b.investValue)+'</div>'
+          + '<div class="pcc-row"><span>Yatırım Kâr/Zarar</span><span class="num '+profitCls+'">'+(b.investProfit>=0?'+':'')+fmt(b.investProfit)+'</span></div>'
+          + '<div class="pcc-row"><span>Bu Ay Gelir</span><span class="num" style="color:var(--income);">'+fmt(incM)+'</span></div>'
+          + '<div class="pcc-row"><span>Bu Ay Gider</span><span class="num" style="color:var(--expense);">'+fmt(expM)+'</span></div>'
+          + '</div>';
+      }).join('');
+    }
+
+    const share = categoryShareLastMonths(6);
+    const shareEl = $('#categoryShareBars');
+    if(share.items.length===0){
+      shareEl.innerHTML = '<div class="empty">Son 6 ayda gider kaydı yok.</div>';
+    } else {
+      shareEl.innerHTML = share.items.map(function(c){
+        return '<div class="bar-row"><div class="bar-top"><span class="name">'+esc(c.name)+' <span style="color:var(--ink-faint);font-weight:600;">· '+c.count+' işlem</span></span><span class="amt num">'+fmt(c.total)+' <span style="color:var(--ink-faint);font-weight:700;">('+fmtNum(c.pct,1)+'%)</span></span></div><div class="bar-track"><div class="bar-fill" style="width:'+Math.max(4,Math.round(c.pct))+'%"></div></div></div>';
+      }).join('');
+    }
+  }
+
   // ---------- tema (açık/koyu/sistem) ----------
   const THEME_KEY = 'kft_theme_v1';
   const THEME_ICONS = {
@@ -1427,6 +1593,7 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
     else if(v==='ekle') renderEkleOptions();
     else if(v==='birikim') renderBirikim();
     else if(v==='rapor') renderRapor();
+    else if(v==='analiz') renderAnaliz();
     else if(v==='kayitlar') renderKayitlar();
   }
 
