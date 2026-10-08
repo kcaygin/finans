@@ -583,11 +583,18 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
         <div class="section-title">Fona Göre Dağılım</div>
         <div id="fundBars"></div>
 
-        <div class="section-title">Alışlarım</div>
-        <div id="fundLotsList"></div>
+        <div class="segmented" id="fundTxTabs" style="margin-top:4px;">
+          <button type="button" data-sub="lots" class="active">Alışlarım</button>
+          <button type="button" data-sub="sales">Satışlarım</button>
+        </div>
 
-        <div class="section-title">Satışlarım</div>
-        <div id="fundSalesList"></div>
+        <div id="fundLotsPane">
+          <div id="fundLotsList"></div>
+        </div>
+
+        <div id="fundSalesPane" style="display:none;">
+          <div id="fundSalesList"></div>
+        </div>
       </div>
     </section>
 
@@ -814,7 +821,7 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
     fundLots:[], fundSales:[], fundPrices:[],
     view:'ozet', addMode:'gider', addPersonId:null,
     ozetPerson:'all', raporPerson:'all', kayitlarPerson:'all', birikimPerson:'all', fundPerson:'all', birikimOverviewPerson:'all',
-    reportPeriod:'thisMonth', recordFilter:'all', holdingsFilter:'all', birikimSubView:'metal', ozetSubView:'kaynaklar',
+    reportPeriod:'thisMonth', recordFilter:'all', holdingsFilter:'all', birikimSubView:'metal', ozetSubView:'kaynaklar', fundTxView:'lots',
     raporExpandedTypes:{}, // {incomeTypeId: true} -- which "Kaynağa Göre" cards are expanded to show their hareketler
     raporExpandedBanks:{}, // {bankName: true} -- which "Bankaya Göre Dağılım" rows are expanded to show their varlıklar
     editing:null // {kind:'gelir'|'gider'|'varlik', id}
@@ -1917,6 +1924,10 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
   function renderFundView(){
     renderBirikimOverview();
     renderPersonChips('fundPersonChips', S.fundPerson, function(val){ S.fundPerson = val; renderFundView(); });
+
+    $$('#fundTxTabs button').forEach(function(b){ b.classList.toggle('active', b.dataset.sub===S.fundTxView); });
+    $('#fundLotsPane').style.display = S.fundTxView==='sales' ? 'none' : '';
+    $('#fundSalesPane').style.display = S.fundTxView==='sales' ? '' : 'none';
 
     let lots = S.fundLots.slice();
     let sales = S.fundSales.slice();
@@ -3092,6 +3103,10 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
       b.addEventListener('click', ()=>{ S.ozetSubView = b.dataset.sub; renderOzet(); });
     });
 
+    $$('#fundTxTabs button').forEach(function(b){
+      b.addEventListener('click', ()=>{ S.fundTxView = b.dataset.sub; renderFundView(); });
+    });
+
     $('#addHoldingBtn').addEventListener('click', ()=> openHoldingSheet(null));
     $('#updatePricesBtn').addEventListener('click', ()=> openPricesSheet());
     $('#addIncomeTypeQuickBtn').addEventListener('click', ()=> openIncomeTypeSheet(null));
@@ -3151,4 +3166,3 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
   }
 })();
 </script>
-</html>
