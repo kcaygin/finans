@@ -347,6 +347,15 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
 .breakdown-row .amounts .sub{font-size:11px;color:var(--ink-faint);margin-top:2px;}
 .profit-pos{color:var(--income);font-weight:600;}
 .profit-neg{color:var(--expense);font-weight:600;}
+
+.delta-summary-banner{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:14px;padding:11px 14px;border-radius:var(--radius-sm);border:1px solid var(--hairline);}
+.delta-summary-banner.pos{background:var(--income-soft);}
+.delta-summary-banner.neg{background:var(--expense-soft);}
+.dsb-label{font-size:12px;font-weight:600;color:var(--ink-soft);}
+.dsb-amount{font-size:15px;font-weight:800;font-family:'Plus Jakarta Sans',sans-serif;}
+.delta-summary-banner.pos .dsb-amount{color:var(--income);}
+.delta-summary-banner.neg .dsb-amount{color:var(--expense);}
+.dsb-pct{font-weight:700;font-size:12.5px;opacity:0.85;}
 .breakdown-totals{display:flex;justify-content:space-between;gap:10px;margin-top:12px;padding-top:12px;border-top:1px solid var(--hairline);}
 .breakdown-totals .t-item{flex:1;}
 .breakdown-totals .t-label{font-size:10.5px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:0.03em;}
@@ -600,6 +609,8 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
               <div class="stat-tile"><div class="l">Kar/Zarar</div><div class="v num" id="bKar">₺0,00</div></div>
             </div>
 
+            <div id="metalPriceDeltaSummary"></div>
+
             <div style="display:flex;gap:10px;margin-top:18px;">
               <button type="button" class="btn-primary gold" id="addHoldingBtn" style="flex:1;margin-top:0;">+ Yeni Varlık Ekle</button>
               <button type="button" class="btn-ghost" id="updatePricesBtn" style="flex:1;margin-top:0;">Fiyatları Güncelle</button>
@@ -631,6 +642,8 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
               <div class="stat-tile"><div class="l">Gerçekleşmemiş K/Z</div><div class="v num" id="fUnrealized">₺0,00</div></div>
               <div class="stat-tile"><div class="l">Gerçekleşen Net Kâr</div><div class="v num" id="fRealized">₺0,00</div></div>
             </div>
+
+            <div id="fundPriceDeltaSummary"></div>
 
             <div style="display:flex;gap:10px;margin-top:18px;">
               <button type="button" class="btn-primary gold" id="addFundLotBtn" style="flex:1;margin-top:0;">+ Alış Ekle</button>
@@ -1205,6 +1218,22 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
     const sign = valueDelta >= 0 ? '+' : '';
     const pctSign = priceDelta.pct >= 0 ? '+' : '';
     return '<div style="font-size:11.5px;color:var(--ink-faint);margin-top:8px;">Son fiyat güncellemesine göre: <span class="'+cls+'">'+sign+fmt(valueDelta)+' ('+pctSign+fmtNum(priceDelta.pct,1)+'%)</span></div>';
+  }
+  // Birikim'in Kıymetli Maden / Yatırım Fonları panelerinde, stat-tile satırının hemen altında
+  // gösterilen öne çıkan özet: o panelde (geçerli kişi filtresiyle) son fiyat güncellemesine göre
+  // toplam ne kadar kâr/zarar oluştuğu -- tek tek kart satırlarındaki priceDeltaLineHtml'in
+  // panel genelindeki toplamı. Hiçbir varlığın/fonun henüz ikinci bir fiyat güncellemesi yoksa
+  // (hasAnyDelta=false) hiç gösterilmez.
+  function priceDeltaSummaryHtml(valueDelta, prevValue, hasAnyDelta){
+    if(!hasAnyDelta) return '';
+    const cls = valueDelta >= 0 ? 'pos' : 'neg';
+    const sign = valueDelta >= 0 ? '+' : '';
+    const pct = prevValue > 0 ? (valueDelta/prevValue*100) : 0;
+    const pctSign = pct >= 0 ? '+' : '';
+    return '<div class="delta-summary-banner '+cls+'">'
+      + '<span class="dsb-label">Son fiyat güncellemesine göre</span>'
+      + '<span class="dsb-amount">'+sign+fmt(valueDelta)+' <span class="dsb-pct">('+pctSign+fmtNum(pct,1)+'%)</span></span>'
+      + '</div>';
   }
 
   // ---------- donut chart (dependency-free inline SVG) ----------
@@ -1994,8 +2023,8 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
     let holdings = S.savingsHoldings.slice();
     if(S.birikimPerson!=='all') holdings = holdings.filter(h=>h.personId===S.birikimPerson);
 
-    let totalCost=0, totalValue=0;
-    holdings.forEach(h=>{ const m = holdingMetrics(h); totalCost+=m.cost; totalValue+=m.value; });
+    let totalCost=0, totalValue=0, totalValueDelta=0, hasAnyDelta=false;
+    holdings.forEach(h=>{ const m = holdingMetrics(h); totalCost+=m.cost; totalValue+=m.value; totalValueDelta+=m.valueDelta; if(m.priceDelta) hasAnyDelta=true; });
     const totalProfit = totalValue - totalCost;
     const pct = totalCost>0 ? (totalProfit/totalCost*100) : 0;
 
@@ -2005,6 +2034,7 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
     karEl.textContent = fmt(totalProfit) + (totalCost>0 ? ' ('+(totalProfit>=0?'+':'')+fmtNum(pct,1)+'%)' : '');
     karEl.classList.toggle('income', totalProfit>=0);
     karEl.classList.toggle('expense', totalProfit<0);
+    $('#metalPriceDeltaSummary').innerHTML = priceDeltaSummaryHtml(totalValueDelta, totalValue-totalValueDelta, hasAnyDelta);
 
     // material breakdown by current value
     const byMat = {};
@@ -2093,8 +2123,8 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
       sales = sales.filter(s=>s.personId===S.fundPerson);
     }
 
-    let totalRemaining=0, totalCost=0, totalValue=0;
-    lots.forEach(l=>{ const m = fundLotMetrics(l); totalRemaining+=m.remaining; totalCost+=m.cost; totalValue+=m.value; });
+    let totalRemaining=0, totalCost=0, totalValue=0, totalValueDelta=0, hasAnyDelta=false;
+    lots.forEach(l=>{ const m = fundLotMetrics(l); totalRemaining+=m.remaining; totalCost+=m.cost; totalValue+=m.value; totalValueDelta+=m.valueDelta; if(m.priceDelta) hasAnyDelta=true; });
     const totalUnrealized = totalValue - totalCost;
     const totalRealizedNet = sales.reduce((s,x)=>s+Number(x.netProfit||0), 0);
 
@@ -2109,6 +2139,7 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
     relEl.textContent = fmt(totalRealizedNet);
     relEl.classList.toggle('income', totalRealizedNet>=0);
     relEl.classList.toggle('expense', totalRealizedNet<0);
+    $('#fundPriceDeltaSummary').innerHTML = priceDeltaSummaryHtml(totalValueDelta, totalValue-totalValueDelta, hasAnyDelta);
 
     // fon adına göre dağılım (kalan varlıkların güncel değerine göre)
     const byFund = {};
