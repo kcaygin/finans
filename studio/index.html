@@ -1,0 +1,8 @@
+<!doctype html>
+<html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#f7f5ee"><title>Kelo | Finans masası</title><link rel="stylesheet" href="style.css"><script src="../finance-core.js" defer></script><script src="app.js" defer></script></head>
+<body>
+<aside class="rail"><a class="brand" href="#ozet"><span>K</span>kelo<span class="brand-dot">.</span></a><nav aria-label="Ana menü">
+<a href="#ozet"><i>◫</i>Özet</a><a href="#hareketler"><i>↕</i>Hareketler</a><a href="#portfoy"><i>◇</i>Portföy</a><a href="#butce"><i>◉</i>Bütçe</a><a href="#veri"><i>⚙</i>Veriler</a></nav><div class="rail-foot"><span></span> Yerel çalışma alanı</div></aside>
+<main><header class="top"><div><p id="date"></p><h1 id="page-title">Finans masası</h1></div><button class="primary" id="new">＋ <span>Yeni işlem</span></button></header><div id="view"></div><p id="notice" role="status" aria-live="polite"></p></main>
+<dialog id="editor"><form id="form"><div class="dialog-head"><h2 id="dialog-title">Yeni işlem</h2><button type="button" class="icon" id="close" aria-label="Kapat">×</button></div><label>İşlem türü<select name="kind" id="kind"><option value="expense">Gider</option><option value="income">Gelir</option><option value="transfer">Hesaplar arası transfer</option><option value="fund">Fon alışı</option><option value="metal">Maden alışı</option><option value="sale">Fon satışı</option><option value="account">Yeni nakit hesabı</option></select></label><div id="fields"></div><p id="form-error" role="alert"></p><button class="primary submit">İşlemi kaydet</button></form></dialog>
+</body></html>
