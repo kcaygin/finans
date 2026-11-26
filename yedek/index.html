@@ -1,0 +1,3168 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="KFT">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#5B5FEF">
+<link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAAGiUlEQVR4nO3cWWwUdQDH8f92tmW7u3gbjRHaUlAR1AdN9MFovE2MxhivSAh4A3IqvUzUaKIColiLRa7ilSj6YHxRHwxBRaFROTzAC1F6WROpLbvbdnen60OND8BvWunszgz9fl53O/3v7jez8//PzIamzegywJEUeT0A+BdxQCIOSMQBiTggEQck4oBEHJCIAxJxQCIOSMQBiTggEQck4oBEHJCIAxJxQCIOSMQBiTggEQck4oBEHJCIAxJxQCIOSMQBiTggEQck4oBEHJCIAxJxQCIOSMQBiTggEQck4oBEHJCIAxJxQCIOSMQBiTggEQck4oBEHJCIAxJxQCIOSMQBiTggEQck4oBEHJCIAxJxQCIOSMQBiTggEQck4oBEHJCIAxJxQArnb9Mzppdec9WYIz6USORmze0+us2OH2c9WhOPx0PqCX/8MfD00kRX18Dwx+OW7p7cQ/O7jTFTp4Rrq+J5/V+H2/xpel1TysUN5jGOfCgbb9VVO5XR3mE/szT599+HloGjEKQ4ysZbdTXxeEyW0dpmP7s00d2TK+SojmGBiaO8zKqtdipjf4u9ZFmi5yBluCYYcQxZxm+/20ueSyQSlOGmAMRRXmbVVcdjuox9++wlyxPJJGW4zO9xDFnG3r320uWJVC9luM/XcVSUW7VVTmX8/Et22fPJ3hGX0deXW7+hd4QbMcakM/+OpKXFfnnVcGeVl19WMnXKkT+IVG9uw6vDHVjnn/YwnzlM/o1jyDJ+/Cn73AvJvj4X9hnZrNnanB75dv7T3ZMb/gYnnxM2U478UCbj8sD+F5/GUVFh1VXFo1FZxu492edfTPb3822SR36MY8gyvvs++0J9Mp2mjPzyXRwTKqxaxzK++Taz4qVUJkMZeeevOCZUWLXV8WipLGPnrkx9QzKTLeSgRi8fxVE5waqpcirj6+2ZhsZkljIKxS9xDFnGl19lVq5K2i5P1uDEF3FUVlo1i53K2NacWbWGMgrN+zgqK63axfFSXcbnW9Or16YGOAlfcB7HMbEyXLM45lDGZ1vSa9anckxNvOBlHEOWsfnT9PoNlOEZz+KYNDFc/YhTGcaYjg6bMjzkzQXGYyIh533GoDtuKz1vqvdHRaOWN299cdgUh4cowxhTVGTmzo49/uTBzj/zezgaj4fefPWEkW+nuu5ge8exM6fy+60JsVho0fxYJDJ0SXCd3+Mwxpx5pjXr/miIPArOF3H09+c+3tTv8ISLLiy++aZIwcaDQd4f7rW12y+tTLW129msuf5aedPRLTdHft9vb9+RKeTYRjmP9xxbvkg//mSird02xry1sXfPD/KsWihk5jwYPeMMq4CjG+08iyOdzq1rSr2yJvXf1Vy2bRoakwcOyIlJJBJ6eEHM4RQM3OXN10o6nXviqURL66Gzvp6eXP3LycfqxobFuE4/reih2dHlK5LuLo65dYHxgcNu0A00r+Iwh5cxaO9e+/U3U/fMjKq/veD84ttvjWx8t8/F8bh+gfGxwRezlUNs2pze/InTR3XjDZFLLi4u2HhGLT/GYYx57Y3Ur/uclhofuDc6fhwHp/nl0zgyWVPfkHS4K7qkJLRoQWzsWA5O88incRhj/jowsLIx6XCNz6mnFM2bE7PYfeSNf+Mwxuzek337HadJxLmTw3fdWVqw8Yw2vo7DGPPBR/3bmp1WRa+7Zsxll5YUbDyjit/jMMasbUq1innvoLtnRisn8O3ivgDE0d+fW9GQdPiRheKwWTgvdvzxAXgtwRKMN7Szc2DVaqeLSU88sWjhvKhaV8XRCUYcxpgdOzPvve+0KjppYnjGdLmuiqMQmDiMMe+937dzl9PB6RWXl1x9ZX5/aXRUCVIcuZxpXJ3q7HQ6uTV9WunZZ/Ht4o4gxWGMSaVyLzY4/WaLZZkFc2MnnxSw1+VPwXsTW1rtdU1OK2PHHRdaOD9WXMzK+kgFLw5jzNbm9IcfOV1zWlFu3Xc3K6cjFZo2o8vrMcCnArnnQGEQByTigEQckIgDEnFAIg5IxAGJOCARByTigEQckIgDEnFAIg5IxAGJOCARByTigEQckIgDEnFAIg5IxAGJOCARByTigEQckIgDEnFAIg5IxAGJOCARByTigEQckIgDEnFAIg5IxAGJOCARByTigEQckIgDEnFAIg5IxAGJOCARByTigEQckIgDEnFAIg5IxAGJOCARByTigEQckIgDEnFAIg5IxAGJOCARByTigPQPyArBqNwjJ3EAAAAASUVORK5CYII=">
+<title>Kürşat Finans Takip</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap');
+
+:root{
+  --bg:#F4F5FA;
+  --surface:#FFFFFF;
+  --surface-2:#EBEDF6;
+  --ink:#1B1D28;
+  --ink-soft:#6B6F86;
+  --ink-faint:#A0A4B8;
+  --hairline:rgba(27,29,40,0.08);
+  --accent:#5B5FEF;
+  --accent-ink:#4438CA;
+  --accent-soft:#ECEBFE;
+  --income:#12B76A;
+  --income-soft:#E7F9F1;
+  --expense:#F04438;
+  --expense-soft:#FDECEB;
+  --gold:#C99A2E;
+  --gold-ink:#8A6A1E;
+  --gold-soft:#FBF3DD;
+  --cash:#4A90A4;
+  --cash-soft:#E6F2F5;
+  --radius:20px;
+  --radius-sm:14px;
+  --shadow:0 1px 2px rgba(16,17,28,0.04), 0 8px 24px rgba(16,17,28,0.07);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#12131C;
+    --surface:#1B1D2A;
+    --surface-2:#242637;
+    --ink:#EDEEF7;
+    --ink-soft:#9498B0;
+    --ink-faint:#5C5F76;
+    --hairline:rgba(237,238,247,0.09);
+    --accent:#8B8FFB;
+    --accent-ink:#B4B7FD;
+    --accent-soft:#25275A;
+    --income:#3DD68C;
+    --income-soft:#123322;
+    --expense:#FF6B61;
+    --expense-soft:#3A1817;
+    --gold:#E4B94F;
+    --gold-ink:#F2CD73;
+    --gold-soft:#3A2E12;
+    --cash:#6FC3D9;
+    --cash-soft:#123238;
+    --shadow:0 1px 2px rgba(0,0,0,0.35), 0 10px 30px rgba(0,0,0,0.4);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#12131C;
+  --surface:#1B1D2A;
+  --surface-2:#242637;
+  --ink:#EDEEF7;
+  --ink-soft:#9498B0;
+  --ink-faint:#5C5F76;
+  --hairline:rgba(237,238,247,0.09);
+  --accent:#8B8FFB;
+  --accent-ink:#B4B7FD;
+  --accent-soft:#25275A;
+  --income:#3DD68C;
+  --income-soft:#123322;
+  --expense:#FF6B61;
+  --expense-soft:#3A1817;
+  --gold:#E4B94F;
+  --gold-ink:#F2CD73;
+  --gold-soft:#3A2E12;
+  --cash:#6FC3D9;
+  --cash-soft:#123238;
+  --shadow:0 1px 2px rgba(0,0,0,0.35), 0 10px 30px rgba(0,0,0,0.4);
+  color-scheme: dark;
+}
+
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:'IBM Plex Sans', system-ui, sans-serif;
+  -webkit-font-smoothing:antialiased;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.num{font-family:'IBM Plex Mono', ui-monospace, monospace; font-variant-numeric: tabular-nums; font-feature-settings:"tnum" 1;}
+h1,h2,h3,.display{font-family:'Plus Jakarta Sans', system-ui, sans-serif; font-weight:700;}
+
+#app{max-width:480px;margin:0 auto;min-height:100vh;position:relative;display:flex;flex-direction:column;}
+
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 20px 10px;
+}
+.brand{display:flex;align-items:center;gap:10px;}
+.brand-mark{
+  width:36px;height:36px;border-radius:11px;background:linear-gradient(135deg, var(--accent), var(--accent-ink));color:#fff;
+  display:flex;align-items:center;justify-content:center;font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:13px;flex:none;letter-spacing:0.02em;
+}
+.brand-name{font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:18px;letter-spacing:-0.01em;}
+.topbar .icon-btn{width:36px;height:36px;}
+.topbar .icon-btn svg{width:18px;height:18px;}
+.topbar-actions{display:flex;align-items:center;gap:8px;}
+
+/* ---------- donut chart ---------- */
+.donut-wrap{display:flex;align-items:center;gap:16px;margin:2px 0 14px;}
+.donut-wrap svg{flex:none;}
+.donut-wrap .num{font-family:'IBM Plex Mono', ui-monospace, monospace;}
+
+/* ---------- micro-interactions ---------- */
+.holding-card,.source-card,.bar-row,.chip,.btn-primary,.btn-ghost,.btn-danger,.icon-btn,.stat-tile{
+  transition:transform .14s ease, box-shadow .14s ease, opacity .14s ease;
+}
+.holding-card:active,.source-card:active{transform:scale(0.98);}
+.chip:active,.icon-btn:active{transform:scale(0.93);}
+.btn-primary:active,.btn-ghost:active,.btn-danger:active{transform:scale(0.97);}
+@media (hover:hover){
+  .holding-card:hover,.source-card:hover{transform:translateY(-1px);}
+  .chip:hover{opacity:0.88;}
+}
+
+main{flex:1;padding:4px 20px 100px;overflow-x:hidden;}
+.view{display:none;}
+.view.active{display:block;animation:fadein .18s ease;}
+@keyframes fadein{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+.section-title{
+  font-size:12.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;
+  color:var(--ink-faint);margin:22px 2px 10px;
+}
+.section-title:first-child{margin-top:6px;}
+
+.hero{
+  position:relative; overflow:hidden; isolation:isolate;
+  background:
+    radial-gradient(130% 160% at 105% -25%, rgba(255,255,255,0.30), rgba(255,255,255,0) 55%),
+    radial-gradient(90% 130% at -15% 115%, rgba(255,255,255,0.18), rgba(255,255,255,0) 55%),
+    linear-gradient(150deg, var(--accent-ink) 0%, var(--accent) 55%, #8B8FFB 100%);
+  color:#fff;border-radius:calc(var(--radius) + 4px);padding:24px 22px 22px;
+  box-shadow:0 20px 44px -16px rgba(91,95,239,0.55), inset 0 1px 0 rgba(255,255,255,0.25);
+}
+.hero::after{
+  content:'';
+  position:absolute; top:-40%; right:-18%; width:70%; height:140%;
+  background:radial-gradient(closest-side, rgba(255,255,255,0.16), rgba(255,255,255,0) 70%);
+  pointer-events:none; z-index:0;
+}
+.hero-label,.hero-amount,.hero-row,.hero-breakdown{position:relative; z-index:1;}
+.hero-label{font-size:12.5px;color:rgba(255,255,255,0.78);letter-spacing:0.04em;text-transform:uppercase;font-weight:600;}
+.hero-amount{font-size:35px;font-weight:700;margin-top:6px;line-height:1.1;letter-spacing:-0.01em;font-family:'Plus Jakarta Sans',sans-serif;}
+.hero-breakdown{font-size:13px;color:rgba(255,255,255,0.85);margin-top:7px;font-weight:600;}
+.hero-row{display:flex;gap:10px;margin-top:18px;}
+.hero-stat{
+  flex:1;background:rgba(255,255,255,0.14);border:1px solid rgba(255,255,255,0.18);
+  border-radius:14px;padding:11px 13px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+}
+.hero-stat .l{font-size:11px;color:rgba(255,255,255,0.78);}
+.hero-stat .v{font-size:16.5px;font-weight:700;margin-top:3px;}
+
+.pot-grid{display:flex;flex-direction:column;gap:10px;}
+.pot-card{
+  background:var(--surface);border:1px solid var(--hairline);border-radius:var(--radius-sm);
+  padding:13px 15px;box-shadow:var(--shadow);
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+}
+.pot-name{font-weight:700;font-size:14.5px;}
+.pot-person{font-weight:500;color:var(--accent-ink);font-size:11.5px;}
+.pot-sub{font-size:11.5px;color:var(--ink-faint);margin-top:2px;}
+.pot-balance{font-size:17px;font-weight:600;white-space:nowrap;}
+.pot-balance.neg{color:var(--expense);}
+.pot-balance.pos{color:var(--income);}
+
+.empty{
+  text-align:center;padding:34px 16px;color:var(--ink-faint);font-size:13.5px;
+  border:1px dashed var(--hairline);border-radius:var(--radius-sm);
+}
+
+.tx-list{display:flex;flex-direction:column;}
+.tx-row{
+  display:flex;align-items:center;gap:12px;padding:11px 2px;border-bottom:1px solid var(--hairline);
+  cursor:pointer;
+}
+.tx-row:last-child{border-bottom:none;}
+.tx-dot{width:9px;height:9px;border-radius:50%;flex:none;}
+.tx-dot.income{background:var(--income);}
+.tx-dot.expense{background:var(--expense);}
+.tx-main{flex:1;min-width:0;}
+.tx-label{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.tx-sub{font-size:11.5px;color:var(--ink-faint);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.tx-amount{font-size:14.5px;font-weight:600;white-space:nowrap;flex:none;}
+.tx-amount.income{color:var(--income);}
+.tx-amount.expense{color:var(--expense);}
+.month-header{font-size:11.5px;font-weight:700;color:var(--ink-faint);text-transform:uppercase;letter-spacing:0.05em;margin:18px 2px 6px;}
+.month-header:first-child{margin-top:0;}
+
+.segmented{display:flex;background:var(--surface-2);border-radius:12px;padding:3px;gap:3px;}
+.segmented button{
+  flex:1;border:none;background:transparent;padding:9px 0;border-radius:9px;font-family:inherit;
+  font-size:14px;font-weight:700;color:var(--ink-soft);cursor:pointer;
+  transition:background .18s ease,color .18s ease,box-shadow .18s ease,transform .18s ease;
+}
+.segmented button.active{background:var(--surface);color:var(--ink);box-shadow:var(--shadow);}
+
+#birikimSubTabs{padding:4px;border-radius:16px;background:var(--surface-2);border:1px solid var(--hairline);}
+#birikimSubTabs button{
+  padding:12px 0;border-radius:12px;font-size:14.5px;display:flex;align-items:center;justify-content:center;gap:7px;
+}
+#birikimSubTabs button .sub-dot{width:8px;height:8px;border-radius:50%;background:currentColor;opacity:0.35;flex:none;transition:opacity .18s ease;}
+#birikimSubTabs button.active .sub-dot{opacity:1;}
+#birikimSubTabs button[data-sub="metal"].active{background:var(--gold-soft);color:var(--gold-ink);box-shadow:var(--shadow);transform:translateY(-1px);}
+#birikimSubTabs button[data-sub="fund"].active{background:var(--accent-soft);color:var(--accent-ink);box-shadow:var(--shadow);transform:translateY(-1px);}
+
+.field{margin-top:16px;}
+.field label{display:block;font-size:12.5px;font-weight:700;color:var(--ink-soft);margin-bottom:6px;}
+.field input, .field select, .field textarea{
+  width:100%;background:var(--surface);border:1px solid var(--hairline);border-radius:var(--radius-sm);
+  padding:12px 13px;font-family:'IBM Plex Sans',sans-serif;font-size:15px;color:var(--ink);
+}
+.field input.num-input{font-family:'IBM Plex Mono',monospace;font-size:19px;font-weight:600;}
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0;}
+input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
+.field select{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%236B6F86' stroke-width='2'%3E%3Cpath d='M6 8l4 4 4-4'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:34px;}
+.field-hint{font-size:11.5px;color:var(--ink-faint);margin-top:5px;}
+.quickadd-toggle{background:none;border:none;color:var(--accent-ink);font-size:12px;font-weight:700;padding:6px 0 0;cursor:pointer;font-family:inherit;}
+.quickadd-row{display:none;gap:8px;margin-top:8px;}
+.quickadd-row.open{display:flex;}
+.quickadd-row input{flex:1;background:var(--surface);border:1px solid var(--hairline);border-radius:10px;padding:9px 11px;font-size:13.5px;color:var(--ink);font-family:inherit;}
+.quickadd-row button{border:none;background:var(--ink);color:var(--bg);border-radius:10px;padding:0 14px;font-size:13px;font-weight:700;cursor:pointer;}
+
+.btn-primary{
+  width:100%;margin-top:22px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius-sm);
+  padding:14px;font-family:'Plus Jakarta Sans',sans-serif;font-size:15.5px;font-weight:700;cursor:pointer;
+}
+.btn-primary:active{opacity:0.85;}
+.btn-primary.expense{background:var(--expense);}
+.btn-primary.income{background:var(--income);}
+.btn-primary.gold{background:var(--gold);color:#2b2108;}
+
+.chips{display:flex;gap:7px;overflow-x:auto;padding-bottom:2px;}
+.chip{
+  flex:none;border:1px solid var(--hairline);background:var(--surface);color:var(--ink-soft);
+  border-radius:99px;padding:7px 14px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;
+}
+.chip.active{background:var(--ink);color:var(--bg);border-color:var(--ink);}
+.chip-manage{
+  flex:none;border:1px dashed var(--hairline);background:transparent;color:var(--ink-faint);
+  border-radius:99px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;
+}
+.chip-manage svg{width:14px;height:14px;}
+
+.stat-row{display:flex;gap:10px;margin-top:2px;}
+.stat-tile{flex:1;background:var(--surface);border:1px solid var(--hairline);border-radius:var(--radius-sm);padding:12px 13px;box-shadow:var(--shadow);}
+.stat-tile .l{font-size:11px;color:var(--ink-faint);font-weight:700;text-transform:uppercase;letter-spacing:0.04em;}
+.stat-tile .v{font-size:16px;font-weight:700;margin-top:4px;}
+.stat-tile .v.income{color:var(--income);}
+.stat-tile .v.expense{color:var(--expense);}
+
+.bar-row{margin-bottom:14px;}
+.bar-top{display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px;}
+.bar-top .name{font-weight:600;}
+.bar-top .amt{font-weight:600;}
+.bar-track{height:9px;background:var(--surface-2);border-radius:99px;overflow:hidden;}
+.bar-fill{height:100%;background:var(--accent);border-radius:99px;}
+.bar-fill.gold{background:var(--gold);}
+
+.source-card{background:var(--surface);border:1px solid var(--hairline);border-radius:var(--radius-sm);padding:13px 15px;box-shadow:var(--shadow);margin-bottom:10px;}
+.source-card .name{font-weight:700;font-size:14px;margin-bottom:10px;}
+.source-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;}
+.source-grid .cell .l{font-size:10px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:0.03em;}
+.source-grid .cell .v{font-size:13px;font-weight:700;margin-top:2px;}
+
+.breakdown-card{background:var(--surface);border:1px solid var(--hairline);border-radius:var(--radius-sm);padding:16px 15px;box-shadow:var(--shadow);margin-top:14px;}
+.breakdown-card .card-title{font-size:12.5px;font-weight:700;color:var(--ink-faint);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:12px;}
+.breakdown-stack{display:flex;height:12px;border-radius:99px;overflow:hidden;background:var(--surface-2);}
+.breakdown-stack .seg{height:100%;}
+.breakdown-stack .seg.cash{background:var(--cash);}
+.breakdown-stack .seg.fund{background:var(--accent);}
+.breakdown-stack .seg.metal{background:var(--gold);}
+.breakdown-legend{display:flex;flex-wrap:wrap;gap:5px 14px;font-size:11.5px;color:var(--ink-soft);margin:9px 0 14px;}
+.breakdown-legend .dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:5px;position:relative;top:0.5px;}
+.breakdown-legend .dot.cash{background:var(--cash);}
+.breakdown-legend .dot.fund{background:var(--accent);}
+.breakdown-legend .dot.metal{background:var(--gold);}
+.breakdown-rows{display:flex;flex-direction:column;gap:8px;}
+.breakdown-row{display:flex;justify-content:space-between;align-items:center;padding:11px 12px;background:var(--surface-2);border-radius:12px;}
+.breakdown-row .label{display:flex;align-items:center;gap:9px;font-weight:600;font-size:13.5px;}
+.breakdown-row .label .dot{width:9px;height:9px;border-radius:50%;flex:none;}
+.breakdown-row .amounts{text-align:right;}
+.breakdown-row .amounts .main{font-weight:700;font-size:14px;}
+.breakdown-row .amounts .sub{font-size:11px;color:var(--ink-faint);margin-top:2px;}
+.profit-pos{color:var(--income);font-weight:600;}
+.profit-neg{color:var(--expense);font-weight:600;}
+
+.delta-summary-banner{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:14px;padding:11px 14px;border-radius:var(--radius-sm);border:1px solid var(--hairline);}
+.delta-summary-banner.pos{background:var(--income-soft);}
+.delta-summary-banner.neg{background:var(--expense-soft);}
+.dsb-label{font-size:12px;font-weight:600;color:var(--ink-soft);}
+.dsb-amount{font-size:15px;font-weight:800;font-family:'Plus Jakarta Sans',sans-serif;}
+.delta-summary-banner.pos .dsb-amount{color:var(--income);}
+.delta-summary-banner.neg .dsb-amount{color:var(--expense);}
+.dsb-pct{font-weight:700;font-size:12.5px;opacity:0.85;}
+.breakdown-totals{display:flex;justify-content:space-between;gap:10px;margin-top:12px;padding-top:12px;border-top:1px solid var(--hairline);}
+.breakdown-totals .t-item{flex:1;}
+.breakdown-totals .t-label{font-size:10.5px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:0.03em;}
+.breakdown-totals .t-val{font-size:14.5px;font-weight:700;margin-top:3px;}
+.breakdown-source-title{font-size:10.5px;font-weight:700;color:var(--ink-faint);text-transform:uppercase;letter-spacing:0.03em;margin:14px 0 6px;}
+.breakdown-source-list{display:flex;flex-direction:column;}
+.breakdown-source-row{display:flex;justify-content:space-between;gap:10px;padding:7px 2px;font-size:12.5px;border-bottom:1px solid var(--hairline);}
+.breakdown-source-row:last-child{border-bottom:none;}
+.breakdown-source-row span:first-child{color:var(--ink-soft);}
+.breakdown-source-row span:last-child{font-weight:600;}
+
+.holding-card{background:var(--surface);border:1px solid var(--hairline);border-radius:var(--radius-sm);padding:14px 15px;box-shadow:var(--shadow);margin-bottom:10px;cursor:pointer;}
+.holding-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
+.holding-material{font-weight:700;font-size:14.5px;}
+.holding-person{font-weight:500;color:var(--accent-ink);font-size:11.5px;}
+.holding-sub{font-size:11.5px;color:var(--ink-faint);margin-top:2px;}
+.holding-profit{text-align:right;font-weight:700;font-size:14.5px;white-space:nowrap;}
+.holding-profit.pos{color:var(--income);}
+.holding-profit.neg{color:var(--expense);}
+.holding-profit-pct{font-size:11px;font-weight:600;margin-top:1px;}
+.holding-bottom{margin-top:12px;padding-top:12px;border-top:1px solid var(--hairline);}
+.coin-dot{width:26px;height:26px;border-radius:50%;background:var(--gold-soft);color:var(--gold-ink);display:flex;align-items:center;justify-content:center;flex:none;font-size:13px;}
+
+.cat-row{display:flex;align-items:center;gap:10px;padding:10px 2px;border-bottom:1px solid var(--hairline);}
+.cat-row:last-child{border-bottom:none;}
+.cat-name{flex:1;font-size:14px;font-weight:600;}
+.cat-name.archived{color:var(--ink-faint);text-decoration:line-through;}
+.icon-btn{border:none;background:var(--surface-2);color:var(--ink-soft);width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex:none;}
+.icon-btn.danger{color:var(--expense);}
+.icon-btn svg{width:15px;height:15px;}
+.add-cat-row{display:flex;gap:8px;margin-top:12px;}
+.add-cat-row input{flex:1;background:var(--surface);border:1px solid var(--hairline);border-radius:10px;padding:10px 12px;font-size:14px;color:var(--ink);font-family:inherit;}
+.add-cat-row button{border:none;background:var(--ink);color:var(--bg);border-radius:10px;padding:0 16px;font-size:13.5px;font-weight:700;cursor:pointer;}
+
+.tabbar{
+  position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:480px;
+  display:flex;background:var(--surface);border-top:1px solid var(--hairline);
+  padding:7px 4px calc(7px + env(safe-area-inset-bottom));
+  box-shadow:0 -2px 16px rgba(0,0,0,0.05);
+}
+.tab{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;
+  color:var(--ink-faint);padding:5px 0;cursor:pointer;font-family:inherit;
+}
+.tab svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+.tab span{font-size:10px;font-weight:700;}
+.tab.active{color:var(--ink);}
+.tab.active svg{stroke:var(--accent);}
+
+.overlay{
+  position:fixed;inset:0;background:rgba(10,10,20,0.45);display:none;align-items:flex-end;justify-content:center;z-index:50;
+}
+.overlay.open{display:flex;}
+.sheet{
+  width:100%;max-width:480px;background:var(--bg);border-radius:22px 22px 0 0;padding:10px 20px calc(24px + env(safe-area-inset-bottom));
+  max-height:86vh;overflow-y:auto;box-shadow:0 -8px 30px rgba(0,0,0,0.2);
+}
+.sheet-handle{width:36px;height:4px;background:var(--hairline);border-radius:99px;margin:6px auto 14px;}
+.sheet-title{font-family:'Plus Jakarta Sans',sans-serif;font-size:19px;font-weight:800;margin-bottom:4px;}
+.sheet-actions{display:flex;gap:10px;margin-top:20px;}
+.btn-ghost{flex:1;border:1px solid var(--hairline);background:var(--surface);color:var(--ink);border-radius:var(--radius-sm);padding:12px;font-family:inherit;font-size:14.5px;font-weight:700;cursor:pointer;}
+.btn-danger{flex:1;border:none;background:var(--expense);color:#fff;border-radius:var(--radius-sm);padding:12px;font-family:inherit;font-size:14.5px;font-weight:700;cursor:pointer;}
+
+#toast{
+  position:fixed;left:50%;bottom:96px;transform:translateX(-50%) translateY(20px);
+  background:var(--ink);color:var(--bg);padding:11px 18px;border-radius:99px;font-size:13.5px;font-weight:700;
+  opacity:0;pointer-events:none;transition:all .25s ease;z-index:60;box-shadow:var(--shadow);white-space:nowrap;
+}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+.banner{
+  background:var(--accent-soft);border:1px solid var(--hairline);border-radius:var(--radius-sm);
+  padding:11px 13px;font-size:12.5px;color:var(--ink-soft);margin-bottom:16px;display:none;
+}
+.banner.show{display:block;}
+
+.lock-error{font-size:12.5px;color:var(--expense);margin-top:10px;min-height:16px;}
+
+.settings-section{margin-top:8px;}
+.settings-section + .settings-section{margin-top:22px;}
+.settings-row{display:flex;flex-direction:column;gap:10px;background:var(--surface);border:1px solid var(--hairline);border-radius:var(--radius-sm);padding:16px;box-shadow:var(--shadow);}
+.settings-row .field{margin-top:0;}
+.settings-row input[type="text"], .settings-row input[type="password"]{
+  width:100%;background:var(--bg);border:1px solid var(--hairline);border-radius:10px;
+  padding:11px 12px;font-family:'IBM Plex Sans',sans-serif;font-size:14px;color:var(--ink);
+}
+.settings-subhead{font-size:12px;font-weight:700;color:var(--accent-ink);margin:14px 0 8px;}
+.settings-subhead:first-child{margin-top:0;}
+
+.desktop-link-row{display:flex;justify-content:center;margin-top:28px;}
+.desktop-link{
+  display:inline-flex;align-items:center;gap:7px;color:var(--ink-faint);font-size:12.5px;font-weight:700;
+  text-decoration:none;padding:9px 14px;border-radius:99px;border:1px solid var(--hairline);background:var(--surface);
+  transition:color .15s ease,border-color .15s ease;
+}
+.desktop-link svg{width:15px;height:15px;flex:none;}
+.desktop-link:hover{color:var(--ink);border-color:var(--ink-faint);}
+</style>
+
+<div id="app">
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-mark">KFT</div>
+      <div class="brand-name">Kürşat Finans</div>
+    </div>
+    <div class="topbar-actions">
+      <button type="button" class="icon-btn" id="themeToggleBtn" title="Tema"></button>
+      <button type="button" class="icon-btn" id="settingsBtn" title="Ayarlar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 13.5c.04-.5.04-1 0-1.5l1.9-1.4-2-3.4-2.2.8c-.4-.3-.8-.6-1.3-.8l-.3-2.3H9.5l-.3 2.3c-.5.2-.9.5-1.3.8l-2.2-.8-2 3.4L5.6 12c-.04.5-.04 1 0 1.5l-1.9 1.4 2 3.4 2.2-.8c.4.3.8.6 1.3.8l.3 2.3h4.9l.3-2.3c.5-.2.9-.5 1.3-.8l2.2.8 2-3.4-1.9-1.4Z"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <main>
+    <div id="dbBanner" class="banner" style="margin:0 20px 12px;"></div>
+
+    <!-- ÖZET -->
+    <section id="view-ozet" class="view active">
+      <div class="chips" id="ozetPersonChips"></div>
+
+      <div class="hero" style="margin-top:14px;">
+        <div class="hero-label">Genel Toplam</div>
+        <div class="hero-amount num" id="heroTotal">₺0,00</div>
+        <div class="hero-breakdown num" id="heroBreakdown">Nakit ₺0,00 · Yatırım ₺0,00</div>
+        <div class="hero-row">
+          <div class="hero-stat"><div class="l">Bu Ay Gelir</div><div class="v num" id="heroIncomeMonth">₺0,00</div></div>
+          <div class="hero-stat"><div class="l">Bu Ay Gider</div><div class="v num" id="heroExpenseMonth">₺0,00</div></div>
+        </div>
+      </div>
+
+      <div class="breakdown-card" id="breakdownCard"></div>
+
+      <div class="segmented" id="ozetSubTabs" style="margin-top:4px;">
+        <button type="button" data-sub="kaynaklar" class="active">Gelir Kaynakları</button>
+        <button type="button" data-sub="hareketler">Son Hareketler</button>
+      </div>
+
+      <div id="ozetKaynaklarPane">
+        <div class="section-title" style="display:flex;align-items:center;justify-content:space-between;">
+          <span>Gelir Kaynakları</span>
+          <button type="button" class="icon-btn" id="addIncomeTypeQuickBtn" title="Gelir kaynağı ekle" style="margin:0;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          </button>
+        </div>
+        <div class="pot-grid" id="potGrid"></div>
+      </div>
+
+      <div id="ozetHareketlerPane" style="display:none;">
+        <div class="section-title">Son Hareketler</div>
+        <div class="tx-list" id="recentList"></div>
+      </div>
+    </section>
+
+    <!-- EKLE -->
+    <section id="view-ekle" class="view">
+      <div class="section-title" style="margin-top:6px;">Yeni Kayıt</div>
+      <div class="segmented">
+        <button data-mode="gider" class="active" id="modeGiderBtn">Gider</button>
+        <button data-mode="gelir" id="modeGelirBtn">Gelir</button>
+      </div>
+
+      <form id="entryForm">
+        <div class="field">
+          <label for="f_person">Kişi</label>
+          <select id="f_person"></select>
+        </div>
+
+        <div class="field">
+          <label for="f_amount">Tutar (₺)</label>
+          <input type="number" inputmode="decimal" step="0.01" min="0" id="f_amount" class="num-input" placeholder="0,00" required>
+        </div>
+
+        <div class="field" id="expenseCatField">
+          <label for="f_category">Gider Kategorisi</label>
+          <select id="f_category"></select>
+          <button type="button" class="quickadd-toggle" data-qa="expense_categories">+ Yeni kategori</button>
+          <div class="quickadd-row" data-qa-row="expense_categories">
+            <input type="text" placeholder="Kategori adı" id="qa_expense_categories">
+            <button type="button" data-qa-submit="expense_categories">Ekle</button>
+          </div>
+        </div>
+
+        <div class="field" id="incomeTypeField" style="display:none;">
+          <label for="f_incometype">Gelir Türü</label>
+          <select id="f_incometype"></select>
+          <button type="button" class="quickadd-toggle" data-qa="income_types">+ Yeni gelir türü</button>
+          <div class="quickadd-row" data-qa-row="income_types">
+            <input type="text" placeholder="Gelir türü adı" id="qa_income_types">
+            <button type="button" data-qa-submit="income_types">Ekle</button>
+          </div>
+        </div>
+
+        <div class="field" id="paidFromField">
+          <label for="f_paidfrom">Hangi Kaynaktan Ödendi</label>
+          <select id="f_paidfrom"></select>
+          <div class="field-hint">Ödeme, seçtiğin gelir kaynağının bakiyesinden düşülür.</div>
+        </div>
+
+        <div class="field">
+          <label for="f_date">Tarih</label>
+          <input type="date" id="f_date" required>
+        </div>
+
+        <div class="field">
+          <label for="f_note">Not (opsiyonel)</label>
+          <input type="text" id="f_note" placeholder="Örn: Eylül ayı elektrik">
+        </div>
+
+        <button type="submit" class="btn-primary expense" id="submitBtn">Gideri Kaydet</button>
+      </form>
+    </section>
+
+    <!-- BİRİKİM -->
+    <section id="view-birikim" class="view">
+      <div class="chips" id="birikimOverviewPersonChips" style="margin-top:14px;"></div>
+      <div class="breakdown-card" id="birikimOverviewCard" style="margin-top:12px;"></div>
+
+      <div class="segmented" id="birikimSubTabs">
+        <button type="button" data-sub="metal" class="active"><span class="sub-dot"></span>Kıymetli Maden</button>
+        <button type="button" data-sub="fund"><span class="sub-dot"></span>Yatırım Fonları</button>
+      </div>
+
+      <div id="birikimMetalPane">
+        <div class="chips" id="birikimPersonChips" style="margin-top:14px;"></div>
+
+        <div class="stat-row" style="margin-top:16px;">
+          <div class="stat-tile"><div class="l">Maliyet</div><div class="v num" id="bMaliyet">₺0,00</div></div>
+          <div class="stat-tile"><div class="l">Güncel Değer</div><div class="v num" id="bDeger">₺0,00</div></div>
+          <div class="stat-tile"><div class="l">Kar/Zarar</div><div class="v num" id="bKar">₺0,00</div></div>
+        </div>
+
+        <div id="metalPriceDeltaSummary"></div>
+
+        <div style="display:flex;gap:10px;margin-top:18px;">
+          <button type="button" class="btn-primary gold" id="addHoldingBtn" style="flex:1;margin-top:0;">+ Yeni Varlık Ekle</button>
+          <button type="button" class="btn-ghost" id="updatePricesBtn" style="flex:1;margin-top:0;">Fiyatları Güncelle</button>
+        </div>
+
+        <div class="section-title">Materyale Göre Dağılım</div>
+        <div id="materialBars"></div>
+
+        <div class="section-title">Varlıklarım</div>
+        <div class="chips" id="holdingsFilterChips" style="margin-bottom:10px;"></div>
+        <div id="holdingsList"></div>
+      </div>
+
+      <div id="birikimFundPane" style="display:none;">
+        <div class="chips" id="fundPersonChips" style="margin-top:14px;"></div>
+
+        <div class="stat-row" style="margin-top:16px;">
+          <div class="stat-tile"><div class="l">Elde Kalan Adet</div><div class="v num" id="fAdet">0</div></div>
+          <div class="stat-tile"><div class="l">Maliyet</div><div class="v num" id="fMaliyet">₺0,00</div></div>
+          <div class="stat-tile"><div class="l">Güncel Değer</div><div class="v num" id="fDeger">₺0,00</div></div>
+        </div>
+        <div class="stat-row" style="margin-top:10px;">
+          <div class="stat-tile"><div class="l">Gerçekleşmemiş K/Z</div><div class="v num" id="fUnrealized">₺0,00</div></div>
+          <div class="stat-tile"><div class="l">Gerçekleşen Net Kâr</div><div class="v num" id="fRealized">₺0,00</div></div>
+        </div>
+
+        <div id="fundPriceDeltaSummary"></div>
+
+        <div style="display:flex;gap:10px;margin-top:18px;">
+          <button type="button" class="btn-primary gold" id="addFundLotBtn" style="flex:1;margin-top:0;">+ Alış Ekle</button>
+          <button type="button" class="btn-ghost" id="addFundSaleBtn" style="flex:1;margin-top:0;">Satış Ekle</button>
+        </div>
+        <button type="button" class="btn-ghost" id="updateFundPriceBtn" style="width:100%;margin-top:10px;">Güncel Fon Fiyatını Güncelle</button>
+
+        <div class="section-title">Fona Göre Dağılım</div>
+        <div id="fundBars"></div>
+
+        <div class="segmented" id="fundTxTabs" style="margin-top:4px;">
+          <button type="button" data-sub="lots" class="active">Alışlarım</button>
+          <button type="button" data-sub="sales">Satışlarım</button>
+        </div>
+
+        <div id="fundLotsPane">
+          <div id="fundLotsList"></div>
+        </div>
+
+        <div id="fundSalesPane" style="display:none;">
+          <div id="fundSalesList"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RAPOR -->
+    <section id="view-rapor" class="view">
+      <div class="chips" id="raporPersonChips"></div>
+
+      <div class="section-title">Dönem</div>
+      <div class="chips" id="periodChips">
+        <button class="chip" data-period="thisMonth">Bu Ay</button>
+        <button class="chip" data-period="lastMonth">Geçen Ay</button>
+        <button class="chip" data-period="thisYear">Bu Yıl</button>
+        <button class="chip" data-period="all">Tümü</button>
+      </div>
+
+      <div class="stat-row" style="margin-top:16px;">
+        <div class="stat-tile"><div class="l">Gelir</div><div class="v num income" id="repIncome">₺0,00</div></div>
+        <div class="stat-tile"><div class="l">Gider</div><div class="v num expense" id="repExpense">₺0,00</div></div>
+        <div class="stat-tile"><div class="l">Net</div><div class="v num" id="repNet">₺0,00</div></div>
+      </div>
+
+      <div class="section-title">Nereye Gitti — Kategoriye Göre</div>
+      <div id="categoryBars"></div>
+
+      <div class="section-title">Kaynağa Göre</div>
+      <div id="sourceCards"></div>
+
+      <div class="section-title">Bankaya Göre Dağılım (Kıymetli Maden)</div>
+      <div id="bankBars"></div>
+    </section>
+
+    <!-- KAYITLAR -->
+    <section id="view-kayitlar" class="view">
+      <div class="chips" id="kayitlarPersonChips"></div>
+
+      <div class="section-title">Filtre</div>
+      <div class="chips" id="recordChips">
+        <button class="chip active" data-rf="all">Tümü</button>
+        <button class="chip" data-rf="gelir">Gelir</button>
+        <button class="chip" data-rf="gider">Gider</button>
+      </div>
+      <div id="recordsList" style="margin-top:14px;"></div>
+    </section>
+
+    <div class="desktop-link-row">
+      <a href="masaustu.html" class="desktop-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg>
+        Masaüstü sürümünü aç
+      </a>
+    </div>
+  </main>
+
+  <nav class="tabbar">
+    <button class="tab active" data-view="ozet">
+      <svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9.5h13V10"/><path d="M9.5 19.5v-6h5v6"/></svg>
+      <span>Özet</span>
+    </button>
+    <button class="tab" data-view="ekle">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.3"/><path d="M12 8v8M8 12h8"/></svg>
+      <span>Ekle</span>
+    </button>
+    <button class="tab" data-view="birikim">
+      <svg viewBox="0 0 24 24"><ellipse cx="12" cy="6.5" rx="7" ry="2.6"/><path d="M5 6.5v5.4c0 1.4 3.1 2.6 7 2.6s7-1.2 7-2.6V6.5"/><path d="M5 11.9v5.4c0 1.4 3.1 2.6 7 2.6s7-1.2 7-2.6v-5.4"/></svg>
+      <span>Birikim</span>
+    </button>
+    <button class="tab" data-view="rapor">
+      <svg viewBox="0 0 24 24"><path d="M4 20V10M12 20V4M20 20v-7"/><path d="M2.5 20.5h19"/></svg>
+      <span>Rapor</span>
+    </button>
+    <button class="tab" data-view="kayitlar">
+      <svg viewBox="0 0 24 24"><path d="M8 6h12M8 12h12M8 18h12"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/></svg>
+      <span>Kayıtlar</span>
+    </button>
+  </nav>
+</div>
+
+<div class="overlay" id="sheetOverlay">
+  <div class="sheet" id="sheetContent"></div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---------- storage layer ----------
+  var LOCAL_PREFIX = 'kft_v1_';
+  var GH_CFG_KEY = 'kft_github_cfg_v1';
+  var COLLECTIONS = ['people','income_types','expense_categories','income_entries','expense_entries','savings_holdings','material_prices','fund_lots','fund_sales','fund_prices'];
+
+  function getGithubConfig(){
+    try{ var raw = window.localStorage.getItem(GH_CFG_KEY); return raw ? JSON.parse(raw) : null; }catch(e){ return null; }
+  }
+  function setGithubConfig(cfg){ try{ window.localStorage.setItem(GH_CFG_KEY, JSON.stringify(cfg)); }catch(e){} }
+  function clearGithubConfig(){ try{ window.localStorage.removeItem(GH_CFG_KEY); }catch(e){} }
+
+  function utf8ToB64(str){ return btoa(unescape(encodeURIComponent(str))); }
+  function b64ToUtf8(b64){ return decodeURIComponent(escape(atob(b64.replace(/\n/g,'')))); }
+
+  function GithubApi(cfg){
+    this.cfg = cfg; // {owner, repo, token, path}
+    this.sha = null;
+  }
+  GithubApi.prototype._url = function(){
+    return 'https://api.github.com/repos/'+encodeURIComponent(this.cfg.owner)+'/'+encodeURIComponent(this.cfg.repo)+'/contents/'+encodeURIComponent(this.cfg.path || 'data.json');
+  };
+  GithubApi.prototype._headers = function(){
+    return {
+      'Authorization': 'Bearer '+this.cfg.token,
+      'Accept': 'application/vnd.github+json',
+      'X-GitHub-Api-Version': '2022-11-28'
+    };
+  };
+  GithubApi.prototype.testConnection = async function(){
+    let res;
+    try{
+      res = await fetch('https://api.github.com/repos/'+encodeURIComponent(this.cfg.owner)+'/'+encodeURIComponent(this.cfg.repo), {headers: this._headers()});
+    }catch(e){ return {ok:false, error:'Bağlantı kurulamadı (internet?)'}; }
+    if(res.status===404) return {ok:false, error:'Repo bulunamadı — kullanıcı adı/repo adını kontrol et'};
+    if(res.status===401) return {ok:false, error:'Token geçersiz'};
+    if(!res.ok) return {ok:false, error:'Hata: '+res.status};
+    const json = await res.json();
+    const perms = json.permissions || {};
+    if(perms.push === false) return {ok:false, error:'Token bu repoya yazma izni vermiyor'};
+    return {ok:true};
+  };
+  GithubApi.prototype.fetchData = async function(){
+    const res = await fetch(this._url(), {headers: this._headers()});
+    if(res.status === 404){ this.sha = null; return null; }
+    if(!res.ok){ throw new Error('GitHub okuma hatası: '+res.status); }
+    const json = await res.json();
+    this.sha = json.sha;
+    if(!json.content) return null;
+    const text = b64ToUtf8(json.content);
+    try{ return JSON.parse(text); }catch(e){ throw new Error('data.json bozuk görünüyor'); }
+  };
+  GithubApi.prototype.saveData = async function(dataObj){
+    const body = { message: 'KFT güncelleme '+new Date().toISOString(), content: utf8ToB64(JSON.stringify(dataObj, null, 2)) };
+    if(this.sha) body.sha = this.sha;
+    const res = await fetch(this._url(), {
+      method: 'PUT',
+      headers: Object.assign({'Content-Type':'application/json'}, this._headers()),
+      body: JSON.stringify(body)
+    });
+    if(res.status === 409){ const err = new Error('conflict'); err.conflict = true; throw err; }
+    if(!res.ok){
+      let msg = 'GitHub yazma hatası: '+res.status;
+      try{ const j = await res.json(); if(j && j.message) msg += ' — '+j.message; }catch(e){}
+      throw new Error(msg);
+    }
+    const json = await res.json();
+    this.sha = json.content.sha;
+  };
+
+  function emptyMem(){
+    var m = {};
+    COLLECTIONS.forEach(function(c){ m[c] = []; });
+    return m;
+  }
+
+  function StoreLayer(gh){
+    this.gh = gh || null;
+    this.mem = emptyMem();
+    if(!this.gh){
+      var self = this;
+      COLLECTIONS.forEach(function(col){
+        try{
+          var raw = window.localStorage.getItem(LOCAL_PREFIX+col);
+          self.mem[col] = raw ? JSON.parse(raw) : [];
+        }catch(e){ self.mem[col] = []; }
+      });
+    }
+  }
+  StoreLayer.prototype.initFromGithub = async function(){
+    const data = await this.gh.fetchData();
+    var self = this;
+    COLLECTIONS.forEach(function(col){
+      self.mem[col] = (data && Array.isArray(data[col])) ? data[col] : [];
+    });
+  };
+  StoreLayer.prototype._persist = async function(col){
+    if(this.gh){
+      try{
+        await this.gh.saveData(this.mem);
+      }catch(e){
+        if(e && e.conflict){
+          toast('Başka bir cihazdan güncelleme geldi, senkronize ediliyor…');
+          try{ await this.initFromGithub(); await loadAll(); renderView(S.view); }catch(e2){}
+        } else {
+          console.error('github save failed', e);
+          toast('GitHub\'a kaydedilemedi — bağlantını kontrol et');
+        }
+        throw e;
+      }
+      return;
+    }
+    try{ window.localStorage.setItem(LOCAL_PREFIX+col, JSON.stringify(this.mem[col])); }catch(e){ console.error('localStorage save failed', e); }
+  };
+  StoreLayer.prototype.list = async function(col){
+    return this.mem[col].slice();
+  };
+  StoreLayer.prototype.add = async function(col, data){
+    const body = Object.assign({}, data, {createdAt: new Date().toISOString()});
+    const id = 'm' + Date.now().toString(36) + Math.random().toString(36).slice(2,8);
+    const row = Object.assign({id}, body);
+    this.mem[col].push(row);
+    await this._persist(col);
+    return row;
+  };
+  StoreLayer.prototype.update = async function(col, id, data){
+    const arr = this.mem[col]; const i = arr.findIndex(x=>x.id===id);
+    if(i>-1){ Object.assign(arr[i], data); await this._persist(col); }
+  };
+  StoreLayer.prototype.remove = async function(col, id){
+    this.mem[col] = this.mem[col].filter(x=>x.id!==id);
+    await this._persist(col);
+  };
+
+  // ---------- app state ----------
+  const S = {
+    store:null,
+    people:[], incomeTypes:[], expenseCategories:[], incomeEntries:[], expenseEntries:[], savingsHoldings:[], materialPrices:[],
+    fundLots:[], fundSales:[], fundPrices:[],
+    view:'ozet', addMode:'gider', addPersonId:null,
+    ozetPerson:'all', raporPerson:'all', kayitlarPerson:'all', birikimPerson:'all', fundPerson:'all', birikimOverviewPerson:'all',
+    reportPeriod:'thisMonth', recordFilter:'all', holdingsFilter:'all', birikimSubView:'metal', ozetSubView:'kaynaklar', fundTxView:'lots',
+    raporExpandedTypes:{}, // {incomeTypeId: true} -- which "Kaynağa Göre" cards are expanded to show their hareketler
+    raporExpandedBanks:{}, // {bankName: true} -- which "Bankaya Göre Dağılım" rows are expanded to show their varlıklar
+    editing:null // {kind:'gelir'|'gider'|'varlik', id}
+  };
+
+  const $ = sel => document.querySelector(sel);
+  const $$ = sel => Array.from(document.querySelectorAll(sel));
+
+  function fmt(n){
+    n = Number(n)||0;
+    return n.toLocaleString('tr-TR', {style:'currency', currency:'TRY', maximumFractionDigits:2, minimumFractionDigits:2});
+  }
+  function fmtNum(n, digits){
+    n = Number(n)||0;
+    return n.toLocaleString('tr-TR', {maximumFractionDigits: digits==null?2:digits, minimumFractionDigits:0});
+  }
+  // donut merkez etiketleri gibi dar alanlarda kullanılan, ondalıksız/₺'siz kompakt format
+  function fmtCompact(n){
+    n = Number(n)||0;
+    return '₺' + n.toLocaleString('tr-TR', {maximumFractionDigits:0, minimumFractionDigits:0});
+  }
+  function todayStr(){
+    const d = new Date();
+    const pad = x => String(x).padStart(2,'0');
+    return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+  }
+  function monthLabel(dateStr){
+    const [y,m] = dateStr.split('-').map(Number);
+    const d = new Date(y, m-1, 1);
+    return d.toLocaleDateString('tr-TR', {month:'long', year:'numeric'});
+  }
+  function dayLabel(dateStr){
+    const [y,m,d] = dateStr.split('-').map(Number);
+    return new Date(y,m-1,d).toLocaleDateString('tr-TR', {day:'numeric', month:'short'});
+  }
+  function toast(msg){
+    const t = $('#toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toast._t);
+    toast._t = setTimeout(()=>t.classList.remove('show'), 1800);
+  }
+  function esc(s){
+    return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+  function personName(id){
+    const p = S.people.find(x=>x.id===id);
+    return p ? p.name : '—';
+  }
+
+  // ---------- period ranges ----------
+  function periodRange(period){
+    const now = new Date();
+    const y = now.getFullYear(), m = now.getMonth();
+    const pad = x => String(x).padStart(2,'0');
+    function ymd(yy,mm,dd){ return yy+'-'+pad(mm+1)+'-'+pad(dd); }
+    if(period==='thisMonth'){
+      const last = new Date(y, m+1, 0).getDate();
+      return [ymd(y,m,1), ymd(y,m,last)];
+    }
+    if(period==='lastMonth'){
+      const pm = m===0?11:m-1, py = m===0?y-1:y;
+      const last = new Date(py, pm+1, 0).getDate();
+      return [ymd(py,pm,1), ymd(py,pm,last)];
+    }
+    if(period==='thisYear'){
+      return [y+'-01-01', y+'-12-31'];
+    }
+    return [null,null];
+  }
+  function inRange(dateStr, range){
+    if(!range[0]) return true;
+    return dateStr >= range[0] && dateStr <= range[1];
+  }
+
+  // ---------- data load ----------
+  var COLLECTION_STATE_KEY = {
+    people:'people', income_types:'incomeTypes', expense_categories:'expenseCategories',
+    income_entries:'incomeEntries', expense_entries:'expenseEntries', savings_holdings:'savingsHoldings',
+    material_prices:'materialPrices', fund_lots:'fundLots', fund_sales:'fundSales', fund_prices:'fundPrices'
+  };
+  async function loadAll(){
+    const results = await Promise.all(COLLECTIONS.map(c=>S.store.list(c)));
+    COLLECTIONS.forEach(function(col, i){
+      const key = COLLECTION_STATE_KEY[col];
+      if(key) S[key] = results[i];
+    });
+    if(!S.addPersonId || !S.people.find(p=>p.id===S.addPersonId)){
+      const active = S.people.find(p=>!p.archived);
+      S.addPersonId = active ? active.id : (S.people[0] ? S.people[0].id : null);
+    }
+  }
+
+  async function seedIfNeeded(){
+    if(S.people.length===0){
+      const p1 = await S.store.add('people', {name:'Kürşat', archived:false});
+      const p2 = await S.store.add('people', {name:'Baba', archived:false});
+      S.people.push(p1, p2);
+    }
+    if(S.incomeTypes.length===0 && S.people.length>0){
+      const me = S.people[0], baba = S.people[1] || S.people[0];
+      const defs = [
+        {name:'Maaş', personId: me.id},
+        {name:'Maaş', personId: baba.id},
+        {name:'Buğday Parası', personId: baba.id},
+        {name:'Kardeşin Buğday Parası', personId: baba.id}
+      ];
+      for(const d of defs){
+        const row = await S.store.add('income_types', Object.assign({archived:false}, d));
+        S.incomeTypes.push(row);
+      }
+    }
+    if(S.expenseCategories.length===0){
+      const defaults = ['Harçlık','Elektrik Faturası','Su Faturası'];
+      for(const name of defaults){
+        const row = await S.store.add('expense_categories', {name, archived:false});
+        S.expenseCategories.push(row);
+      }
+    }
+    if(!S.addPersonId && S.people[0]) S.addPersonId = S.people[0].id;
+  }
+
+  // ---------- derived ----------
+  function potBalance(typeId){
+    const income = S.incomeEntries.filter(e=>e.typeId===typeId).reduce((a,e)=>a+Number(e.amount||0),0);
+    const spent = S.expenseEntries.filter(e=>e.paidFromTypeId===typeId).reduce((a,e)=>a+Number(e.amount||0),0);
+    return {income, spent, balance: income-spent};
+  }
+  function totalBalance(personFilter){
+    let types = S.incomeTypes;
+    if(personFilter && personFilter!=='all') types = types.filter(t=>t.personId===personFilter);
+    const ids = types.map(t=>t.id);
+    const income = S.incomeEntries.filter(e=>ids.includes(e.typeId)).reduce((a,e)=>a+Number(e.amount||0),0);
+    const expense = S.expenseEntries.filter(e=>ids.includes(e.paidFromTypeId)).reduce((a,e)=>a+Number(e.amount||0),0);
+    return {income, expense, balance: income-expense};
+  }
+  // current value of every investment (precious-metal holding + remaining fund lot) owned by this person
+  // (or everyone, when personFilter is 'all') -- used for the Özet hero's "Genel Toplam" (nakit + yatırım).
+  function totalInvestmentValue(personFilter){
+    return investmentBreakdown(personFilter).investValue;
+  }
+  // full nakit / yatırım fonu / kıymetli metal dağılımı + her birinin ana para / kâr ayrımı
+  // (Özet hero'nun altındaki "Dağılım" dashboard'u için).
+  function investmentBreakdown(personFilter){
+    const cash = totalBalance(personFilter).balance;
+    let fundCost = 0, fundValue = 0;
+    S.fundLots.forEach(function(l){
+      if(personFilter && personFilter!=='all' && l.personId!==personFilter) return;
+      const m = fundLotMetrics(l);
+      fundCost += m.cost; fundValue += m.value;
+    });
+    let metalCost = 0, metalValue = 0;
+    S.savingsHoldings.forEach(function(h){
+      if(personFilter && personFilter!=='all' && h.personId!==personFilter) return;
+      const m = holdingMetrics(h);
+      metalCost += m.cost; metalValue += m.value;
+    });
+    const fundProfit = fundValue - fundCost;
+    const metalProfit = metalValue - metalCost;
+    const investValue = fundValue + metalValue;
+    const investCost = fundCost + metalCost;
+    const investProfit = fundProfit + metalProfit;
+    const grandTotal = cash + investValue;
+    const totalPrincipal = cash + investCost;
+    return {
+      cash,
+      fundCost, fundValue, fundProfit,
+      metalCost, metalValue, metalProfit,
+      investValue, investCost, investProfit,
+      grandTotal, totalPrincipal
+    };
+  }
+  function unifiedEntries(personFilter){
+    let inc = S.incomeEntries.map(e=>({
+      id:e.id, kind:'gelir', label:e.typeName||'—', sub:e.note||'', amount:Number(e.amount||0),
+      date:e.date, note:e.note||'', createdAt:e.createdAt||'', personId:e.personId, personName:e.personName||'', raw:e
+    }));
+    let exp = S.expenseEntries.map(e=>({
+      id:e.id, kind:'gider', label:e.categoryName||'—', sub:(e.paidFromTypeName?('Kaynak: '+e.paidFromTypeName):'') + (e.note?(' · '+e.note):''),
+      amount:Number(e.amount||0), date:e.date, note:e.note||'', createdAt:e.createdAt||'', personId:e.personId, personName:e.personName||'', raw:e
+    }));
+    let all = inc.concat(exp);
+    if(personFilter && personFilter!=='all') all = all.filter(e=>e.personId===personFilter);
+    return all.sort((a,b)=>{
+      if(a.date!==b.date) return a.date < b.date ? 1 : -1;
+      return (a.createdAt < b.createdAt) ? 1 : -1;
+    });
+  }
+  // all gelir/gider hareketleri for one income source (gelir kaynağı), newest first,
+  // optionally limited to a date range -- used by Rapor's "Kaynağa Göre" cards to show
+  // the actual transactions behind a source's dönem geliri/gideri figures.
+  function entriesForIncomeType(typeId, range){
+    let rows = unifiedEntries('all').filter(function(e){
+      return (e.kind==='gelir' && e.raw.typeId===typeId) || (e.kind==='gider' && e.raw.paidFromTypeId===typeId);
+    });
+    if(range && range[0]) rows = rows.filter(function(e){ return inRange(e.date, range); });
+    return rows;
+  }
+  // ---------- shared material/bank current prices ----------
+  function materialPriceKey(material, bank){
+    return String(material||'').trim().toLowerCase() + '||' + String(bank||'').trim().toLowerCase();
+  }
+  function getGroupPrice(material, bank){
+    const key = materialPriceKey(material, bank);
+    const row = S.materialPrices.find(p=>materialPriceKey(p.material, p.bank)===key);
+    return row ? Number(row.price) : null;
+  }
+  async function setGroupPrice(material, bank, price){
+    const key = materialPriceKey(material, bank);
+    const existing = S.materialPrices.find(p=>materialPriceKey(p.material, p.bank)===key);
+    if(existing){
+      const oldPrice = Number(existing.price);
+      const data = {price};
+      // only move the "previous price" baseline when the price actually changes -- re-saving
+      // an unchanged row (e.g. via the single "Kaydet" that saves every row at once) must not
+      // reset it, or the son-güncelleme delta would silently disappear.
+      if(oldPrice > 0 && oldPrice !== Number(price)){
+        data.previousPrice = oldPrice;
+        data.previousPriceAt = new Date().toISOString();
+      }
+      await S.store.update('material_prices', existing.id, data);
+      Object.assign(existing, data);
+    } else {
+      const row = await S.store.add('material_prices', {material, bank, price});
+      S.materialPrices.push(row);
+    }
+  }
+  // returns {prev, cur, diff, pct, at} for the last time this material+bank group's shared
+  // price actually changed, or null if there's no previous value recorded yet.
+  function getGroupPriceDelta(material, bank){
+    const key = materialPriceKey(material, bank);
+    const row = S.materialPrices.find(p=>materialPriceKey(p.material, p.bank)===key);
+    if(!row || row.previousPrice==null) return null;
+    const prev = Number(row.previousPrice), cur = Number(row.price);
+    if(!(prev > 0)) return null;
+    const diff = cur - prev;
+    return {prev, cur, diff, pct: diff/prev*100, at: row.previousPriceAt};
+  }
+  // one-time, safe migration: derive initial shared prices from existing holdings
+  // so previously imported/entered data keeps showing the exact same kar/zarar
+  // until someone explicitly updates a group's price via "Fiyatları Güncelle".
+  async function migrateMaterialPricesIfNeeded(){
+    if(S.materialPrices.length > 0 || S.savingsHoldings.length === 0) return;
+    const seen = {};
+    for(const h of S.savingsHoldings){
+      const key = materialPriceKey(h.material, h.bank);
+      if(seen[key]) continue;
+      seen[key] = true;
+      const price = Number(h.currentPrice||0);
+      if(price > 0){
+        const row = await S.store.add('material_prices', {material: h.material, bank: h.bank, price});
+        S.materialPrices.push(row);
+      }
+    }
+  }
+  function holdingMetrics(h){
+    const qty = Number(h.quantity||0);
+    const cost = Number(h.purchasePrice||0) * qty;
+    const groupPrice = getGroupPrice(h.material, h.bank);
+    const effectivePrice = groupPrice != null ? groupPrice : Number(h.currentPrice||0);
+    const value = effectivePrice * qty;
+    const profit = value - cost;
+    const pct = cost > 0 ? (profit/cost*100) : 0;
+    const priceDelta = getGroupPriceDelta(h.material, h.bank);
+    const valueDelta = priceDelta ? priceDelta.diff * qty : 0;
+    return {cost, value, profit, pct, effectivePrice, hasGroupPrice: groupPrice != null, priceDelta, valueDelta};
+  }
+
+  // ---------- investment funds (FIFO + %17.5 stopaj) ----------
+  function fundKey(name){ return String(name||'').trim().toLowerCase(); }
+  function getFundPrice(fundName){
+    const key = fundKey(fundName);
+    const row = S.fundPrices.find(p=>fundKey(p.fundName)===key);
+    return row ? Number(row.price) : null;
+  }
+  async function setFundPrice(fundName, price){
+    const key = fundKey(fundName);
+    const existing = S.fundPrices.find(p=>fundKey(p.fundName)===key);
+    if(existing){
+      const oldPrice = Number(existing.price);
+      const data = {price};
+      if(oldPrice > 0 && oldPrice !== Number(price)){
+        data.previousPrice = oldPrice;
+        data.previousPriceAt = new Date().toISOString();
+      }
+      await S.store.update('fund_prices', existing.id, data);
+      Object.assign(existing, data);
+    } else {
+      const row = await S.store.add('fund_prices', {fundName, price});
+      S.fundPrices.push(row);
+    }
+  }
+  // returns {prev, cur, diff, pct, at} for the last time this fund's price actually changed,
+  // or null if there's no previous value recorded yet.
+  function getFundPriceDelta(fundName){
+    const key = fundKey(fundName);
+    const row = S.fundPrices.find(p=>fundKey(p.fundName)===key);
+    if(!row || row.previousPrice==null) return null;
+    const prev = Number(row.previousPrice), cur = Number(row.price);
+    if(!(prev > 0)) return null;
+    const diff = cur - prev;
+    return {prev, cur, diff, pct: diff/prev*100, at: row.previousPriceAt};
+  }
+  function lotRemaining(lot){
+    return lot.remainingQuantity!=null ? Number(lot.remainingQuantity) : Number(lot.quantity||0);
+  }
+  function fundLotMetrics(lot){
+    const remaining = lotRemaining(lot);
+    const cost = remaining * Number(lot.purchasePrice||0);
+    const curPrice = getFundPrice(lot.fundName);
+    const value = curPrice != null ? remaining * curPrice : cost;
+    const profit = value - cost;
+    const priceDelta = getFundPriceDelta(lot.fundName);
+    const valueDelta = priceDelta ? priceDelta.diff * remaining : 0;
+    return {remaining, cost, value, profit, curPrice, hasPrice: curPrice != null, priceDelta, valueDelta};
+  }
+  // small "son güncellemeye göre değişim" line shown on holding/fund-lot cards when a previous
+  // price is on record for that material+bank group or fund (see getGroupPriceDelta/getFundPriceDelta).
+  function priceDeltaLineHtml(priceDelta, valueDelta){
+    if(!priceDelta) return '';
+    const cls = valueDelta >= 0 ? 'profit-pos' : 'profit-neg';
+    const sign = valueDelta >= 0 ? '+' : '';
+    const pctSign = priceDelta.pct >= 0 ? '+' : '';
+    return '<div style="font-size:11.5px;color:var(--ink-faint);margin-top:8px;">Son fiyat güncellemesine göre: <span class="'+cls+'">'+sign+fmt(valueDelta)+' ('+pctSign+fmtNum(priceDelta.pct,1)+'%)</span></div>';
+  }
+  // Birikim'in Kıymetli Maden / Yatırım Fonları panelerinde, stat-tile satırının hemen altında
+  // gösterilen öne çıkan özet: o panelde (geçerli kişi filtresiyle) son fiyat güncellemesine göre
+  // toplam ne kadar kâr/zarar oluştuğu -- tek tek kart satırlarındaki priceDeltaLineHtml'in
+  // panel genelindeki toplamı. Hiçbir varlığın/fonun henüz ikinci bir fiyat güncellemesi yoksa
+  // (hasAnyDelta=false) hiç gösterilmez.
+  function priceDeltaSummaryHtml(valueDelta, prevValue, hasAnyDelta){
+    if(!hasAnyDelta) return '';
+    const cls = valueDelta >= 0 ? 'pos' : 'neg';
+    const sign = valueDelta >= 0 ? '+' : '';
+    const pct = prevValue > 0 ? (valueDelta/prevValue*100) : 0;
+    const pctSign = pct >= 0 ? '+' : '';
+    return '<div class="delta-summary-banner '+cls+'">'
+      + '<span class="dsb-label">Son fiyat güncellemesine göre</span>'
+      + '<span class="dsb-amount">'+sign+fmt(valueDelta)+' <span class="dsb-pct">('+pctSign+fmtNum(pct,1)+'%)</span></span>'
+      + '</div>';
+  }
+
+  // ---------- donut chart (dependency-free inline SVG) ----------
+  // segments: [{value:number, color:'var(--x)'}, ...] -- değeri <=0 olanlar atlanır.
+  // opts: {size, stroke, centerLabel, centerSub}
+  const CHART_PALETTE = ['var(--gold)','var(--accent)','var(--cash)','var(--income)','var(--expense)','var(--gold-ink)','var(--accent-ink)'];
+  function donutSvg(segments, opts){
+    opts = opts || {};
+    const size = opts.size || 104;
+    const stroke = opts.stroke || 15;
+    const r = (size - stroke) / 2;
+    const c = size / 2;
+    const circumference = 2 * Math.PI * r;
+    const total = segments.reduce(function(s,x){ return s + Math.max(0, Number(x.value)||0); }, 0);
+    const bg = '<circle cx="'+c+'" cy="'+c+'" r="'+r+'" fill="none" stroke="var(--surface-2)" stroke-width="'+stroke+'"/>';
+    let arcs = '';
+    if(total > 0){
+      let offset = 0;
+      arcs = segments.filter(function(s){ return Number(s.value) > 0; }).map(function(s){
+        const frac = Number(s.value) / total;
+        const len = frac * circumference;
+        const dasharray = len + ' ' + (circumference - len);
+        const dashoffset = -offset;
+        offset += len;
+        return '<circle cx="'+c+'" cy="'+c+'" r="'+r+'" fill="none" stroke="'+s.color+'" stroke-width="'+stroke+'" stroke-dasharray="'+dasharray+'" stroke-dashoffset="'+dashoffset+'" transform="rotate(-90 '+c+' '+c+')"/>';
+      }).join('');
+    }
+    let labelFontSize = opts.centerLabelSize || 13;
+    const labelStr = opts.centerLabel != null ? String(opts.centerLabel) : '';
+    if(labelStr.length > 9) labelFontSize = Math.max(8.5, labelFontSize - (labelStr.length - 9) * 0.9);
+    const centerLabel = opts.centerLabel != null
+      ? '<text x="'+c+'" y="'+(opts.centerSub!=null ? c-4 : c)+'" text-anchor="middle" dominant-baseline="middle" font-size="'+labelFontSize+'" font-weight="800" fill="var(--ink)" class="num">'+esc(labelStr)+'</text>'
+      : '';
+    const centerSub = opts.centerSub != null
+      ? '<text x="'+c+'" y="'+(c+12)+'" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="var(--ink-faint)">'+esc(String(opts.centerSub))+'</text>'
+      : '';
+    return '<svg width="'+size+'" height="'+size+'" viewBox="0 0 '+size+' '+size+'" style="flex:none;">'+bg+arcs+centerLabel+centerSub+'</svg>';
+  }
+
+  // ---------- tema (açık/koyu/sistem) ----------
+  const THEME_KEY = 'kft_theme_v1';
+  const THEME_ICONS = {
+    auto: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 3.5a8.5 8.5 0 0 0 0 17Z" fill="currentColor" stroke="none"/></svg>',
+    light: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M4.2 4.2l1.6 1.6M18.2 18.2l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.2 19.8l1.6-1.6M18.2 5.8l1.6-1.6"/></svg>',
+    dark: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4 6.8 6.8 0 0 0 20 14.5Z"/></svg>'
+  };
+  const THEME_TITLES = {auto:'Tema: Sistem (dokun — Açık)', light:'Tema: Açık (dokun — Koyu)', dark:'Tema: Koyu (dokun — Sistem)'};
+  function getStoredTheme(){
+    try{ return localStorage.getItem(THEME_KEY) || 'auto'; } catch(e){ return 'auto'; }
+  }
+  function applyTheme(mode){
+    const root = document.documentElement;
+    if(mode === 'dark') root.setAttribute('data-theme', 'dark');
+    else if(mode === 'light') root.setAttribute('data-theme', 'light');
+    else root.removeAttribute('data-theme');
+    const btn = $('#themeToggleBtn');
+    if(btn){
+      btn.innerHTML = THEME_ICONS[mode] || THEME_ICONS.auto;
+      btn.title = THEME_TITLES[mode] || THEME_TITLES.auto;
+    }
+  }
+  function initTheme(){
+    try{
+      applyTheme(getStoredTheme());
+      const btn = $('#themeToggleBtn');
+      if(btn){
+        btn.addEventListener('click', function(){
+          const cur = getStoredTheme();
+          const next = cur === 'auto' ? 'light' : (cur === 'light' ? 'dark' : 'auto');
+          try{ localStorage.setItem(THEME_KEY, next); } catch(e){}
+          applyTheme(next);
+        });
+      }
+    } catch(e){ console.error('theme init failed', e); }
+  }
+  function lotIsUntouched(lot){
+    return Math.abs(lotRemaining(lot) - Number(lot.quantity||0)) < 1e-9;
+  }
+  // FIFO consumption: sells the oldest lots first for this person+fund, computes
+  // cost basis / gross profit / %17.5 stopaj (only on positive profit) / net profit.
+  async function recordFundSale(personId, fundName, sellQty, salePrice, saleDate, note){
+    sellQty = Number(sellQty);
+    const lots = S.fundLots
+      .filter(l=>l.personId===personId && fundKey(l.fundName)===fundKey(fundName) && lotRemaining(l) > 1e-9)
+      .slice()
+      .sort(function(a,b){
+        if(a.purchaseDate !== b.purchaseDate) return a.purchaseDate < b.purchaseDate ? -1 : 1;
+        return (a.createdAt||'') < (b.createdAt||'') ? -1 : 1;
+      });
+    const totalAvailable = lots.reduce(function(s,l){ return s + lotRemaining(l); }, 0);
+    if(sellQty <= 0) throw new Error('invalid_qty');
+    if(sellQty > totalAvailable + 1e-9){
+      const err = new Error('insufficient_units');
+      err.available = totalAvailable;
+      throw err;
+    }
+    let toSell = sellQty;
+    let costBasis = 0;
+    const breakdown = [];
+    for(const lot of lots){
+      if(toSell <= 1e-9) break;
+      const avail = lotRemaining(lot);
+      const take = Math.min(avail, toSell);
+      costBasis += take * Number(lot.purchasePrice||0);
+      breakdown.push({lotId: lot.id, qty: take, purchasePrice: Number(lot.purchasePrice||0), purchaseDate: lot.purchaseDate});
+      const newRemaining = avail - take;
+      await S.store.update('fund_lots', lot.id, {remainingQuantity: newRemaining});
+      lot.remainingQuantity = newRemaining;
+      toSell -= take;
+    }
+    const proceeds = sellQty * Number(salePrice);
+    const grossProfit = proceeds - costBasis;
+    const stopaj = grossProfit > 0 ? grossProfit * 0.175 : 0;
+    const netProfit = grossProfit - stopaj;
+    const row = await S.store.add('fund_sales', {
+      personId, fundName, quantity: sellQty, salePrice: Number(salePrice), saleDate: saleDate || todayStr(),
+      note: note||'', costBasis, proceeds, grossProfit, stopaj, netProfit, lotBreakdown: breakdown
+    });
+    S.fundSales.push(row);
+    return row;
+  }
+  // reverses a sale: restores remainingQuantity on every lot it consumed, then deletes the sale record.
+  async function reverseFundSale(saleId){
+    const sale = S.fundSales.find(s=>s.id===saleId);
+    if(!sale) return;
+    const breakdown = sale.lotBreakdown || [];
+    for(const b of breakdown){
+      const lot = S.fundLots.find(l=>l.id===b.lotId);
+      if(!lot) continue;
+      const newRemaining = lotRemaining(lot) + Number(b.qty);
+      await S.store.update('fund_lots', lot.id, {remainingQuantity: newRemaining});
+      lot.remainingQuantity = newRemaining;
+    }
+    await S.store.remove('fund_sales', saleId);
+    S.fundSales = S.fundSales.filter(s=>s.id!==saleId);
+  }
+
+  // ---------- which gelir kaynağı (income source) funded which investment ----------
+  // aggregates current cost/value/profit of every precious-metal holding and every
+  // remaining (unsold) fund lot that was recorded as funded by this income type,
+  // so a "gelir kaynağı" card can show what its money is currently doing in Birikim.
+  function incomeTypeInvestmentStats(typeId){
+    let cost = 0, value = 0;
+    S.savingsHoldings.forEach(function(h){
+      if(h.incomeTypeId !== typeId) return;
+      const m = holdingMetrics(h);
+      cost += m.cost; value += m.value;
+    });
+    S.fundLots.forEach(function(l){
+      if(l.incomeTypeId !== typeId) return;
+      const m = fundLotMetrics(l);
+      cost += m.cost; value += m.value;
+    });
+    return {cost: cost, value: value, profit: value - cost, hasInvestment: cost>0 || value>0};
+  }
+  // investments (holding/fund lot) that aren't tagged to any of the currently-visible income sources
+  // (never tagged, or tagged to an archived/deleted one) -- so Gelir Kaynakları's per-source kâr figures
+  // can always be reconciled against the Dağılım dashboard's overall total.
+  function unassignedInvestmentStats(personFilter, visibleTypes){
+    const validIds = new Set((visibleTypes||[]).map(t=>t.id));
+    let cost = 0, value = 0;
+    S.savingsHoldings.forEach(function(h){
+      if(personFilter && personFilter!=='all' && h.personId!==personFilter) return;
+      if(h.incomeTypeId && validIds.has(h.incomeTypeId)) return;
+      const m = holdingMetrics(h);
+      cost += m.cost; value += m.value;
+    });
+    S.fundLots.forEach(function(l){
+      if(personFilter && personFilter!=='all' && l.personId!==personFilter) return;
+      if(l.incomeTypeId && validIds.has(l.incomeTypeId)) return;
+      const m = fundLotMetrics(l);
+      cost += m.cost; value += m.value;
+    });
+    return {cost: cost, value: value, profit: value - cost, hasInvestment: cost>0 || value>0};
+  }
+  // Dağılım kartındaki "Toplam Ana Para"nın gelir kaynağına göre kırılımı: her kaynağın nakit bakiyesi
+  // + o kaynağın fonladığı yatırımların maliyeti (+ hiçbir kaynağa bağlanmamış yatırımlar için bir satır),
+  // böylece satırların toplamı her zaman Toplam Ana Para'ya tam eşit olur.
+  function principalBySource(personFilter){
+    let types = S.incomeTypes.filter(t=>!t.archived);
+    if(personFilter && personFilter!=='all') types = types.filter(t=>t.personId===personFilter);
+    const rows = types.map(function(t){
+      const cash = potBalance(t.id).balance;
+      const inv = incomeTypeInvestmentStats(t.id);
+      return {name: t.name+' · '+personName(t.personId), amount: cash + inv.cost, profit: inv.profit, hasInvestment: inv.hasInvestment};
+    });
+    const unassigned = unassignedInvestmentStats(personFilter, types);
+    if(Math.abs(unassigned.cost) > 0.005) rows.push({name:'Kaynağı Belirtilmemiş Yatırımlar', amount: unassigned.cost, profit: unassigned.profit, hasInvestment: unassigned.hasInvestment});
+    return rows.filter(function(r){ return Math.abs(r.amount) > 0.005; }).sort(function(a,b){ return b.amount - a.amount; });
+  }
+  // <select> options for "which gelir kaynağı funded this investment" pickers, scoped to one person
+  function fundingIncomeTypeOptionsHtml(personId, selectedId){
+    const types = S.incomeTypes.filter(function(t){ return !t.archived && t.personId===personId; });
+    let html = '<option value=""'+(!selectedId?' selected':'')+'>— Belirtilmedi —</option>';
+    html += types.map(function(t){
+      const b = potBalance(t.id);
+      return '<option value="'+t.id+'"'+(t.id===selectedId?' selected':'')+'>'+esc(t.name)+' — bakiye '+fmt(b.balance)+'</option>';
+    }).join('');
+    return html;
+  }
+
+  // ---------- person chips (shared renderer) ----------
+  function renderPersonChips(containerId, current, onChange){
+    const el = $('#'+containerId);
+    const active = S.people.filter(p=>!p.archived);
+    let html = '<button type="button" class="chip'+(current==='all'?' active':'')+'" data-pf="all">Tümü</button>';
+    html += active.map(p=>'<button type="button" class="chip'+(current===p.id?' active':'')+'" data-pf="'+p.id+'">'+esc(p.name)+'</button>').join('');
+    html += '<button type="button" class="chip-manage" title="Kişileri Yönet (ekle/sil)">'
+      + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>'
+      + '</button>';
+    el.innerHTML = html;
+    el.querySelectorAll('.chip').forEach(btn=>{
+      btn.addEventListener('click', ()=>{ onChange(btn.dataset.pf); });
+    });
+    el.querySelector('.chip-manage').addEventListener('click', ()=> openPeopleManageSheet());
+  }
+
+  function openPeopleManageSheet(){
+    const overlay = $('#sheetOverlay');
+    const content = $('#sheetContent');
+
+    function renderInner(){
+      let html = '<div class="sheet-handle"></div><div class="sheet-title">Kişileri Yönet</div>';
+      html += '<div class="field-hint" style="margin-bottom:12px;">Buradaki kişiler; Özet, Ekle, Birikim, Rapor ve Kayıtlar\'da kullanılır.</div>';
+      html += S.people.map(p=>settingsCatRowHtml(p,'people')).join('') || '<div class="empty">Kişi yok.</div>';
+      html += '<div class="add-cat-row"><input type="text" id="pm_newPerson" placeholder="Yeni kişi adı"><button type="button" id="pm_addPersonBtn">Ekle</button></div>';
+      content.innerHTML = html;
+
+      bindSettingsCatRows(content, 'people', function(){
+        renderInner();
+        renderView(S.view);
+      });
+
+      $('#pm_addPersonBtn').addEventListener('click', async ()=>{
+        const input = $('#pm_newPerson');
+        const name = input.value.trim();
+        if(!name) return;
+        try{
+          const row = await S.store.add('people', {name, archived:false});
+          S.people.push(row);
+          renderInner();
+          renderView(S.view);
+        } catch(e){
+          console.error('add person failed', e);
+          toast('Eklenemedi, tekrar dene');
+        }
+      });
+    }
+
+    renderInner();
+    overlay.classList.add('open');
+  }
+
+  // ---------- navigation ----------
+  function setView(v){
+    S.view = v;
+    $$('.view').forEach(el=>el.classList.remove('active'));
+    $('#view-'+v).classList.add('active');
+    $$('.tab').forEach(el=>el.classList.toggle('active', el.dataset.view===v));
+    renderView(v);
+  }
+  function renderView(v){
+    if(v==='ozet') renderOzet();
+    else if(v==='ekle') renderEkleOptions();
+    else if(v==='birikim') renderBirikim();
+    else if(v==='rapor') renderRapor();
+    else if(v==='kayitlar') renderKayitlar();
+  }
+
+  // ---------- render: özet ----------
+  // Özet hero'nun altındaki "Dağılım" dashboard'u: nakit/fon/metal payları (stacked bar + legend)
+  // ve her kategorinin ana para / kâr ayrımı, artı genel ana para/kâr toplamı.
+  function renderBreakdownCard(b, personFilter){
+    const el = $('#breakdownCard');
+    if(!el) return;
+    const total = Math.max(b.cash, 0) + Math.max(b.fundValue, 0) + Math.max(b.metalValue, 0);
+    const pct = function(part){ return total > 0 ? Math.max(0, part) / total * 100 : 0; };
+    const cashPct = pct(b.cash), fundPct = pct(b.fundValue), metalPct = pct(b.metalValue);
+
+    const profitSpan = function(v){
+      const cls = v >= 0 ? 'profit-pos' : 'profit-neg';
+      const sign = v >= 0 ? '+' : '';
+      return '<span class="'+cls+'">'+sign+fmt(v)+'</span>';
+    };
+
+    const donut = donutSvg(
+      [{value:b.cash, color:'var(--cash)'}, {value:b.fundValue, color:'var(--accent)'}, {value:b.metalValue, color:'var(--gold)'}],
+      {centerLabel: fmtCompact(total), centerLabelSize: 13, centerSub: 'Toplam'}
+    );
+    el.innerHTML =
+      '<div class="card-title">Dağılım</div>'
+      + '<div class="donut-wrap">' + donut + '</div>'
+      + '<div class="breakdown-stack">'
+        + (cashPct > 0 ? '<div class="seg cash" style="width:'+cashPct+'%"></div>' : '')
+        + (fundPct > 0 ? '<div class="seg fund" style="width:'+fundPct+'%"></div>' : '')
+        + (metalPct > 0 ? '<div class="seg metal" style="width:'+metalPct+'%"></div>' : '')
+      + '</div>'
+      + '<div class="breakdown-legend">'
+        + '<span><span class="dot cash"></span>Nakit · '+fmt(b.cash)+'</span>'
+        + '<span><span class="dot fund"></span>Yatırım Fonu · '+fmt(b.fundValue)+'</span>'
+        + '<span><span class="dot metal"></span>Kıymetli Metal · '+fmt(b.metalValue)+'</span>'
+      + '</div>'
+      + '<div class="breakdown-rows">'
+        + '<div class="breakdown-row"><div class="label"><span class="dot cash" style="width:9px;height:9px;border-radius:50%;display:inline-block;background:var(--cash);"></span>Nakit</div>'
+          + '<div class="amounts"><div class="main">'+fmt(b.cash)+'</div></div></div>'
+        + '<div class="breakdown-row"><div class="label"><span class="dot fund" style="width:9px;height:9px;border-radius:50%;display:inline-block;background:var(--accent);"></span>Yatırım Fonu</div>'
+          + '<div class="amounts"><div class="main">'+fmt(b.fundValue)+'</div><div class="sub">Ana Para '+fmt(b.fundCost)+' · '+profitSpan(b.fundProfit)+'</div></div></div>'
+        + '<div class="breakdown-row"><div class="label"><span class="dot metal" style="width:9px;height:9px;border-radius:50%;display:inline-block;background:var(--gold);"></span>Kıymetli Metal</div>'
+          + '<div class="amounts"><div class="main">'+fmt(b.metalValue)+'</div><div class="sub">Ana Para '+fmt(b.metalCost)+' · '+profitSpan(b.metalProfit)+'</div></div></div>'
+      + '</div>'
+      + '<div class="breakdown-totals">'
+        + '<div class="t-item"><div class="t-label">Toplam Ana Para</div><div class="t-val">'+fmt(b.totalPrincipal)+'</div></div>'
+        + '<div class="t-item" style="text-align:right;"><div class="t-label">Toplam Kâr/Zarar</div><div class="t-val" style="color:'+(b.investProfit>=0?'var(--income)':'var(--expense)')+';">'+(b.investProfit>=0?'+':'')+fmt(b.investProfit)+'</div></div>'
+      + '</div>';
+
+    const sourceRows = principalBySource(personFilter);
+    if(sourceRows.length > 0){
+      el.innerHTML +=
+        '<div class="breakdown-source-title">Ana Para · Kaynağa Göre</div>'
+        + '<div class="breakdown-source-list">'
+          + sourceRows.map(function(r){
+              const profitPart = r.hasInvestment ? ' <span class="num">('+profitSpan(r.profit)+')</span>' : '';
+              return '<div class="breakdown-source-row"><span>'+esc(r.name)+'</span><span class="num">'+fmt(r.amount)+profitPart+'</span></div>';
+            }).join('')
+        + '</div>';
+    }
+  }
+
+  function renderOzet(){
+    renderPersonChips('ozetPersonChips', S.ozetPerson, function(val){ S.ozetPerson = val; renderOzet(); });
+
+    const b = investmentBreakdown(S.ozetPerson);
+    $('#heroTotal').textContent = fmt(b.grandTotal);
+    $('#heroBreakdown').textContent = 'Nakit '+fmt(b.cash)+' · Yatırım '+fmt(b.investValue);
+    renderBreakdownCard(b, S.ozetPerson);
+    const range = periodRange('thisMonth');
+    let incEntries = S.incomeEntries, expEntries = S.expenseEntries;
+    if(S.ozetPerson!=='all'){
+      const ids = S.incomeTypes.filter(t=>t.personId===S.ozetPerson).map(t=>t.id);
+      incEntries = incEntries.filter(e=>ids.includes(e.typeId));
+      expEntries = expEntries.filter(e=>ids.includes(e.paidFromTypeId));
+    }
+    const incM = incEntries.filter(e=>inRange(e.date, range)).reduce((a,e)=>a+Number(e.amount||0),0);
+    const expM = expEntries.filter(e=>inRange(e.date, range)).reduce((a,e)=>a+Number(e.amount||0),0);
+    $('#heroIncomeMonth').textContent = fmt(incM);
+    $('#heroExpenseMonth').textContent = fmt(expM);
+
+    $$('#ozetSubTabs button').forEach(function(b){ b.classList.toggle('active', b.dataset.sub===S.ozetSubView); });
+    $('#ozetKaynaklarPane').style.display = S.ozetSubView==='hareketler' ? 'none' : '';
+    $('#ozetHareketlerPane').style.display = S.ozetSubView==='hareketler' ? '' : 'none';
+
+    let types = S.incomeTypes.filter(t=>!t.archived);
+    if(S.ozetPerson!=='all') types = types.filter(t=>t.personId===S.ozetPerson);
+    const grid = $('#potGrid');
+    const unassigned = unassignedInvestmentStats(S.ozetPerson, types);
+    if(types.length===0 && !unassigned.hasInvestment){
+      grid.innerHTML = '<div class="empty">Henüz gelir kaynağı yok. Yukarıdaki + ile ekleyebilirsin.</div>';
+    } else {
+      let html = types.map(t=>{
+        const b = potBalance(t.id);
+        const cls = b.balance < 0 ? 'neg' : 'pos';
+        const inv = incomeTypeInvestmentStats(t.id);
+        const invLine = inv.hasInvestment
+          ? '<div class="pot-sub">Yatırım '+fmt(inv.value)+' <span style="color:'+(inv.profit>=0?'var(--income)':'var(--expense)')+';font-weight:600;">('+(inv.profit>=0?'+':'')+fmt(inv.profit)+' '+(inv.profit>=0?'kâr':'zarar')+')</span></div>'
+          : '';
+        return '<div class="pot-card" data-id="'+t.id+'" style="cursor:pointer;"><div><div class="pot-name">'+esc(t.name)+' <span class="pot-person">· '+esc(personName(t.personId))+'</span></div><div class="pot-sub">Gelen '+fmt(b.income)+' · Harcanan '+fmt(b.spent)+'</div>'+invLine+'</div><div class="pot-balance num '+cls+'">'+fmt(b.balance)+'</div></div>';
+      }).join('');
+      // reconciliation card: any holding/fund lot not tagged to one of the sources above, so the
+      // Gelir Kaynakları kâr toplamı can always be made to match the Dağılım card's toplam kâr.
+      if(unassigned.hasInvestment){
+        html += '<div class="pot-card unassigned" style="cursor:default;border-style:dashed;">'
+          + '<div><div class="pot-name">Kaynağı Belirtilmemiş <span class="pot-person">· yatırım</span></div>'
+          + '<div class="pot-sub">Bir gelir kaynağına bağlanmamış yatırımlar (fon + kıymetli maden)</div>'
+          + '<div class="pot-sub">Yatırım '+fmt(unassigned.value)+' <span style="color:'+(unassigned.profit>=0?'var(--income)':'var(--expense)')+';font-weight:600;">('+(unassigned.profit>=0?'+':'')+fmt(unassigned.profit)+' '+(unassigned.profit>=0?'kâr':'zarar')+')</span></div></div>'
+          + '<div class="pot-balance num" style="color:var(--ink-faint);">'+fmt(unassigned.value)+'</div>'
+          + '</div>';
+      }
+      grid.innerHTML = html;
+      grid.querySelectorAll('.pot-card').forEach(function(card){
+        if(!card.dataset.id) return;
+        card.addEventListener('click', ()=> openIncomeTypeSheet(card.dataset.id));
+      });
+    }
+
+    const recent = unifiedEntries(S.ozetPerson).slice(0,6);
+    const list = $('#recentList');
+    if(recent.length===0){
+      list.innerHTML = '<div class="empty">Henüz kayıt yok. "Ekle" sekmesinden ilk kaydını gir.</div>';
+    } else {
+      list.innerHTML = recent.map(e=>txRowHtml(e)).join('');
+      bindTxRows(list);
+    }
+  }
+
+  function openIncomeTypeSheet(id){
+    const overlay = $('#sheetOverlay');
+    const content = $('#sheetContent');
+    const isNew = !id;
+    const defaultPersonId = (S.ozetPerson && S.ozetPerson!=='all') ? S.ozetPerson : (S.addPersonId || (S.people[0] && S.people[0].id) || '');
+    const t = isNew ? {personId: defaultPersonId, name:'', archived:false} : S.incomeTypes.find(x=>x.id===id);
+    if(!t) return;
+    const persons = S.people.filter(p=>!p.archived);
+    const inv = isNew ? {hasInvestment:false} : incomeTypeInvestmentStats(t.id);
+    const potB = isNew ? {income:0, spent:0, balance:0} : potBalance(t.id);
+
+    content.innerHTML =
+      '<div class="sheet-handle"></div>'
+      + '<div class="sheet-title">'+(isNew?'Yeni Gelir Kaynağı':'Gelir Kaynağını Düzenle')+'</div>'
+      + '<div class="field"><label>Kişi</label><select id="it_person">'
+        + persons.map(p=>'<option value="'+p.id+'"'+(p.id===t.personId?' selected':'')+'>'+esc(p.name)+'</option>').join('')
+        + '</select></div>'
+      + '<div class="field"><label>Ad</label><input type="text" id="it_name" value="'+esc(t.name)+'" placeholder="Örn: Maaş"></div>'
+      + (!isNew ? '<div class="holding-bottom source-grid" style="grid-template-columns:1fr 1fr;margin:4px 0 14px;"><div class="cell"><div class="l">Nakit Bakiye</div><div class="v num">'+fmt(potB.balance)+'</div></div>'
+          + (inv.hasInvestment
+            ? '<div class="cell"><div class="l">Yatırım (güncel değer)</div><div class="v num">'+fmt(inv.value)+'</div></div>'
+              + '<div class="cell"><div class="l">Yatırım Maliyeti</div><div class="v num">'+fmt(inv.cost)+'</div></div>'
+              + '<div class="cell"><div class="l">Yatırım Kâr/Zarar</div><div class="v num" style="color:'+(inv.profit>=0?'var(--income)':'var(--expense)')+';">'+(inv.profit>=0?'+':'')+fmt(inv.profit)+'</div></div>'
+            : '<div class="cell"><div class="l">Yatırım</div><div class="v num">Yok</div></div>')
+          + '</div>'
+        : '')
+      + '<div class="sheet-actions">'
+      + (isNew ? '' : '<button type="button" class="btn-ghost" id="it_archive">'+(t.archived?'Arşivden Çıkar':'Arşivle')+'</button>')
+      + (isNew ? '' : '<button type="button" class="btn-danger" id="it_delete">Sil</button>')
+      + '<button type="button" class="btn-ghost" id="it_save">Kaydet</button>'
+      + '</div>';
+
+    overlay.classList.add('open');
+
+    $('#it_save').addEventListener('click', async ()=>{
+      const personId = $('#it_person').value;
+      const name = $('#it_name').value.trim();
+      if(!personId){ toast('Önce bir kişi ekle'); return; }
+      if(!name){ toast('Ad gir'); return; }
+      try{
+        if(isNew){
+          const row = await S.store.add('income_types', {personId, name, archived:false});
+          S.incomeTypes.push(row);
+          toast('Gelir kaynağı eklendi');
+        } else {
+          await S.store.update('income_types', t.id, {personId, name});
+          Object.assign(t, {personId, name});
+          toast('Güncellendi');
+        }
+        closeSheet();
+        renderOzet();
+      } catch(e){
+        console.error('income type save failed', e);
+        toast('Kaydedilemedi, tekrar dene');
+      }
+    });
+
+    if(!isNew){
+      $('#it_archive').addEventListener('click', async ()=>{
+        const newVal = !t.archived;
+        try{
+          await S.store.update('income_types', t.id, {archived:newVal});
+          t.archived = newVal;
+          closeSheet();
+          toast(newVal ? 'Arşivlendi' : 'Arşivden çıkarıldı');
+          renderOzet();
+        } catch(e){
+          console.error('income type archive failed', e);
+          toast('İşlem başarısız, tekrar dene');
+        }
+      });
+      $('#it_delete').addEventListener('click', async ()=>{
+        const btn = $('#it_delete');
+        if(btn.dataset.confirm !== '1'){
+          btn.dataset.confirm = '1';
+          btn.textContent = 'Emin misin? Tekrar dokun';
+          return;
+        }
+        try{
+          await S.store.remove('income_types', t.id);
+          S.incomeTypes = S.incomeTypes.filter(x=>x.id!==t.id);
+          closeSheet();
+          toast('Silindi');
+          renderOzet();
+        } catch(e){
+          console.error('income type delete failed', e);
+          toast('Silinemedi, tekrar dene');
+        }
+      });
+    }
+  }
+
+  function txRowHtml(e){
+    const sign = e.kind==='gider' ? '−' : '+';
+    return '<div class="tx-row" data-kind="'+e.kind+'" data-id="'+e.id+'">'
+      + '<div class="tx-dot '+(e.kind==='gider'?'expense':'income')+'"></div>'
+      + '<div class="tx-main"><div class="tx-label">'+esc(e.label)+'</div><div class="tx-sub">'+esc((e.sub?e.sub+' · ':'')+dayLabel(e.date))+'</div></div>'
+      + '<div class="tx-amount num '+(e.kind==='gider'?'expense':'income')+'">'+sign+' '+fmt(e.amount)+'</div>'
+      + '</div>';
+  }
+  function bindTxRows(container){
+    container.querySelectorAll('.tx-row').forEach(row=>{
+      row.addEventListener('click', ()=> openEditSheet(row.dataset.kind, row.dataset.id));
+    });
+  }
+
+  // ---------- render: ekle ----------
+  function fillSelect(sel, items, selectedId){
+    sel.innerHTML = items.map(i=>'<option value="'+i.id+'"'+(i.id===selectedId?' selected':'')+'>'+esc(i.name)+'</option>').join('');
+  }
+  function renderEkleOptions(){
+    const persons = S.people.filter(p=>!p.archived);
+    fillSelect($('#f_person'), persons, S.addPersonId);
+
+    const cats = S.expenseCategories.filter(c=>!c.archived);
+    fillSelect($('#f_category'), cats);
+
+    const types = S.incomeTypes.filter(t=>!t.archived && t.personId===S.addPersonId);
+    fillSelect($('#f_incometype'), types);
+
+    const paidSelect = $('#f_paidfrom');
+    paidSelect.innerHTML = types.map(t=>{
+      const b = potBalance(t.id);
+      return '<option value="'+t.id+'">'+esc(t.name)+' — bakiye '+fmt(b.balance)+'</option>';
+    }).join('');
+
+    if(!$('#f_date').value) $('#f_date').value = todayStr();
+    applyMode();
+  }
+  function applyMode(){
+    const isExpense = S.addMode === 'gider';
+    $('#modeGiderBtn').classList.toggle('active', isExpense);
+    $('#modeGelirBtn').classList.toggle('active', !isExpense);
+    $('#expenseCatField').style.display = isExpense ? '' : 'none';
+    $('#incomeTypeField').style.display = isExpense ? 'none' : '';
+    $('#paidFromField').style.display = isExpense ? '' : 'none';
+    const btn = $('#submitBtn');
+    btn.textContent = isExpense ? 'Gideri Kaydet' : 'Geliri Kaydet';
+    btn.classList.toggle('expense', isExpense);
+    btn.classList.toggle('income', !isExpense);
+  }
+
+  async function handleQuickAdd(kind, name){
+    name = name.trim();
+    if(!name) return;
+    const data = {name, archived:false};
+    if(kind==='income_types') data.personId = S.addPersonId;
+    const row = await S.store.add(kind, data);
+    if(kind==='income_types') S.incomeTypes.push(row); else S.expenseCategories.push(row);
+    toast('Eklendi: '+name);
+    renderEkleOptions();
+    if(kind==='income_types'){ $('#f_incometype').value = row.id; $('#f_paidfrom').value = row.id; }
+    else { $('#f_category').value = row.id; }
+  }
+
+  async function submitEntry(ev){
+    ev.preventDefault();
+    const amount = parseFloat($('#f_amount').value);
+    if(!amount || amount<=0){ toast('Geçerli bir tutar gir'); return; }
+    const date = $('#f_date').value || todayStr();
+    const note = $('#f_note').value.trim();
+    const person = S.people.find(p=>p.id===S.addPersonId);
+
+    if(S.addMode==='gider'){
+      const catId = $('#f_category').value;
+      const cat = S.expenseCategories.find(c=>c.id===catId);
+      const typeId = $('#f_paidfrom').value;
+      const type = S.incomeTypes.find(t=>t.id===typeId);
+      if(!cat || !type){ toast('Kategori ve kaynak seç'); return; }
+      const row = await S.store.add('expense_entries', {
+        categoryId: cat.id, categoryName: cat.name,
+        paidFromTypeId: type.id, paidFromTypeName: type.name,
+        personId: type.personId, personName: personName(type.personId),
+        amount, date, note
+      });
+      S.expenseEntries.push(row);
+      toast('Gider kaydedildi');
+    } else {
+      const typeId = $('#f_incometype').value;
+      const type = S.incomeTypes.find(t=>t.id===typeId);
+      if(!type){ toast('Gelir türü seç'); return; }
+      const row = await S.store.add('income_entries', {
+        typeId: type.id, typeName: type.name, personId: type.personId, personName: personName(type.personId), amount, date, note
+      });
+      S.incomeEntries.push(row);
+      toast('Gelir kaydedildi');
+    }
+    $('#f_amount').value = '';
+    $('#f_note').value = '';
+    renderEkleOptions();
+  }
+
+  // ---------- render: birikim ----------
+  const MATERIAL_PRESETS = ['Gram Altın','Çeyrek Altın','Yarım Altın','Tam Altın','Cumhuriyet Altını','Gümüş (gram)'];
+  const FUND_PRESETS = ['EP1'];
+
+  // Birikim'in ana sayfasında (hangi alt-sekme açık olursa olsun görünen), tüm kişilerin
+  // yatırım fonu + kıymetli maden varlıklarını birleştiren özet: toplam güncel değer, ana para, kâr/zarar.
+  function renderBirikimOverview(){
+    const el = $('#birikimOverviewCard');
+    if(!el) return;
+    renderPersonChips('birikimOverviewPersonChips', S.birikimOverviewPerson, function(val){ S.birikimOverviewPerson = val; renderBirikimOverview(); });
+    const personFilter = S.birikimOverviewPerson;
+
+    let fundCost = 0, fundValue = 0, fundValueDelta = 0, hasAnyDelta = false;
+    S.fundLots.forEach(function(l){
+      if(personFilter && personFilter!=='all' && l.personId!==personFilter) return;
+      const m = fundLotMetrics(l);
+      fundCost += m.cost; fundValue += m.value; fundValueDelta += m.valueDelta;
+      if(m.priceDelta) hasAnyDelta = true;
+    });
+    let metalCost = 0, metalValue = 0, metalValueDelta = 0;
+    S.savingsHoldings.forEach(function(h){
+      if(personFilter && personFilter!=='all' && h.personId!==personFilter) return;
+      const m = holdingMetrics(h);
+      metalCost += m.cost; metalValue += m.value; metalValueDelta += m.valueDelta;
+      if(m.priceDelta) hasAnyDelta = true;
+    });
+    const fundProfit = fundValue - fundCost;
+    const metalProfit = metalValue - metalCost;
+    const totalValue = fundValue + metalValue;
+    const totalCost = fundCost + metalCost;
+    const totalProfit = totalValue - totalCost;
+    const totalValueDelta = fundValueDelta + metalValueDelta;
+    const pct = function(part){ return totalValue > 0 ? Math.max(0, part) / totalValue * 100 : 0; };
+    const fundPct = pct(fundValue), metalPct = pct(metalValue);
+
+    const profitSpan = function(v){
+      const cls = v >= 0 ? 'profit-pos' : 'profit-neg';
+      const sign = v >= 0 ? '+' : '';
+      return '<span class="'+cls+'">'+sign+fmt(v)+'</span>';
+    };
+
+    const scopeLabel = personFilter && personFilter!=='all' ? esc(personName(personFilter)) : 'Tüm Kişiler';
+    const ovDonut = donutSvg(
+      [{value:fundValue, color:'var(--accent)'}, {value:metalValue, color:'var(--gold)'}],
+      {size:84, stroke:12, centerLabel: fmtCompact(totalValue), centerLabelSize: 10.5}
+    );
+    el.innerHTML =
+      '<div class="card-title">Birikim Özeti · '+scopeLabel+'</div>'
+      + '<div style="display:flex;align-items:center;gap:16px;">'
+        + '<div style="flex:none;">' + ovDonut + '</div>'
+        + '<div style="flex:1;min-width:0;">'
+          + '<div class="num" style="font-size:25px;font-weight:800;margin-bottom:3px;">'+fmt(totalValue)+'</div>'
+          + '<div style="font-size:12.5px;color:var(--ink-soft);margin-bottom:'+(hasAnyDelta?'4px':'0px')+';">Ana Para '+fmt(totalCost)+' · '+profitSpan(totalProfit)+' '+(totalProfit>=0?'kâr':'zarar')+'</div>'
+          + (hasAnyDelta ? '<div style="font-size:12.5px;">Son fiyat güncellemesine göre '+profitSpan(totalValueDelta)+'</div>' : '')
+        + '</div>'
+      + '</div>'
+      + '<div style="margin-top:12px;" class="breakdown-stack">'
+        + (fundPct > 0 ? '<div class="seg fund" style="width:'+fundPct+'%"></div>' : '')
+        + (metalPct > 0 ? '<div class="seg metal" style="width:'+metalPct+'%"></div>' : '')
+      + '</div>'
+      + '<div class="breakdown-legend">'
+        + '<span><span class="dot fund"></span>Yatırım Fonu · '+fmt(fundValue)+'</span>'
+        + '<span><span class="dot metal"></span>Kıymetli Metal · '+fmt(metalValue)+'</span>'
+      + '</div>'
+      + '<div class="breakdown-rows">'
+        + '<div class="breakdown-row"><div class="label"><span class="dot" style="width:9px;height:9px;border-radius:50%;display:inline-block;background:var(--accent);"></span>Yatırım Fonu</div>'
+          + '<div class="amounts"><div class="main">'+fmt(fundValue)+'</div><div class="sub">Ana Para '+fmt(fundCost)+' · '+profitSpan(fundProfit)+'</div></div></div>'
+        + '<div class="breakdown-row"><div class="label"><span class="dot" style="width:9px;height:9px;border-radius:50%;display:inline-block;background:var(--gold);"></span>Kıymetli Metal</div>'
+          + '<div class="amounts"><div class="main">'+fmt(metalValue)+'</div><div class="sub">Ana Para '+fmt(metalCost)+' · '+profitSpan(metalProfit)+'</div></div></div>'
+      + '</div>';
+  }
+
+  function renderBirikim(){
+    renderBirikimOverview();
+    $$('#birikimSubTabs button').forEach(function(b){ b.classList.toggle('active', b.dataset.sub===S.birikimSubView); });
+    $('#birikimMetalPane').style.display = S.birikimSubView==='fund' ? 'none' : '';
+    $('#birikimFundPane').style.display = S.birikimSubView==='fund' ? '' : 'none';
+    if(S.birikimSubView==='fund'){ renderFundView(); return; }
+
+    renderPersonChips('birikimPersonChips', S.birikimPerson, function(val){ S.birikimPerson = val; renderBirikim(); });
+
+    let holdings = S.savingsHoldings.slice();
+    if(S.birikimPerson!=='all') holdings = holdings.filter(h=>h.personId===S.birikimPerson);
+
+    let totalCost=0, totalValue=0, totalValueDelta=0, hasAnyDelta=false;
+    holdings.forEach(h=>{ const m = holdingMetrics(h); totalCost+=m.cost; totalValue+=m.value; totalValueDelta+=m.valueDelta; if(m.priceDelta) hasAnyDelta=true; });
+    const totalProfit = totalValue - totalCost;
+    const pct = totalCost>0 ? (totalProfit/totalCost*100) : 0;
+
+    $('#bMaliyet').textContent = fmt(totalCost);
+    $('#bDeger').textContent = fmt(totalValue);
+    const karEl = $('#bKar');
+    karEl.textContent = fmt(totalProfit) + (totalCost>0 ? ' ('+(totalProfit>=0?'+':'')+fmtNum(pct,1)+'%)' : '');
+    karEl.classList.toggle('income', totalProfit>=0);
+    karEl.classList.toggle('expense', totalProfit<0);
+    $('#metalPriceDeltaSummary').innerHTML = priceDeltaSummaryHtml(totalValueDelta, totalValue-totalValueDelta, hasAnyDelta);
+
+    // material breakdown by current value
+    const byMat = {};
+    holdings.forEach(h=>{
+      const m = holdingMetrics(h);
+      const key = h.material || '—';
+      if(!byMat[key]) byMat[key] = {qty:0, unit:h.unit||'', total:0};
+      byMat[key].qty += Number(h.quantity||0);
+      byMat[key].total += m.value;
+    });
+    const matArr = Object.keys(byMat).map(k=>({name:k, qty:byMat[k].qty, unit:byMat[k].unit, total:byMat[k].total})).sort((a,b)=>b.total-a.total);
+    const maxMat = matArr.length ? matArr[0].total : 0;
+    const matEl = $('#materialBars');
+    if(matArr.length===0){
+      matEl.innerHTML = '<div class="empty">Henüz varlık eklenmedi.</div>';
+    } else {
+      const matDonut = donutSvg(
+        matArr.map((m,i)=>({value:m.total, color:CHART_PALETTE[i % CHART_PALETTE.length]})),
+        {size:88, stroke:12, centerLabel: fmtCompact(matArr.reduce((s,m)=>s+m.total,0)), centerLabelSize: 10.5}
+      );
+      matEl.innerHTML = '<div class="donut-wrap">' + matDonut + '</div>' + matArr.map(m=>{
+        const p = maxMat ? Math.max(4, Math.round(m.total/maxMat*100)) : 0;
+        return '<div class="bar-row"><div class="bar-top"><span class="name">'+esc(m.name)+'</span><span class="amt num">'+fmtNum(m.qty)+' '+esc(m.unit)+' · '+fmt(m.total)+'</span></div><div class="bar-track"><div class="bar-fill gold" style="width:'+p+'%"></div></div></div>';
+      }).join('');
+    }
+
+    // kâr/zarar filtresi (sadece "Varlıklarım" listesini etkiler)
+    const profitCount = holdings.filter(h=>holdingMetrics(h).profit>0).length;
+    const lossCount = holdings.filter(h=>holdingMetrics(h).profit<0).length;
+    const hfOptions = [
+      {key:'all', label:'Tümü ('+holdings.length+')'},
+      {key:'profit', label:'Kârda ('+profitCount+')'},
+      {key:'loss', label:'Zararda ('+lossCount+')'}
+    ];
+    const hfEl = $('#holdingsFilterChips');
+    hfEl.innerHTML = hfOptions.map(o=>'<button type="button" class="chip'+(S.holdingsFilter===o.key?' active':'')+'" data-hf="'+o.key+'">'+esc(o.label)+'</button>').join('');
+    hfEl.querySelectorAll('.chip').forEach(btn=>{
+      btn.addEventListener('click', ()=>{ S.holdingsFilter = btn.dataset.hf; renderBirikim(); });
+    });
+
+    let listHoldings = holdings.slice();
+    if(S.holdingsFilter==='profit') listHoldings = listHoldings.filter(h=>holdingMetrics(h).profit>0);
+    else if(S.holdingsFilter==='loss') listHoldings = listHoldings.filter(h=>holdingMetrics(h).profit<0);
+
+    const listEl = $('#holdingsList');
+    if(listHoldings.length===0){
+      listEl.innerHTML = holdings.length===0
+        ? '<div class="empty">Henüz varlık eklenmedi. Altın, gümüş gibi birikimlerini "+ Yeni Varlık Ekle" ile gir.</div>'
+        : '<div class="empty">Bu filtreye uyan varlık yok.</div>';
+    } else {
+      listHoldings.sort((a,b)=> (b.createdAt||'').localeCompare(a.createdAt||''));
+      listEl.innerHTML = listHoldings.map(h=>{
+        const m = holdingMetrics(h);
+        const cls = m.profit >= 0 ? 'pos' : 'neg';
+        const sign = m.profit >= 0 ? '+' : '';
+        return '<div class="holding-card" data-id="'+h.id+'">'
+          + '<div class="holding-top">'
+          + '<div><div class="holding-material">'+esc(h.material)+' <span class="holding-person">· '+esc(personName(h.personId))+'</span></div>'
+          + '<div class="holding-sub">'+esc(h.bank||'—')+' · '+fmtNum(h.quantity)+' '+esc(h.unit||'')+'</div></div>'
+          + '<div class="holding-profit '+cls+'">'+sign+fmt(m.profit)+'<div class="holding-profit-pct">'+(m.cost>0?(sign+fmtNum(m.pct,1)+'%'):'')+'</div></div>'
+          + '</div>'
+          + '<div class="holding-bottom source-grid" style="grid-template-columns:1fr 1fr 1fr 1fr;">'
+          + '<div class="cell"><div class="l">Miktar</div><div class="v num">'+fmtNum(h.quantity)+' '+esc(h.unit||'')+'</div></div>'
+          + '<div class="cell"><div class="l">Maliyet</div><div class="v num">'+fmt(m.cost)+'</div></div>'
+          + '<div class="cell"><div class="l">Güncel Fiyat'+(m.hasGroupPrice?' · ortak':'')+'</div><div class="v num">'+fmt(m.effectivePrice)+'</div></div>'
+          + '<div class="cell"><div class="l">Güncel Değer</div><div class="v num">'+fmt(m.value)+'</div></div>'
+          + '</div>'
+          + priceDeltaLineHtml(m.priceDelta, m.valueDelta)
+          + '</div>';
+      }).join('');
+      listEl.querySelectorAll('.holding-card').forEach(card=>{
+        card.addEventListener('click', ()=> openHoldingSheet(card.dataset.id));
+      });
+    }
+  }
+
+  // ---------- render: yatırım fonları (Birikim alt-sekmesi) ----------
+  function renderFundView(){
+    renderBirikimOverview();
+    renderPersonChips('fundPersonChips', S.fundPerson, function(val){ S.fundPerson = val; renderFundView(); });
+
+    $$('#fundTxTabs button').forEach(function(b){ b.classList.toggle('active', b.dataset.sub===S.fundTxView); });
+    $('#fundLotsPane').style.display = S.fundTxView==='sales' ? 'none' : '';
+    $('#fundSalesPane').style.display = S.fundTxView==='sales' ? '' : 'none';
+
+    let lots = S.fundLots.slice();
+    let sales = S.fundSales.slice();
+    if(S.fundPerson!=='all'){
+      lots = lots.filter(l=>l.personId===S.fundPerson);
+      sales = sales.filter(s=>s.personId===S.fundPerson);
+    }
+
+    let totalRemaining=0, totalCost=0, totalValue=0, totalValueDelta=0, hasAnyDelta=false;
+    lots.forEach(l=>{ const m = fundLotMetrics(l); totalRemaining+=m.remaining; totalCost+=m.cost; totalValue+=m.value; totalValueDelta+=m.valueDelta; if(m.priceDelta) hasAnyDelta=true; });
+    const totalUnrealized = totalValue - totalCost;
+    const totalRealizedNet = sales.reduce((s,x)=>s+Number(x.netProfit||0), 0);
+
+    $('#fAdet').textContent = fmtNum(totalRemaining, 4);
+    $('#fMaliyet').textContent = fmt(totalCost);
+    $('#fDeger').textContent = fmt(totalValue);
+    const unrEl = $('#fUnrealized');
+    unrEl.textContent = fmt(totalUnrealized);
+    unrEl.classList.toggle('income', totalUnrealized>=0);
+    unrEl.classList.toggle('expense', totalUnrealized<0);
+    const relEl = $('#fRealized');
+    relEl.textContent = fmt(totalRealizedNet);
+    relEl.classList.toggle('income', totalRealizedNet>=0);
+    relEl.classList.toggle('expense', totalRealizedNet<0);
+    $('#fundPriceDeltaSummary').innerHTML = priceDeltaSummaryHtml(totalValueDelta, totalValue-totalValueDelta, hasAnyDelta);
+
+    // fon adına göre dağılım (kalan varlıkların güncel değerine göre)
+    const byFund = {};
+    lots.forEach(l=>{
+      const m = fundLotMetrics(l);
+      const key = l.fundName || '—';
+      if(!byFund[key]) byFund[key] = {qty:0, total:0};
+      byFund[key].qty += m.remaining;
+      byFund[key].total += m.value;
+    });
+    const fundArr = Object.keys(byFund).map(k=>({name:k, qty:byFund[k].qty, total:byFund[k].total})).sort((a,b)=>b.total-a.total);
+    const maxFund = fundArr.length ? fundArr[0].total : 0;
+    const fundBarsEl = $('#fundBars');
+    if(fundArr.length===0){
+      fundBarsEl.innerHTML = '<div class="empty">Henüz fon alışı eklenmedi.</div>';
+    } else {
+      const fundDonut = donutSvg(
+        fundArr.map((f,i)=>({value:f.total, color:CHART_PALETTE[i % CHART_PALETTE.length]})),
+        {size:88, stroke:12, centerLabel: fmtCompact(fundArr.reduce((s,f)=>s+f.total,0)), centerLabelSize: 10.5}
+      );
+      fundBarsEl.innerHTML = '<div class="donut-wrap">' + fundDonut + '</div>' + fundArr.map(f=>{
+        const p = maxFund ? Math.max(4, Math.round(f.total/maxFund*100)) : 0;
+        return '<div class="bar-row"><div class="bar-top"><span class="name">'+esc(f.name)+'</span><span class="amt num">'+fmtNum(f.qty,4)+' adet · '+fmt(f.total)+'</span></div><div class="bar-track"><div class="bar-fill gold" style="width:'+p+'%"></div></div></div>';
+      }).join('');
+    }
+
+    // Alışlarım (lots) — en yeni en üstte
+    const lotsEl = $('#fundLotsList');
+    if(lots.length===0){
+      lotsEl.innerHTML = '<div class="empty">Henüz fon alışı eklenmedi. "+ Alış Ekle" ile başla.</div>';
+    } else {
+      const sortedLots = lots.slice().sort((a,b)=> (b.createdAt||'').localeCompare(a.createdAt||''));
+      lotsEl.innerHTML = sortedLots.map(l=>{
+        const m = fundLotMetrics(l);
+        const cls = m.profit >= 0 ? 'pos' : 'neg';
+        const sign = m.profit >= 0 ? '+' : '';
+        const soldPart = !lotIsUntouched(l) ? ' <span class="holding-person">· '+fmtNum(Number(l.quantity)-m.remaining,4)+' satıldı</span>' : '';
+        return '<div class="holding-card" data-id="'+l.id+'">'
+          + '<div class="holding-top">'
+          + '<div><div class="holding-material">'+esc(l.fundName)+' <span class="holding-person">· '+esc(personName(l.personId))+'</span></div>'
+          + '<div class="holding-sub">'+dayLabel(l.purchaseDate)+' · '+fmtNum(l.quantity,4)+' adet alış'+soldPart+'</div></div>'
+          + '<div class="holding-profit '+cls+'">'+sign+fmt(m.profit)+'<div class="holding-profit-pct">'+(m.hasPrice?'':'fiyat girilmedi')+'</div></div>'
+          + '</div>'
+          + '<div class="holding-bottom source-grid" style="grid-template-columns:1fr 1fr 1fr 1fr;">'
+          + '<div class="cell"><div class="l">Kalan Adet</div><div class="v num">'+fmtNum(m.remaining,4)+'</div></div>'
+          + '<div class="cell"><div class="l">Maliyet</div><div class="v num">'+fmt(m.cost)+'</div></div>'
+          + '<div class="cell"><div class="l">Güncel Fiyat</div><div class="v num">'+(m.hasPrice?fmt(m.curPrice):'—')+'</div></div>'
+          + '<div class="cell"><div class="l">Güncel Değer</div><div class="v num">'+fmt(m.value)+'</div></div>'
+          + '</div>'
+          + priceDeltaLineHtml(m.priceDelta, m.valueDelta)
+          + '</div>';
+      }).join('');
+      lotsEl.querySelectorAll('.holding-card').forEach(card=>{
+        card.addEventListener('click', ()=> openFundLotSheet(card.dataset.id));
+      });
+    }
+
+    // Satışlarım (sales) — en yeni en üstte
+    const salesEl = $('#fundSalesList');
+    if(sales.length===0){
+      salesEl.innerHTML = '<div class="empty">Henüz satış kaydı yok.</div>';
+    } else {
+      const sortedSales = sales.slice().sort((a,b)=> (b.createdAt||'').localeCompare(a.createdAt||''));
+      salesEl.innerHTML = sortedSales.map(s=>{
+        const cls = s.netProfit >= 0 ? 'pos' : 'neg';
+        const sign = s.netProfit >= 0 ? '+' : '';
+        return '<div class="holding-card" data-id="'+s.id+'">'
+          + '<div class="holding-top">'
+          + '<div><div class="holding-material">'+esc(s.fundName)+' <span class="holding-person">· '+esc(personName(s.personId))+'</span></div>'
+          + '<div class="holding-sub">'+dayLabel(s.saleDate)+' · '+fmtNum(s.quantity,4)+' adet satış</div></div>'
+          + '<div class="holding-profit '+cls+'">'+sign+fmt(s.netProfit)+'<div class="holding-profit-pct">net (stopaj sonrası)</div></div>'
+          + '</div>'
+          + '<div class="holding-bottom source-grid" style="grid-template-columns:1fr 1fr 1fr 1fr;">'
+          + '<div class="cell"><div class="l">Maliyet</div><div class="v num">'+fmt(s.costBasis)+'</div></div>'
+          + '<div class="cell"><div class="l">Brüt Kâr</div><div class="v num">'+fmt(s.grossProfit)+'</div></div>'
+          + '<div class="cell"><div class="l">Stopaj (%17,5)</div><div class="v num">'+fmt(s.stopaj)+'</div></div>'
+          + '<div class="cell"><div class="l">Net Kâr</div><div class="v num">'+fmt(s.netProfit)+'</div></div>'
+          + '</div>'
+          + '</div>';
+      }).join('');
+      salesEl.querySelectorAll('.holding-card').forEach(card=>{
+        card.addEventListener('click', ()=> openFundSaleDetailSheet(card.dataset.id));
+      });
+    }
+  }
+
+  function openHoldingSheet(id){
+    const overlay = $('#sheetOverlay');
+    const content = $('#sheetContent');
+    const isNew = !id;
+    const h = isNew ? {personId:S.addPersonId, material:'', bank:'', quantity:'', unit:'gram', purchasePrice:'', purchaseDate:todayStr(), currentPrice:'', note:'', incomeTypeId:''} : S.savingsHoldings.find(x=>x.id===id);
+    if(!h) return;
+
+    const persons = S.people.filter(p=>!p.archived);
+
+    content.innerHTML =
+      '<div class="sheet-handle"></div>'
+      + '<div class="sheet-title">'+(isNew?'Yeni Varlık':'Varlığı Düzenle')+'</div>'
+      + '<div class="field"><label>Kişi</label><select id="h_person">'
+        + persons.map(p=>'<option value="'+p.id+'"'+(p.id===h.personId?' selected':'')+'>'+esc(p.name)+'</option>').join('')
+        + '</select></div>'
+      + '<div class="field"><label>Gelir Kaynağı (opsiyonel)</label><select id="h_incometype">'+fundingIncomeTypeOptionsHtml(h.personId, h.incomeTypeId)+'</select>'
+        + '<div class="field-hint" style="margin-top:6px;">Bu varlığı hangi gelir kaynağının parasıyla aldıysan seç — o kaynağın kartında bu yatırımın güncel değeri ve kâr/zararı da gösterilir.</div></div>'
+      + '<div class="field"><label>Materyal</label><input type="text" id="h_material" list="materialOptions" value="'+esc(h.material)+'" placeholder="Örn: Gram Altın"></div>'
+      + '<datalist id="materialOptions">' + MATERIAL_PRESETS.map(m=>'<option value="'+esc(m)+'">').join('') + '</datalist>'
+      + '<div class="field"><label>Banka</label><input type="text" id="h_bank" value="'+esc(h.bank)+'" placeholder="Örn: İş Bankası"></div>'
+      + '<div class="field"><label>Miktar</label><input type="number" step="0.0001" min="0" id="h_quantity" class="num-input" value="'+(h.quantity||'')+'"></div>'
+      + '<div class="field"><label>Birim</label><select id="h_unit"><option value="gram"'+(h.unit==='gram'?' selected':'')+'>gram</option><option value="adet"'+(h.unit==='adet'?' selected':'')+'>adet</option></select></div>'
+      + '<div class="field"><label>Alış Fiyatı (birim başına, ₺)</label><input type="number" step="0.01" min="0" id="h_purchaseprice" class="num-input" value="'+(h.purchasePrice||'')+'"></div>'
+      + '<div class="field"><label>Alış Tarihi</label><input type="date" id="h_purchasedate" value="'+(h.purchaseDate||todayStr())+'"></div>'
+      + '<div class="field"><label>Güncel Fiyat (birim başına, ₺)</label><input type="number" step="0.01" min="0" id="h_currentprice" class="num-input" value="'+(h.currentPrice||'')+'">'
+        + '<div class="field-hint" id="h_price_hint" style="margin-top:6px;"></div></div>'
+      + '<div class="field"><label>Not</label><input type="text" id="h_note" value="'+esc(h.note||'')+'"></div>'
+      + '<div class="sheet-actions">'
+      + (isNew ? '' : '<button type="button" class="btn-danger" id="h_delete">Sil</button>')
+      + '<button type="button" class="btn-ghost" id="h_save">Kaydet</button>'
+      + '</div>';
+
+    overlay.classList.add('open');
+
+    function updatePriceHint(){
+      const mat = $('#h_material').value.trim();
+      const bank = $('#h_bank').value.trim();
+      const hintEl = $('#h_price_hint');
+      if(!mat){ hintEl.textContent = ''; return; }
+      const gp = getGroupPrice(mat, bank);
+      if(gp != null){
+        hintEl.textContent = 'Bu materyal + banka için ortak güncel fiyat: '+fmt(gp)+' — tüm ilgili varlıklarda otomatik kullanılır. Bu alan sadece ortak fiyat silinirse yedek olarak devreye girer. Fiyatı değiştirmek için "Fiyatları Güncelle"yi kullan.';
+      } else {
+        hintEl.textContent = 'Bu materyal + banka için henüz ortak fiyat yok. Buraya gireceğin değer, bu materyal/bankadaki tüm varlıklar için başlangıç ortak fiyatı olacak.';
+      }
+    }
+    updatePriceHint();
+    $('#h_material').addEventListener('input', updatePriceHint);
+    $('#h_bank').addEventListener('input', updatePriceHint);
+    $('#h_person').addEventListener('change', ()=>{
+      $('#h_incometype').innerHTML = fundingIncomeTypeOptionsHtml($('#h_person').value, '');
+    });
+
+    $('#h_save').addEventListener('click', async ()=>{
+      const personId = $('#h_person').value;
+      const incomeTypeId = $('#h_incometype').value || null;
+      const material = $('#h_material').value.trim();
+      const bank = $('#h_bank').value.trim();
+      const quantity = parseFloat($('#h_quantity').value);
+      const unit = $('#h_unit').value;
+      const purchasePrice = parseFloat($('#h_purchaseprice').value);
+      const purchaseDate = $('#h_purchasedate').value || todayStr();
+      const currentPrice = parseFloat($('#h_currentprice').value) || 0;
+      const note = $('#h_note').value.trim();
+      if(!material){ toast('Materyal adı gir'); return; }
+      if(!quantity || quantity<=0){ toast('Geçerli bir miktar gir'); return; }
+      if(!purchasePrice || purchasePrice<0){ toast('Geçerli bir alış fiyatı gir'); return; }
+      const data = {personId, personName: personName(personId), incomeTypeId, material, bank, quantity, unit, purchasePrice, purchaseDate, currentPrice, note};
+      if(currentPrice > 0 && getGroupPrice(material, bank) == null){
+        await setGroupPrice(material, bank, currentPrice);
+      }
+      if(isNew){
+        const row = await S.store.add('savings_holdings', data);
+        S.savingsHoldings.push(row);
+        toast('Varlık eklendi');
+      } else {
+        await S.store.update('savings_holdings', h.id, data);
+        Object.assign(h, data);
+        toast('Güncellendi');
+      }
+      closeSheet();
+      renderBirikim();
+    });
+
+    if(!isNew){
+      $('#h_delete').addEventListener('click', async ()=>{
+        const btn = $('#h_delete');
+        if(btn.dataset.confirm !== '1'){
+          btn.dataset.confirm = '1';
+          btn.textContent = 'Emin misin? Tekrar dokun';
+          return;
+        }
+        await S.store.remove('savings_holdings', h.id);
+        S.savingsHoldings = S.savingsHoldings.filter(x=>x.id!==h.id);
+        closeSheet();
+        toast('Silindi');
+        renderBirikim();
+      });
+    }
+  }
+
+  function openPricesSheet(){
+    const overlay = $('#sheetOverlay');
+    const content = $('#sheetContent');
+
+    const groups = [];
+    const seen = {};
+    S.savingsHoldings.forEach(function(h){
+      const key = materialPriceKey(h.material, h.bank);
+      if(seen[key]) return;
+      seen[key] = true;
+      groups.push({material: h.material, bank: h.bank});
+    });
+    groups.sort(function(a,b){ return (a.material+'|'+a.bank).localeCompare(b.material+'|'+b.bank, 'tr'); });
+
+    let html = '<div class="sheet-handle"></div><div class="sheet-title">Fiyatları Güncelle</div>';
+    if(groups.length===0){
+      html += '<div class="empty">Önce Birikim\'e en az bir varlık ekle.</div>';
+    } else {
+      html += '<div class="field-hint" style="margin-bottom:10px;">Buraya girdiğin fiyat, aynı materyal + banka kombinasyonuna sahip tüm kişilerin tüm alışlarında otomatik kullanılır — her alışı tek tek güncellemene gerek yok.</div>'
+        + '<button type="button" class="btn-ghost" id="fetchPricesBtn" style="margin-top:0;margin-bottom:6px;">↻ Dünya Katılım / Ziraat Katılım\'dan Fiyatları Çek</button>'
+        + '<div id="fetchPricesStatus" class="field-hint" style="margin-bottom:14px;"></div>';
+      html += groups.map(function(g, i){
+        const cur = getGroupPrice(g.material, g.bank);
+        return '<div class="price-row" data-idx="'+i+'" style="display:flex;gap:8px;align-items:flex-end;margin-bottom:12px;">'
+          + '<div style="flex:1;min-width:0;"><div style="font-weight:700;font-family:\'Plus Jakarta Sans\',sans-serif;">'+esc(g.material)+'</div><div style="font-size:12.5px;color:var(--ink-faint);">'+esc(g.bank||'Banka belirtilmemiş')+'</div></div>'
+          + '<input type="number" step="0.01" min="0" class="num-input price-input" style="width:110px;flex:none;" data-material="'+esc(g.material)+'" data-bank="'+esc(g.bank||'')+'" value="'+(cur!=null?cur:'')+'" placeholder="₺">'
+          + '</div>';
+      }).join('');
+      html += '<button type="button" class="btn-primary gold" id="savePricesBtn" style="margin-top:6px;">Kaydet</button>';
+    }
+    content.innerHTML = html;
+    overlay.classList.add('open');
+
+    const saveBtn = $('#savePricesBtn');
+    if(saveBtn){
+      saveBtn.addEventListener('click', async function(){
+        const inputs = Array.from(content.querySelectorAll('.price-input'));
+        const originalLabel = saveBtn.textContent;
+        saveBtn.textContent = 'Kaydediliyor…';
+        saveBtn.disabled = true;
+        try{
+          let count = 0;
+          for(const input of inputs){
+            const price = parseFloat(input.value);
+            if(!price || price<=0) continue;
+            await setGroupPrice(input.dataset.material, input.dataset.bank, price);
+            count++;
+          }
+          renderBirikim();
+          if(count > 0){
+            saveBtn.textContent = 'Kaydedildi ✓';
+            toast(count + ' fiyat güncellendi');
+          } else {
+            toast('Geçerli bir fiyat gir');
+          }
+          setTimeout(function(){ if(saveBtn.isConnected){ saveBtn.textContent = originalLabel; saveBtn.disabled = false; } }, 1200);
+        } catch(e){
+          console.error('price save failed', e);
+          saveBtn.textContent = originalLabel;
+          saveBtn.disabled = false;
+          toast('Kaydedilemedi, tekrar dene');
+        }
+      });
+    }
+
+    const fetchBtn = $('#fetchPricesBtn');
+    if(fetchBtn){
+      fetchBtn.addEventListener('click', async function(){
+        const statusEl = $('#fetchPricesStatus');
+        const originalLabel = fetchBtn.textContent;
+        fetchBtn.textContent = 'Çekiliyor…';
+        fetchBtn.disabled = true;
+        statusEl.textContent = '';
+        try{
+          const res = await fetch('./prices.json?t=' + Date.now(), {cache:'no-store'});
+          if(!res.ok) throw new Error('not_found');
+          const data = await res.json();
+          const filled = applyFetchedPrices(data, content);
+          if(filled === 0){
+            statusEl.textContent = 'Dosya okundu ama eşleşen materyal/banka bulunamadı (Gram Altın/Gümüş veya Fiziki Altın/Gümüş, Dünya Katılım/Ziraat Katılım banka adıyla olmalı).';
+          } else {
+            const when = data.updatedAt ? new Date(data.updatedAt).toLocaleString('tr-TR') : '';
+            statusEl.textContent = filled + ' alan dolduruldu (kaynak güncellemesi: ' + when + '). Kontrol edip aşağıdaki tek "Kaydet" butonuna basman yeterli.';
+          }
+        } catch(e){
+          console.error('fetch prices failed', e);
+          statusEl.textContent = 'prices.json okunamadı. Bu özellik için GitHub reponda otomatik fiyat çekme workflow\'unun kurulu olması gerekiyor — henüz kurmadıysan bana söyle, adım adım ekleyelim.';
+        }
+        fetchBtn.textContent = originalLabel;
+        fetchBtn.disabled = false;
+      });
+    }
+  }
+
+  // fills matching .price-input fields from a fetched prices.json payload; returns how many were filled
+  function applyFetchedPrices(data, container){
+    let filled = 0;
+    container.querySelectorAll('.price-input').forEach(function(input){
+      const bank = String(input.dataset.bank||'').toLowerCase();
+      const material = String(input.dataset.material||'').toLowerCase();
+      const isCoin = /çeyrek|ceyrek|yarım|yarim|tam altın|tam altin|cumhuriyet/.test(material);
+      if(isCoin) return;
+      const isGold = /altın|altin/.test(material);
+      const isSilver = /gümüş|gumus/.test(material);
+      if(!isGold && !isSilver) return;
+      const isFiziki = /fiziki/.test(material);
+      let src = null;
+      if(isFiziki){
+        // physical/home-held holdings have no market feed of their own -- use Dünya Katılım as a proxy
+        src = data.dunyaKatilim;
+      } else if(/dünya|dunya/.test(bank)) src = data.dunyaKatilim;
+      else if(/ziraat/.test(bank)) src = data.ziraatKatilim;
+      if(!src) return;
+      const val = isGold ? src.altinAlis : src.gumusAlis;
+      if(val == null || isNaN(val)) return;
+      input.value = Number(val).toFixed(2);
+      input.style.outline = '2px solid var(--gold)';
+      setTimeout(function(){ input.style.outline = ''; }, 2000);
+      filled++;
+    });
+    return filled;
+  }
+
+  // ---------- fund lot add/edit sheet ----------
+  function fundNameOptionsHtml(){
+    const names = {};
+    S.fundLots.forEach(l=>{ if(l.fundName) names[l.fundName]=true; });
+    FUND_PRESETS.forEach(n=>{ names[n]=true; });
+    return Object.keys(names).map(n=>'<option value="'+esc(n)+'">').join('');
+  }
+  function openFundLotSheet(id){
+    const overlay = $('#sheetOverlay');
+    const content = $('#sheetContent');
+    const isNew = !id;
+    const l = isNew
+      ? {personId:S.addPersonId, fundName:(FUND_PRESETS[0]||''), quantity:'', purchasePrice:'', purchaseDate:todayStr(), note:'', incomeTypeId:''}
+      : S.fundLots.find(x=>x.id===id);
+    if(!l) return;
+
+    // once any units from this lot have been sold, the person/fund (which pin down which
+    // FIFO pool it belongs to) can no longer change -- but the quantity/price/date/note CAN
+    // still be corrected, as long as the new quantity doesn't go below what's already sold.
+    const consumed = isNew ? 0 : (Number(l.quantity||0) - lotRemaining(l));
+    const identityLocked = !isNew && consumed > 1e-9;
+    const persons = S.people.filter(p=>!p.archived);
+
+    content.innerHTML =
+      '<div class="sheet-handle"></div>'
+      + '<div class="sheet-title">'+(isNew?'Yeni Fon Alışı':'Fon Alışını Düzenle')+'</div>'
+      + (identityLocked ? '<div class="field-hint" style="margin-bottom:12px;">Bu alıştan '+fmtNum(consumed,4)+' adet satıldığı için kişi/fon adı değiştirilemez, ama adet/fiyat/tarih/not düzeltilebilir (adet en az '+fmtNum(consumed,4)+' olmalı).</div>' : '')
+      + '<div class="field"><label>Kişi</label><select id="fl_person"'+(identityLocked?' disabled':'')+'>'
+        + persons.map(p=>'<option value="'+p.id+'"'+(p.id===l.personId?' selected':'')+'>'+esc(p.name)+'</option>').join('')
+        + '</select></div>'
+      + '<div class="field"><label>Gelir Kaynağı (opsiyonel)</label><select id="fl_incometype">'+fundingIncomeTypeOptionsHtml(l.personId, l.incomeTypeId)+'</select>'
+        + '<div class="field-hint" style="margin-top:6px;">Bu alışı hangi gelir kaynağının parasıyla yaptıysan seç — o kaynağın kartında bu yatırımın güncel değeri ve kâr/zararı da gösterilir.</div></div>'
+      + '<div class="field"><label>Fon Adı</label><input type="text" id="fl_name" list="fundNameOptions" value="'+esc(l.fundName)+'" placeholder="Örn: EP1"'+(identityLocked?' disabled':'')+'></div>'
+      + '<datalist id="fundNameOptions">' + fundNameOptionsHtml() + '</datalist>'
+      + '<div class="field"><label>Adet</label><input type="number" step="0.0001" min="0" id="fl_quantity" class="num-input" value="'+(l.quantity||'')+'"></div>'
+      + '<div class="field"><label>Alış Fiyatı (birim başına, ₺)</label><input type="number" step="0.0001" min="0" id="fl_price" class="num-input" value="'+(l.purchasePrice||'')+'"></div>'
+      + '<div class="field-hint" id="fl_total_hint" style="display:none;">Toplam tutar: <strong id="fl_total_val"></strong></div>'
+      + '<div class="field"><label>Alış Tarihi</label><input type="date" id="fl_date" value="'+(l.purchaseDate||todayStr())+'"></div>'
+      + '<div class="field"><label>Not</label><input type="text" id="fl_note" value="'+esc(l.note||'')+'"></div>'
+      + '<div class="sheet-actions">'
+      + (isNew ? '' : '<button type="button" class="btn-danger" id="fl_delete"'+(identityLocked?' disabled title="Bir kısmı satılmış, silinemez"':'')+'>Sil</button>')
+      + '<button type="button" class="btn-ghost" id="fl_save">Kaydet</button>'
+      + '</div>';
+
+    overlay.classList.add('open');
+
+    if(!identityLocked){
+      $('#fl_person').addEventListener('change', ()=>{
+        $('#fl_incometype').innerHTML = fundingIncomeTypeOptionsHtml($('#fl_person').value, '');
+      });
+    }
+
+    function updateFlTotal(){
+      const q = parseFloat($('#fl_quantity').value);
+      const p = parseFloat($('#fl_price').value);
+      const hint = $('#fl_total_hint');
+      if(q > 0 && p >= 0){
+        $('#fl_total_val').textContent = fmt(q * p);
+        hint.style.display = '';
+      } else {
+        hint.style.display = 'none';
+      }
+    }
+    $('#fl_quantity').addEventListener('input', updateFlTotal);
+    $('#fl_price').addEventListener('input', updateFlTotal);
+    updateFlTotal();
+
+    $('#fl_save').addEventListener('click', async ()=>{
+      const incomeTypeId = $('#fl_incometype').value || null;
+      const quantity = parseFloat($('#fl_quantity').value);
+      const purchasePrice = parseFloat($('#fl_price').value);
+      const purchaseDate = $('#fl_date').value || todayStr();
+      const note = $('#fl_note').value.trim();
+      if(!quantity || quantity<=0){ toast('Geçerli bir adet gir'); return; }
+      if(!purchasePrice || purchasePrice<0){ toast('Geçerli bir alış fiyatı gir'); return; }
+
+      if(identityLocked){
+        if(quantity < consumed - 1e-9){ toast('Adet, zaten satılmış olan '+fmtNum(consumed,4)+' adetten az olamaz'); return; }
+        const data = {incomeTypeId, quantity, remainingQuantity: quantity - consumed, purchasePrice, purchaseDate, note};
+        await S.store.update('fund_lots', l.id, data);
+        Object.assign(l, data);
+        toast('Güncellendi');
+        closeSheet();
+        renderFundView();
+        return;
+      }
+
+      const personId = $('#fl_person').value;
+      const fundName = $('#fl_name').value.trim();
+      if(!fundName){ toast('Fon adı gir'); return; }
+      const data = {personId, incomeTypeId, fundName, quantity, remainingQuantity: quantity, purchasePrice, purchaseDate, note};
+      if(isNew){
+        const row = await S.store.add('fund_lots', data);
+        S.fundLots.push(row);
+        toast('Fon alışı eklendi');
+      } else {
+        await S.store.update('fund_lots', l.id, data);
+        Object.assign(l, data);
+        toast('Güncellendi');
+      }
+      closeSheet();
+      renderFundView();
+    });
+
+    if(!isNew && !identityLocked){
+      $('#fl_delete').addEventListener('click', async ()=>{
+        const btn = $('#fl_delete');
+        if(btn.dataset.confirm !== '1'){
+          btn.dataset.confirm = '1';
+          btn.textContent = 'Emin misin? Tekrar dokun';
+          return;
+        }
+        await S.store.remove('fund_lots', l.id);
+        S.fundLots = S.fundLots.filter(x=>x.id!==l.id);
+        closeSheet();
+        toast('Silindi');
+        renderFundView();
+      });
+    }
+  }
+
+  // ---------- fund sale sheet (FIFO + %17.5 stopaj) ----------
+  function openFundSaleSheet(){
+    const overlay = $('#sheetOverlay');
+    const content = $('#sheetContent');
+    const persons = S.people.filter(p=>!p.archived);
+    const defaultPerson = S.addPersonId || (persons[0] && persons[0].id) || '';
+
+    function availableFor(personId, fundName){
+      return S.fundLots
+        .filter(l=>l.personId===personId && fundKey(l.fundName)===fundKey(fundName))
+        .reduce((s,l)=>s+lotRemaining(l), 0);
+    }
+
+    content.innerHTML =
+      '<div class="sheet-handle"></div>'
+      + '<div class="sheet-title">Fon Satışı Kaydet</div>'
+      + '<div class="field-hint" style="margin-bottom:12px;">Satış, en önce alınan lottan başlanarak (FIFO) düşülür. Kârdan otomatik %17,5 stopaj hesaplanır.</div>'
+      + '<div class="field"><label>Kişi</label><select id="fs_person">'
+        + persons.map(p=>'<option value="'+p.id+'"'+(p.id===defaultPerson?' selected':'')+'>'+esc(p.name)+'</option>').join('')
+        + '</select></div>'
+      + '<div class="field"><label>Fon Adı</label><input type="text" id="fs_name" list="fundNameOptions" placeholder="Örn: EP1"></div>'
+      + '<datalist id="fundNameOptions">' + fundNameOptionsHtml() + '</datalist>'
+      + '<div class="field-hint" id="fs_avail_hint" style="margin-bottom:4px;"></div>'
+      + '<div class="field"><label>Satış Adedi</label><input type="number" step="0.0001" min="0" id="fs_quantity" class="num-input"></div>'
+      + '<div class="field"><label>Satış Fiyatı (birim başına, ₺)</label><input type="number" step="0.0001" min="0" id="fs_price" class="num-input"></div>'
+      + '<div class="field"><label>Satış Tarihi</label><input type="date" id="fs_date" value="'+todayStr()+'"></div>'
+      + '<div class="field"><label>Not</label><input type="text" id="fs_note"></div>'
+      + '<div class="field-hint" id="fs_preview_hint" style="margin-bottom:4px;"></div>'
+      + '<div class="sheet-actions">'
+      + '<button type="button" class="btn-ghost" id="fs_save">Satışı Kaydet</button>'
+      + '</div>';
+
+    overlay.classList.add('open');
+
+    function updateAvailHint(){
+      const personId = $('#fs_person').value;
+      const fundName = $('#fs_name').value.trim();
+      const hint = $('#fs_avail_hint');
+      if(!fundName){ hint.textContent = ''; return; }
+      const avail = availableFor(personId, fundName);
+      hint.textContent = 'Elde kalan: '+fmtNum(avail,4)+' adet';
+    }
+    function updatePreview(){
+      const personId = $('#fs_person').value;
+      const fundName = $('#fs_name').value.trim();
+      const qty = parseFloat($('#fs_quantity').value);
+      const price = parseFloat($('#fs_price').value);
+      const hint = $('#fs_preview_hint');
+      if(!fundName || !qty || qty<=0 || !price || price<=0){ hint.textContent = ''; return; }
+      const avail = availableFor(personId, fundName);
+      if(qty > avail + 1e-9){ hint.textContent = 'Yetersiz adet — elde sadece '+fmtNum(avail,4)+' var.'; return; }
+      // simulate FIFO without persisting, just for preview
+      const lots = S.fundLots
+        .filter(l=>l.personId===personId && fundKey(l.fundName)===fundKey(fundName) && lotRemaining(l) > 1e-9)
+        .slice()
+        .sort(function(a,b){ return (a.purchaseDate||'') < (b.purchaseDate||'') ? -1 : 1; });
+      let toSell = qty, costBasis = 0;
+      for(const lot of lots){
+        if(toSell<=1e-9) break;
+        const take = Math.min(lotRemaining(lot), toSell);
+        costBasis += take * Number(lot.purchasePrice||0);
+        toSell -= take;
+      }
+      const proceeds = qty*price;
+      const grossProfit = proceeds - costBasis;
+      const stopaj = grossProfit>0 ? grossProfit*0.175 : 0;
+      const netProfit = grossProfit - stopaj;
+      hint.textContent = 'Maliyet: '+fmt(costBasis)+' · Brüt Kâr: '+fmt(grossProfit)+' · Stopaj: '+fmt(stopaj)+' · Net Kâr: '+fmt(netProfit);
+    }
+    $('#fs_person').addEventListener('change', ()=>{ updateAvailHint(); updatePreview(); });
+    $('#fs_name').addEventListener('input', ()=>{ updateAvailHint(); updatePreview(); });
+    $('#fs_quantity').addEventListener('input', updatePreview);
+    $('#fs_price').addEventListener('input', updatePreview);
+
+    $('#fs_save').addEventListener('click', async ()=>{
+      const personId = $('#fs_person').value;
+      const fundName = $('#fs_name').value.trim();
+      const quantity = parseFloat($('#fs_quantity').value);
+      const salePrice = parseFloat($('#fs_price').value);
+      const saleDate = $('#fs_date').value || todayStr();
+      const note = $('#fs_note').value.trim();
+      if(!fundName){ toast('Fon adı gir'); return; }
+      if(!quantity || quantity<=0){ toast('Geçerli bir satış adedi gir'); return; }
+      if(!salePrice || salePrice<=0){ toast('Geçerli bir satış fiyatı gir'); return; }
+      try{
+        await recordFundSale(personId, fundName, quantity, salePrice, saleDate, note);
+        toast('Satış kaydedildi');
+        closeSheet();
+        renderFundView();
+      } catch(e){
+        if(e && e.message==='insufficient_units'){
+          toast('Yetersiz adet — elde sadece '+fmtNum(e.available,4)+' var');
+        } else {
+          console.error('fund sale failed', e);
+          toast('Kaydedilemedi, tekrar dene');
+        }
+      }
+    });
+  }
+
+  // ---------- fund sale detail / reverse sheet ----------
+  // lots for person+fund with THIS sale's consumption virtually un-done -- lets us preview
+  // "what if I change this sale's numbers" (or check feasibility) without touching the store yet.
+  function lotsWithVirtualRestore(personId, fundName, excludeSale){
+    const restoreMap = {};
+    if(excludeSale){
+      (excludeSale.lotBreakdown||[]).forEach(function(b){ restoreMap[b.lotId] = (restoreMap[b.lotId]||0) + Number(b.qty); });
+    }
+    return S.fundLots
+      .filter(function(l){ return l.personId===personId && fundKey(l.fundName)===fundKey(fundName); })
+      .map(function(l){ return { id:l.id, purchaseDate:l.purchaseDate||'', createdAt:l.createdAt||'', purchasePrice:Number(l.purchasePrice||0), remaining: lotRemaining(l) + (restoreMap[l.id]||0) }; })
+      .filter(function(l){ return l.remaining > 1e-9; })
+      .sort(function(a,b){
+        if(a.purchaseDate !== b.purchaseDate) return a.purchaseDate < b.purchaseDate ? -1 : 1;
+        return a.createdAt < b.createdAt ? -1 : 1;
+      });
+  }
+  // applies an edit to an existing sale: undoes its old lot consumption, then re-applies FIFO
+  // with the new numbers. Throws insufficient_units (without changing anything) if the new
+  // quantity can't be covered once the old sale's units are given back.
+  async function updateFundSale(sale, newQuantity, newSalePrice, newSaleDate, newNote){
+    const virtualLots = lotsWithVirtualRestore(sale.personId, sale.fundName, sale);
+    const available = virtualLots.reduce(function(s,l){ return s+l.remaining; }, 0);
+    if(newQuantity > available + 1e-9){
+      const err = new Error('insufficient_units');
+      err.available = available;
+      throw err;
+    }
+    await reverseFundSale(sale.id);
+    return await recordFundSale(sale.personId, sale.fundName, newQuantity, newSalePrice, newSaleDate, newNote);
+  }
+
+  function openFundSaleDetailSheet(id){
+    const overlay = $('#sheetOverlay');
+    const content = $('#sheetContent');
+    const s = S.fundSales.find(x=>x.id===id);
+    if(!s) return;
+
+    content.innerHTML =
+      '<div class="sheet-handle"></div>'
+      + '<div class="sheet-title">Satışı Düzenle</div>'
+      + '<div class="field-hint" style="margin-bottom:12px;">'+esc(s.fundName)+' · '+esc(personName(s.personId))+' — kişi ve fon adı değiştirilemez.</div>'
+      + '<div class="field"><label>Satış Adedi</label><input type="number" step="0.0001" min="0" id="fsd_quantity" class="num-input" value="'+s.quantity+'"></div>'
+      + '<div class="field"><label>Satış Fiyatı (birim başına, ₺)</label><input type="number" step="0.0001" min="0" id="fsd_price" class="num-input" value="'+s.salePrice+'"></div>'
+      + '<div class="field"><label>Satış Tarihi</label><input type="date" id="fsd_date" value="'+(s.saleDate||todayStr())+'"></div>'
+      + '<div class="field"><label>Not</label><input type="text" id="fsd_note" value="'+esc(s.note||'')+'"></div>'
+      + '<div class="field-hint" id="fsd_preview_hint" style="margin-bottom:4px;"></div>'
+      + '<div class="field-hint" style="margin-bottom:12px;">Değişiklik kaydedersen, bu satış önce geri alınır ve yeni sayılarla FIFO olarak yeniden uygulanır. Silersen düştüğü alışlara adetleri geri eklenir.</div>'
+      + '<div class="sheet-actions">'
+      + '<button type="button" class="btn-danger" id="fsd_delete">Satışı Sil (Geri Al)</button>'
+      + '<button type="button" class="btn-ghost" id="fsd_save">Kaydet</button>'
+      + '</div>';
+
+    overlay.classList.add('open');
+
+    function updatePreview(){
+      const qty = parseFloat($('#fsd_quantity').value);
+      const price = parseFloat($('#fsd_price').value);
+      const hint = $('#fsd_preview_hint');
+      if(!qty || qty<=0 || !price || price<=0){ hint.textContent = ''; return; }
+      const virtualLots = lotsWithVirtualRestore(s.personId, s.fundName, s);
+      const available = virtualLots.reduce(function(a,l){ return a+l.remaining; }, 0);
+      if(qty > available + 1e-9){ hint.textContent = 'Yetersiz adet — geri alınca elde sadece '+fmtNum(available,4)+' olur.'; return; }
+      let toSell = qty, costBasis = 0;
+      for(const lot of virtualLots){
+        if(toSell<=1e-9) break;
+        const take = Math.min(lot.remaining, toSell);
+        costBasis += take * lot.purchasePrice;
+        toSell -= take;
+      }
+      const proceeds = qty*price;
+      const grossProfit = proceeds - costBasis;
+      const stopaj = grossProfit>0 ? grossProfit*0.175 : 0;
+      const netProfit = grossProfit - stopaj;
+      hint.textContent = 'Maliyet: '+fmt(costBasis)+' · Brüt Kâr: '+fmt(grossProfit)+' · Stopaj: '+fmt(stopaj)+' · Net Kâr: '+fmt(netProfit);
+    }
+    updatePreview();
+    $('#fsd_quantity').addEventListener('input', updatePreview);
+    $('#fsd_price').addEventListener('input', updatePreview);
+
+    $('#fsd_save').addEventListener('click', async ()=>{
+      const quantity = parseFloat($('#fsd_quantity').value);
+      const salePrice = parseFloat($('#fsd_price').value);
+      const saleDate = $('#fsd_date').value || todayStr();
+      const note = $('#fsd_note').value.trim();
+      if(!quantity || quantity<=0){ toast('Geçerli bir satış adedi gir'); return; }
+      if(!salePrice || salePrice<=0){ toast('Geçerli bir satış fiyatı gir'); return; }
+      try{
+        await updateFundSale(s, quantity, salePrice, saleDate, note);
+        toast('Satış güncellendi');
+        closeSheet();
+        renderFundView();
+      } catch(e){
+        if(e && e.message==='insufficient_units'){
+          toast('Yetersiz adet — geri alınca elde sadece '+fmtNum(e.available,4)+' olur');
+        } else {
+          console.error('fund sale update failed', e);
+          toast('Güncellenemedi, tekrar dene');
+        }
+      }
+    });
+
+    $('#fsd_delete').addEventListener('click', async ()=>{
+      const btn = $('#fsd_delete');
+      if(btn.dataset.confirm !== '1'){
+        btn.dataset.confirm = '1';
+        btn.textContent = 'Emin misin? Tekrar dokun';
+        return;
+      }
+      await reverseFundSale(s.id);
+      closeSheet();
+      toast('Satış geri alındı');
+      renderFundView();
+    });
+  }
+
+  // ---------- fund current price sheet ----------
+  function openFundPricesSheet(){
+    const overlay = $('#sheetOverlay');
+    const content = $('#sheetContent');
+
+    const names = {};
+    S.fundLots.forEach(l=>{ if(l.fundName) names[fundKey(l.fundName)] = l.fundName; });
+    const groups = Object.values(names).sort((a,b)=>a.localeCompare(b,'tr'));
+
+    let html = '<div class="sheet-handle"></div><div class="sheet-title">Güncel Fon Fiyatını Güncelle</div>';
+    if(groups.length===0){
+      html += '<div class="empty">Önce en az bir fon alışı ekle.</div>';
+    } else {
+      html += '<div class="field-hint" style="margin-bottom:14px;">Buraya girdiğin fiyat, o fondaki tüm kalan (satılmamış) adetlerin güncel değerini ve gerçekleşmemiş kâr/zararını hesaplamak için kullanılır.</div>';
+      html += groups.map(function(name, i){
+        const cur = getFundPrice(name);
+        return '<div class="price-row" data-idx="'+i+'" style="display:flex;gap:8px;align-items:flex-end;margin-bottom:12px;">'
+          + '<div style="flex:1;min-width:0;font-weight:700;font-family:\'Plus Jakarta Sans\',sans-serif;">'+esc(name)+'</div>'
+          + '<input type="number" step="0.0001" min="0" class="num-input fund-price-input" style="width:110px;flex:none;" data-fund="'+esc(name)+'" value="'+(cur!=null?cur:'')+'" placeholder="₺">'
+          + '<button type="button" class="btn-ghost fund-price-save-btn" style="flex:none;width:auto;padding:12px 14px;margin-top:0;" data-fund="'+esc(name)+'">Kaydet</button>'
+          + '</div>';
+      }).join('');
+    }
+    content.innerHTML = html;
+    overlay.classList.add('open');
+
+    content.querySelectorAll('.fund-price-save-btn').forEach(function(btn){
+      btn.addEventListener('click', async function(){
+        const row = btn.closest('.price-row');
+        const input = row.querySelector('.fund-price-input');
+        const price = parseFloat(input.value);
+        if(!price || price<=0){ toast('Geçerli bir fiyat gir'); return; }
+        const originalLabel = btn.textContent;
+        btn.textContent = '…';
+        btn.disabled = true;
+        try{
+          await setFundPrice(btn.dataset.fund, price);
+          btn.textContent = 'Kaydedildi ✓';
+          renderFundView();
+          setTimeout(function(){ if(btn.isConnected){ btn.textContent = originalLabel; btn.disabled = false; } }, 1200);
+        } catch(e){
+          console.error('fund price save failed', e);
+          btn.textContent = originalLabel;
+          btn.disabled = false;
+          toast('Kaydedilemedi, tekrar dene');
+        }
+      });
+    });
+  }
+
+  // ---------- render: rapor ----------
+  function renderRapor(){
+    renderPersonChips('raporPersonChips', S.raporPerson, function(val){ S.raporPerson = val; renderRapor(); });
+    $$('#periodChips .chip').forEach(c=>c.classList.toggle('active', c.dataset.period===S.reportPeriod));
+
+    let typeIds = S.incomeTypes.map(t=>t.id);
+    if(S.raporPerson!=='all') typeIds = S.incomeTypes.filter(t=>t.personId===S.raporPerson).map(t=>t.id);
+
+    const range = periodRange(S.reportPeriod);
+    const inc = S.incomeEntries.filter(e=>inRange(e.date, range) && typeIds.includes(e.typeId));
+    const exp = S.expenseEntries.filter(e=>inRange(e.date, range) && typeIds.includes(e.paidFromTypeId));
+    const incSum = inc.reduce((a,e)=>a+Number(e.amount||0),0);
+    const expSum = exp.reduce((a,e)=>a+Number(e.amount||0),0);
+    $('#repIncome').textContent = fmt(incSum);
+    $('#repExpense').textContent = fmt(expSum);
+    const net = incSum-expSum;
+    const netEl = $('#repNet');
+    netEl.textContent = fmt(net);
+    netEl.classList.toggle('income', net>=0);
+    netEl.classList.toggle('expense', net<0);
+
+    const byCat = {};
+    exp.forEach(e=>{
+      const key = e.categoryId || e.categoryName;
+      if(!byCat[key]) byCat[key] = {name:e.categoryName||'—', total:0};
+      byCat[key].total += Number(e.amount||0);
+    });
+    const catArr = Object.values(byCat).sort((a,b)=>b.total-a.total);
+    const maxCat = catArr.length ? catArr[0].total : 0;
+    const catEl = $('#categoryBars');
+    if(catArr.length===0){
+      catEl.innerHTML = '<div class="empty">Bu dönemde gider kaydı yok.</div>';
+    } else {
+      catEl.innerHTML = catArr.map(c=>{
+        const pct = maxCat ? Math.max(4, Math.round(c.total/maxCat*100)) : 0;
+        return '<div class="bar-row"><div class="bar-top"><span class="name">'+esc(c.name)+'</span><span class="amt num">'+fmt(c.total)+'</span></div><div class="bar-track"><div class="bar-fill" style="width:'+pct+'%"></div></div></div>';
+      }).join('');
+    }
+
+    let types = S.incomeTypes.filter(t=>!t.archived);
+    if(S.raporPerson!=='all') types = types.filter(t=>t.personId===S.raporPerson);
+    const srcEl = $('#sourceCards');
+    if(types.length===0){
+      srcEl.innerHTML = '<div class="empty">Gelir türü yok.</div>';
+    } else {
+      srcEl.innerHTML = types.map(t=>{
+        const periodInc = inc.filter(e=>e.typeId===t.id).reduce((a,e)=>a+Number(e.amount||0),0);
+        const periodExp = exp.filter(e=>e.paidFromTypeId===t.id).reduce((a,e)=>a+Number(e.amount||0),0);
+        const allTime = potBalance(t.id);
+        const isOpen = !!S.raporExpandedTypes[t.id];
+        const typeEntries = entriesForIncomeType(t.id, range);
+        let txHtml = '';
+        if(isOpen){
+          txHtml = '<div class="source-tx-list" style="margin-top:10px;border-top:1px solid var(--hairline);padding-top:8px;">'
+            + (typeEntries.length===0
+              ? '<div class="empty">Bu dönemde hareket yok.</div>'
+              : '<div class="tx-list">'+typeEntries.map(e=>txRowHtml(e)).join('')+'</div>')
+            + '</div>';
+        }
+        return '<div class="source-card" data-type="'+t.id+'">'
+          + '<div class="name source-card-header" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between;">'
+            + '<span>'+esc(t.name)+' · '+esc(personName(t.personId))+'</span>'
+            + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width:16px;height:16px;flex:none;transform:rotate('+(isOpen?'180deg':'0deg')+');transition:transform .15s;"><path d="M6 9l6 6 6-6"/></svg>'
+          + '</div>'
+          + '<div class="source-grid">'
+          + '<div class="cell"><div class="l">Dönem Geliri</div><div class="v num">'+fmt(periodInc)+'</div></div>'
+          + '<div class="cell"><div class="l">Dönem Gideri</div><div class="v num">'+fmt(periodExp)+'</div></div>'
+          + '<div class="cell"><div class="l">Güncel Bakiye</div><div class="v num">'+fmt(allTime.balance)+'</div></div>'
+          + '</div>'
+          + txHtml
+          + '</div>';
+      }).join('');
+      srcEl.querySelectorAll('.source-card-header').forEach(function(header){
+        header.addEventListener('click', function(){
+          const card = header.closest('.source-card');
+          const typeId = card.dataset.type;
+          if(S.raporExpandedTypes[typeId]) delete S.raporExpandedTypes[typeId];
+          else S.raporExpandedTypes[typeId] = true;
+          renderRapor();
+        });
+      });
+      srcEl.querySelectorAll('.source-tx-list .tx-row').forEach(function(row){
+        row.addEventListener('click', function(e){
+          e.stopPropagation();
+          openEditSheet(row.dataset.kind, row.dataset.id);
+        });
+      });
+    }
+
+    // kıymetli maden varlıklarının bankaya göre güncel değer dağılımı (nokta-zaman anlık
+    // bir değer olduğu için Dönem filtresinden değil, sadece kişi filtresinden etkilenir)
+    let bankHoldings = S.savingsHoldings.slice();
+    if(S.raporPerson!=='all') bankHoldings = bankHoldings.filter(h=>h.personId===S.raporPerson);
+    const byBank = {};
+    bankHoldings.forEach(function(h){
+      const key = h.bank || 'Banka belirtilmemiş';
+      const m = holdingMetrics(h);
+      if(!byBank[key]) byBank[key] = {count:0, total:0, holdings:[]};
+      byBank[key].count += 1;
+      byBank[key].total += m.value;
+      byBank[key].holdings.push(h);
+    });
+    const bankArr = Object.keys(byBank).map(function(k){ return {name:k, count:byBank[k].count, total:byBank[k].total, holdings:byBank[k].holdings}; }).sort(function(a,b){ return b.total-a.total; });
+    const maxBank = bankArr.length ? bankArr[0].total : 0;
+    const bankEl = $('#bankBars');
+    if(bankArr.length===0){
+      bankEl.innerHTML = '<div class="empty">Henüz kıymetli maden varlığı eklenmedi.</div>';
+    } else {
+      const bankDonut = donutSvg(
+        bankArr.map(function(b,i){ return {value:b.total, color:CHART_PALETTE[i % CHART_PALETTE.length]}; }),
+        {size:88, stroke:12, centerLabel: fmtCompact(bankArr.reduce(function(s,b){ return s+b.total; },0)), centerLabelSize: 10.5}
+      );
+      bankEl.innerHTML = '<div class="donut-wrap">' + bankDonut + '</div>' + bankArr.map(function(b){
+        const pct = maxBank ? Math.max(4, Math.round(b.total/maxBank*100)) : 0;
+        const isOpen = !!S.raporExpandedBanks[b.name];
+        // o bankadaki varlıkların kendi dağılımı -- en değerliden en düşüğe
+        const sortedHoldings = b.holdings.slice().sort(function(x,y){ return holdingMetrics(y).value - holdingMetrics(x).value; });
+        const detailHtml = isOpen
+          ? '<div class="breakdown-source-list" style="margin-top:2px;">' + sortedHoldings.map(function(h){
+              const hm = holdingMetrics(h);
+              return '<div class="breakdown-source-row"><span>'+esc(h.material)+' · '+esc(personName(h.personId))+' · '+fmtNum(h.quantity)+' '+esc(h.unit||'')+'</span><span>'+fmt(hm.value)+'</span></div>';
+            }).join('') + '</div>'
+          : '';
+        return '<div class="bar-row" data-bank="'+esc(b.name)+'">'
+          + '<div class="bar-top bank-bar-header" style="cursor:pointer;align-items:center;">'
+            + '<span class="name">'+esc(b.name)+'</span>'
+            + '<span class="amt num" style="display:inline-flex;align-items:center;gap:6px;">'+b.count+' varlık · '+fmt(b.total)
+              + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width:14px;height:14px;flex:none;transform:rotate('+(isOpen?'180deg':'0deg')+');transition:transform .15s;"><path d="M6 9l6 6 6-6"/></svg>'
+            + '</span>'
+          + '</div>'
+          + '<div class="bar-track"><div class="bar-fill gold" style="width:'+pct+'%"></div></div>'
+          + detailHtml
+          + '</div>';
+      }).join('');
+      bankEl.querySelectorAll('.bank-bar-header').forEach(function(header){
+        header.addEventListener('click', function(){
+          const row = header.closest('.bar-row');
+          const key = row.dataset.bank;
+          if(S.raporExpandedBanks[key]) delete S.raporExpandedBanks[key];
+          else S.raporExpandedBanks[key] = true;
+          renderRapor();
+        });
+      });
+    }
+  }
+
+  // ---------- render: kayıtlar ----------
+  function renderKayitlar(){
+    renderPersonChips('kayitlarPersonChips', S.kayitlarPerson, function(val){ S.kayitlarPerson = val; renderKayitlar(); });
+    $$('#recordChips .chip').forEach(c=>c.classList.toggle('active', c.dataset.rf===S.recordFilter));
+
+    let entries = unifiedEntries(S.kayitlarPerson);
+    if(S.recordFilter!=='all') entries = entries.filter(e=>e.kind===S.recordFilter);
+    const el = $('#recordsList');
+    if(entries.length===0){
+      el.innerHTML = '<div class="empty">Kayıt bulunamadı.</div>';
+      return;
+    }
+    let html = '';
+    let lastMonth = null;
+    entries.forEach(e=>{
+      const ml = monthLabel(e.date);
+      if(ml !== lastMonth){ html += '<div class="month-header">'+ml+'</div>'; lastMonth = ml; }
+      html += txRowHtml(e);
+    });
+    el.innerHTML = '<div class="tx-list">'+html+'</div>';
+    bindTxRows(el);
+  }
+
+  // ---------- edit sheet (income/expense entries) ----------
+  function openEditSheet(kind, id){
+    const arr = kind==='gider' ? S.expenseEntries : S.incomeEntries;
+    const entry = arr.find(e=>e.id===id);
+    if(!entry) return;
+    S.editing = {kind, id};
+    const overlay = $('#sheetOverlay');
+    const content = $('#sheetContent');
+
+    let catOptionsHtml = '';
+    if(kind==='gider'){
+      catOptionsHtml = '<div class="field"><label>Kategori</label><select id="e_category">'
+        + S.expenseCategories.map(c=>'<option value="'+c.id+'"'+(c.id===entry.categoryId?' selected':'')+'>'+esc(c.name)+'</option>').join('')
+        + '</select></div>'
+        + '<div class="field"><label>Hangi Kaynaktan Ödendi</label><select id="e_paidfrom">'
+        + S.incomeTypes.map(t=>'<option value="'+t.id+'"'+(t.id===entry.paidFromTypeId?' selected':'')+'>'+esc(t.name)+' · '+esc(personName(t.personId))+'</option>').join('')
+        + '</select></div>';
+    } else {
+      catOptionsHtml = '<div class="field"><label>Gelir Türü</label><select id="e_type">'
+        + S.incomeTypes.map(t=>'<option value="'+t.id+'"'+(t.id===entry.typeId?' selected':'')+'>'+esc(t.name)+' · '+esc(personName(t.personId))+'</option>').join('')
+        + '</select></div>';
+    }
+
+    content.innerHTML =
+      '<div class="sheet-handle"></div>'
+      + '<div class="sheet-title">'+(kind==='gider'?'Gideri Düzenle':'Geliri Düzenle')+'</div>'
+      + '<div class="field"><label>Tutar (₺)</label><input type="number" step="0.01" min="0" id="e_amount" class="num-input" value="'+entry.amount+'"></div>'
+      + catOptionsHtml
+      + '<div class="field"><label>Tarih</label><input type="date" id="e_date" value="'+entry.date+'"></div>'
+      + '<div class="field"><label>Not</label><input type="text" id="e_note" value="'+esc(entry.note||'')+'"></div>'
+      + '<div class="sheet-actions">'
+      + '<button type="button" class="btn-danger" id="e_delete">Sil</button>'
+      + '<button type="button" class="btn-ghost" id="e_save">Kaydet</button>'
+      + '</div>';
+
+    overlay.classList.add('open');
+
+    $('#e_save').addEventListener('click', async ()=>{
+      const amount = parseFloat($('#e_amount').value);
+      if(!amount || amount<=0){ toast('Geçerli bir tutar gir'); return; }
+      const date = $('#e_date').value || entry.date;
+      const note = $('#e_note').value.trim();
+      const col = kind==='gider' ? 'expense_entries' : 'income_entries';
+      const patch = {amount, date, note};
+      if(kind==='gider'){
+        const cat = S.expenseCategories.find(c=>c.id===$('#e_category').value);
+        const type = S.incomeTypes.find(t=>t.id===$('#e_paidfrom').value);
+        if(cat){ patch.categoryId = cat.id; patch.categoryName = cat.name; }
+        if(type){ patch.paidFromTypeId = type.id; patch.paidFromTypeName = type.name; patch.personId = type.personId; patch.personName = personName(type.personId); }
+      } else {
+        const type = S.incomeTypes.find(t=>t.id===$('#e_type').value);
+        if(type){ patch.typeId = type.id; patch.typeName = type.name; patch.personId = type.personId; patch.personName = personName(type.personId); }
+      }
+      await S.store.update(col, entry.id, patch);
+      Object.assign(entry, patch);
+      closeSheet();
+      toast('Güncellendi');
+      renderView(S.view);
+    });
+
+    $('#e_delete').addEventListener('click', async ()=>{
+      const btn = $('#e_delete');
+      if(btn.dataset.confirm !== '1'){
+        btn.dataset.confirm = '1';
+        btn.textContent = 'Emin misin? Tekrar dokun';
+        return;
+      }
+      const col = kind==='gider' ? 'expense_entries' : 'income_entries';
+      await S.store.remove(col, entry.id);
+      const idx = arr.findIndex(e=>e.id===entry.id);
+      if(idx>-1) arr.splice(idx,1);
+      closeSheet();
+      toast('Silindi');
+      renderView(S.view);
+    });
+  }
+  function closeSheet(){
+    $('#sheetOverlay').classList.remove('open');
+    $('#sheetContent').innerHTML = '';
+    S.editing = null;
+  }
+
+  // ---------- settings sheet ----------
+
+  function settingsCatRowHtml(item, kind, extra){
+    return '<div class="cat-row" data-kind="'+kind+'" data-id="'+item.id+'">'
+      + '<div class="cat-name'+(item.archived?' archived':'')+'">'+esc(item.name)+(extra?' <span style="color:var(--ink-faint);font-weight:500;">'+esc(extra)+'</span>':'')+'</div>'
+      + '<button type="button" class="icon-btn" data-act="archive" title="'+(item.archived?'Arşivden çıkar':'Arşivle')+'">'
+      + (item.archived
+          ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M6 7v13h12V7M9 11h6"/></svg>'
+          : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M6 7v13h12V7M10 11v5M14 11v5"/></svg>')
+      + '</button>'
+      + '<button type="button" class="icon-btn danger" data-act="delete" title="Sil"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>'
+      + '</div>';
+  }
+  function bindSettingsCatRows(container, col, onChange){
+    container.querySelectorAll('.cat-row[data-kind="'+col+'"]').forEach(row=>{
+      const id = row.dataset.id;
+      row.querySelector('[data-act="archive"]').addEventListener('click', async ()=>{
+        const arr = S[col];
+        const item = arr.find(x=>x.id===id);
+        const newVal = !item.archived;
+        await S.store.update(col==='people'?'people':(col==='incomeTypes'?'income_types':'expense_categories'), id, {archived:newVal});
+        item.archived = newVal;
+        onChange();
+      });
+      row.querySelector('[data-act="delete"]').addEventListener('click', async ()=>{
+        const btn = row.querySelector('[data-act="delete"]');
+        if(btn.dataset.confirm !== '1'){
+          btn.dataset.confirm = '1';
+          btn.title = 'Emin misin? Tekrar dokun';
+          btn.style.background = 'var(--expense)';
+          btn.style.color = '#fff';
+          setTimeout(()=>{ btn.dataset.confirm=''; btn.title='Sil'; btn.style.background=''; btn.style.color=''; }, 3000);
+          return;
+        }
+        const arr = S[col];
+        const dbCol = col==='people'?'people':(col==='incomeTypes'?'income_types':'expense_categories');
+        await S.store.remove(dbCol, id);
+        const idx = arr.findIndex(x=>x.id===id);
+        if(idx>-1) arr.splice(idx,1);
+        toast('Silindi');
+        onChange();
+      });
+    });
+  }
+
+  function openSettingsSheet(){
+    renderSettingsSheet();
+    $('#sheetOverlay').classList.add('open');
+  }
+
+  function renderSettingsSheet(){
+    const content = $('#sheetContent');
+    const ghCfg = getGithubConfig();
+
+    let html = '<div class="sheet-handle"></div><div class="sheet-title">Ayarlar</div>';
+
+    // Kişiler
+    html += '<div class="settings-section"><div class="field"><label>Kişiler</label></div>';
+    html += S.people.map(p=>settingsCatRowHtml(p,'people')).join('') || '<div class="empty">Kişi yok.</div>';
+    html += '<div class="add-cat-row"><input type="text" id="newPerson" placeholder="Yeni kişi adı"><button type="button" id="addPersonBtn">Ekle</button></div>';
+    html += '</div>';
+
+    // Gelir Türleri (grouped by person)
+    html += '<div class="settings-section"><div class="field"><label>Gelir Türleri</label></div>';
+    const activePeople = S.people.filter(p=>!p.archived);
+    if(activePeople.length===0){
+      html += '<div class="empty">Önce bir kişi ekle.</div>';
+    } else {
+      activePeople.forEach(p=>{
+        html += '<div class="settings-subhead">'+esc(p.name)+'</div>';
+        const types = S.incomeTypes.filter(t=>t.personId===p.id);
+        html += types.map(t=>settingsCatRowHtml(t,'incomeTypes')).join('') || '<div class="empty">Gelir türü yok.</div>';
+        html += '<div class="add-cat-row"><input type="text" id="newIncomeType_'+p.id+'" placeholder="Yeni gelir türü"><button type="button" class="addIncomeTypeBtn" data-person="'+p.id+'">Ekle</button></div>';
+      });
+    }
+    html += '</div>';
+
+    // Gider Kategorileri
+    html += '<div class="settings-section"><div class="field"><label>Gider Kategorileri</label></div>';
+    html += S.expenseCategories.map(c=>settingsCatRowHtml(c,'expenseCategories')).join('') || '<div class="empty">Kategori yok.</div>';
+    html += '<div class="add-cat-row"><input type="text" id="newExpenseCat" placeholder="Yeni kategori adı"><button type="button" id="addExpenseCatBtn">Ekle</button></div>';
+    html += '</div>';
+
+    // GitHub sync
+    html += '<div class="settings-section"><div class="field"><label>GitHub Senkronizasyonu</label></div>';
+    if(ghCfg){
+      html += '<div class="settings-row"><div class="field-hint">Bağlı: <strong>'+esc(ghCfg.owner)+'/'+esc(ghCfg.repo)+'</strong>. Bu cihaz ve diğer cihazlar bu repodaki veriyi paylaşır.</div>'
+        + '<button type="button" class="btn-danger" id="gh_disconnect">Bağlantıyı Kaldır (bu cihazda)</button></div>';
+    } else {
+      html += '<div class="settings-row"><div class="field-hint">Telefon ve bilgisayar arasında senkron için, verinin tutulacağı <strong>private</strong> bir GitHub reposu ve o repoya yazma izni olan bir token gir.</div>'
+        + '<input type="text" id="gh_repo" placeholder="kullanici-adi/repo-adi">'
+        + '<input type="password" id="gh_token" placeholder="Personal Access Token">'
+        + '<button type="button" class="btn-primary" id="gh_connect" style="margin-top:0;">Bağlan</button></div>';
+    }
+    html += '<div id="gh_err" class="lock-error"></div></div>';
+
+    content.innerHTML = html;
+
+    // bind Kişiler
+    bindSettingsCatRows(content.querySelector('.settings-section'), 'people', renderSettingsSheet);
+    $('#addPersonBtn').addEventListener('click', async ()=>{
+      const name = $('#newPerson').value.trim();
+      if(!name) return;
+      const row = await S.store.add('people', {name, archived:false});
+      S.people.push(row);
+      $('#newPerson').value='';
+      renderSettingsSheet();
+    });
+
+    // bind income types (per person groups) — query all cat-rows of kind incomeTypes across sheet
+    bindSettingsCatRows(content, 'incomeTypes', renderSettingsSheet);
+    content.querySelectorAll('.addIncomeTypeBtn').forEach(btn=>{
+      btn.addEventListener('click', async ()=>{
+        const personId = btn.dataset.person;
+        const input = $('#newIncomeType_'+personId);
+        const name = input.value.trim();
+        if(!name) return;
+        const row = await S.store.add('income_types', {name, personId, archived:false});
+        S.incomeTypes.push(row);
+        renderSettingsSheet();
+      });
+    });
+
+    // bind expense categories
+    bindSettingsCatRows(content, 'expenseCategories', renderSettingsSheet);
+    $('#addExpenseCatBtn').addEventListener('click', async ()=>{
+      const name = $('#newExpenseCat').value.trim();
+      if(!name) return;
+      const row = await S.store.add('expense_categories', {name, archived:false});
+      S.expenseCategories.push(row);
+      renderSettingsSheet();
+    });
+
+    // GitHub
+    if(ghCfg){
+      $('#gh_disconnect').addEventListener('click', ()=>{
+        clearGithubConfig();
+        closeSheet();
+        toast('GitHub bağlantısı kaldırıldı, sayfa yenileniyor…');
+        setTimeout(()=>location.reload(), 600);
+      });
+    } else {
+      $('#gh_connect').addEventListener('click', async ()=>{
+        const raw = $('#gh_repo').value.trim();
+        const token = $('#gh_token').value.trim();
+        const parts = raw.split('/').map(s=>s.trim()).filter(Boolean);
+        if(parts.length !== 2){ $('#gh_err').textContent = 'Repo adını "kullanici/repo" biçiminde gir'; return; }
+        if(!token){ $('#gh_err').textContent = 'Token gerekli'; return; }
+        const btn = $('#gh_connect');
+        btn.textContent = 'Bağlanıyor…';
+        btn.disabled = true;
+        const cfg = {owner: parts[0], repo: parts[1], token: token, path: 'data.json'};
+        const api = new GithubApi(cfg);
+        const result = await api.testConnection();
+        if(result.ok){
+          setGithubConfig(cfg);
+          closeSheet();
+          toast('GitHub\'a bağlandı, sayfa yenileniyor…');
+          setTimeout(()=>location.reload(), 600);
+        } else {
+          btn.textContent = 'Bağlan';
+          btn.disabled = false;
+          $('#gh_err').textContent = result.error || 'Bağlanılamadı';
+        }
+      });
+    }
+  }
+
+  // ---------- wire up ----------
+  function bindStatic(){
+    $$('.tab').forEach(t=>t.addEventListener('click', ()=>setView(t.dataset.view)));
+    $('#sheetOverlay').addEventListener('click', (e)=>{ if(e.target.id==='sheetOverlay') closeSheet(); });
+
+    $('#modeGiderBtn').addEventListener('click', ()=>{ S.addMode='gider'; applyMode(); });
+    $('#modeGelirBtn').addEventListener('click', ()=>{ S.addMode='gelir'; applyMode(); });
+    $('#f_person').addEventListener('change', (e)=>{ S.addPersonId = e.target.value; renderEkleOptions(); });
+    $('#entryForm').addEventListener('submit', submitEntry);
+
+    $$('[data-qa]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const row = document.querySelector('[data-qa-row="'+btn.dataset.qa+'"]');
+        row.classList.toggle('open');
+        if(row.classList.contains('open')) row.querySelector('input').focus();
+      });
+    });
+    $$('[data-qa-submit]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const kind = btn.dataset.qaSubmit;
+        const input = $('#qa_'+kind);
+        handleQuickAdd(kind, input.value);
+        input.value = '';
+        document.querySelector('[data-qa-row="'+kind+'"]').classList.remove('open');
+      });
+    });
+
+    $$('#periodChips .chip').forEach(c=>c.addEventListener('click', ()=>{ S.reportPeriod = c.dataset.period; renderRapor(); }));
+    $$('#recordChips .chip').forEach(c=>c.addEventListener('click', ()=>{ S.recordFilter = c.dataset.rf; renderKayitlar(); }));
+
+    $$('#ozetSubTabs button').forEach(function(b){
+      b.addEventListener('click', ()=>{ S.ozetSubView = b.dataset.sub; renderOzet(); });
+    });
+
+    $$('#fundTxTabs button').forEach(function(b){
+      b.addEventListener('click', ()=>{ S.fundTxView = b.dataset.sub; renderFundView(); });
+    });
+
+    $('#addHoldingBtn').addEventListener('click', ()=> openHoldingSheet(null));
+    $('#updatePricesBtn').addEventListener('click', ()=> openPricesSheet());
+    $('#addIncomeTypeQuickBtn').addEventListener('click', ()=> openIncomeTypeSheet(null));
+
+    $$('#birikimSubTabs button').forEach(function(b){
+      b.addEventListener('click', ()=>{ S.birikimSubView = b.dataset.sub; renderBirikim(); });
+    });
+    $('#addFundLotBtn').addEventListener('click', ()=> openFundLotSheet(null));
+    $('#addFundSaleBtn').addEventListener('click', ()=> openFundSaleSheet());
+    $('#updateFundPriceBtn').addEventListener('click', ()=> openFundPricesSheet());
+
+    $('#settingsBtn').addEventListener('click', openSettingsSheet);
+  }
+
+  // ---------- boot ----------
+  async function boot(){
+    initTheme();
+    const banner = $('#dbBanner');
+    const ghCfg = getGithubConfig();
+    let gh = ghCfg ? new GithubApi(ghCfg) : null;
+
+    S.store = new StoreLayer(gh);
+
+    if(gh){
+      try{
+        await S.store.initFromGithub();
+        banner.textContent = 'Veriler GitHub\'da saklanıyor (' + gh.cfg.owner + '/' + gh.cfg.repo + ') — cihazlar arasında senkron.';
+        banner.classList.add('show');
+      } catch(e){
+        console.error('github init failed', e);
+        S.store = new StoreLayer(null);
+        banner.textContent = 'GitHub\'a bağlanılamadı, bu cihazdaki yerel veriler kullanılıyor. Ayarlar\'dan bağlantıyı kontrol et.';
+        banner.classList.add('show');
+      }
+    } else {
+      banner.textContent = 'Veriler bu cihazda, bu tarayıcıda saklanıyor. Cihazlar arasında senkron için Ayarlar\'dan GitHub bağla.';
+      banner.classList.add('show');
+    }
+
+    await loadAll();
+    await seedIfNeeded();
+    await migrateMaterialPricesIfNeeded();
+
+    bindStatic();
+    $('#f_date').value = todayStr();
+    setView('ozet');
+  }
+
+  function start(){
+    boot();
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', start);
+  } else {
+    start();
+  }
+})();
+</script>

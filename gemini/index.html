@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="KFT Gemini">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#0B0E14">
+  <link rel="manifest" href="./manifest.json">
+  <link rel="apple-touch-icon" href="./assets/icon-192.png">
+  <link rel="icon" type="image/png" href="./assets/icon-192.png">
+  <link rel="stylesheet" href="./css/app.css">
+  <title>Kürşat Finans — Gemini Edition</title>
+</head>
+<body>
+  <div id="app">
+    <!-- Masaüstü Sol Sidebar -->
+    <aside class="sidebar">
+      <div class="brand">
+        <img src="./assets/icon-192.png" alt="KFT" class="brand-logo">
+        <div class="brand-text">
+          <div class="brand-name">Kürşat Finans</div>
+          <div class="brand-sub"><span class="sync-dot" id="syncDotSide"></span><span id="syncLabelSide">Hazırlanıyor…</span></div>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav" aria-label="Ana menü">
+        <button type="button" class="tab active" data-view="ozet">
+          <svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9.5h13V10"/><path d="M9.5 19.5v-6h5v6"/></svg>
+          <span>Özet</span>
+        </button>
+        <button type="button" class="tab" data-view="ekle">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 8v8M8 12h8"/></svg>
+          <span>Hızlı Ekle</span>
+        </button>
+        <button type="button" class="tab" data-view="birikim">
+          <svg viewBox="0 0 24 24"><ellipse cx="12" cy="6.5" rx="7" ry="2.6"/><path d="M5 6.5v5.4c0 1.4 3.1 2.6 7 2.6s7-1.2 7-2.6V6.5"/><path d="M5 11.9v5.4c0 1.4 3.1 2.6 7 2.6s7-1.2 7-2.6v-5.4"/></svg>
+          <span>Birikim</span>
+        </button>
+        <button type="button" class="tab" data-view="analiz">
+          <svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg>
+          <span>Analiz & Rapor</span>
+        </button>
+        <button type="button" class="tab" data-view="kayitlar">
+          <svg viewBox="0 0 24 24"><path d="M8 6h12M8 12h12M8 18h12"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/></svg>
+          <span>Kayıtlar & Ekstre</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-tools">
+        <button type="button" class="icon-btn" id="syncBtnSide" title="Şimdi Eşitle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg>
+        </button>
+        <button type="button" class="icon-btn" id="privacyBtnSide" title="Gizlilik Modu">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+        <button type="button" class="icon-btn" id="themeBtnSide" title="Tema"></button>
+        <button type="button" class="icon-btn" id="settingsBtnSide" title="Ayarlar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 13.5c.04-.5.04-1 0-1.5l1.9-1.4-2-3.4-2.2.8c-.4-.3-.8-.6-1.3-.8l-.3-2.3H9.5l-.3 2.3c-.5.2-.9.5-1.3.8l-2.2-.8-2 3.4L5.6 12c-.04.5-.04 1 0 1.5l-1.9 1.4 2 3.4 2.2-.8c.4.3.8.6 1.3.8l.3 2.3h4.9l.3-2.3c.5-.2.9-.5 1.3-.8l2.2.8 2-3.4-1.9-1.4Z"/></svg>
+        </button>
+      </div>
+
+      <div class="sidebar-links">
+        <a href="../yedek/" class="side-link"><span>Eski Sürüm Yedeği</span><span>↗</span></a>
+        <a href="../" class="side-link"><span>Diğer Sürüm (Ana)</span><span>↗</span></a>
+      </div>
+    </aside>
+
+    <!-- Mobil Üst Bar (Safe-Area Uyumlu) -->
+    <header class="topbar">
+      <div class="brand">
+        <img src="./assets/icon-192.png" alt="KFT" class="brand-logo">
+        <div class="brand-text">
+          <div class="brand-name">Kürşat Finans</div>
+          <div class="brand-sub"><span class="sync-dot" id="syncDotTop"></span><span id="syncLabelTop">Hazırlanıyor…</span></div>
+        </div>
+      </div>
+      <div class="topbar-actions">
+        <button type="button" class="icon-btn" id="syncBtnTop" title="Şimdi Eşitle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg>
+        </button>
+        <button type="button" class="icon-btn" id="privacyBtnTop" title="Tutarları Gizle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+        <button type="button" class="icon-btn" id="themeBtnTop" title="Tema"></button>
+        <button type="button" class="icon-btn" id="settingsBtnTop" title="Ayarlar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 13.5c.04-.5.04-1 0-1.5l1.9-1.4-2-3.4-2.2.8c-.4-.3-.8-.6-1.3-.8l-.3-2.3H9.5l-.3 2.3c-.5.2-.9.5-1.3.8l-2.2-.8-2 3.4L5.6 12c-.04.5-.04 1 0 1.5l-1.9 1.4 2 3.4 2.2-.8c.4.3.8.6 1.3.8l.3 2.3h4.9l.3-2.3c.5-.2.9-.5 1.3-.8l2.2.8 2-3.4-1.9-1.4Z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <main>
+      <div id="syncBanner" class="banner"></div>
+
+      <!-- ÖZET -->
+      <section id="view-ozet" class="view active">
+        <div class="chips" id="ozetPersonChips"></div>
+
+        <div class="bento-aside">
+          <div class="hero">
+            <div class="hero-head">
+              <div class="hero-label" id="heroTitleLabel">Net Servet</div>
+              <div class="hero-pills">
+                <button type="button" class="hero-pill num" id="currencyToggleBtn">₺ TRY</button>
+              </div>
+            </div>
+            <div class="hero-amount num" id="heroNetWorth">₺0,00</div>
+            <div class="hero-sub num" id="heroSubLine">Brüt Varlık ₺0,00 · Borç ₺0,00</div>
+
+            <div class="hero-kpis">
+              <button type="button" class="hero-kpi" id="kpiCashBtn" title="Nakit hareketlerini gör">
+                <div class="l"><span>Nakdim</span><span>↗</span></div>
+                <div class="v num" id="kpiCashVal">₺0</div>
+              </button>
+              <button type="button" class="hero-kpi" id="kpiPortfolioBtn" title="Portföy detayını gör">
+                <div class="l"><span>Portföy</span><span>↗</span></div>
+                <div class="v num" id="kpiPortfolioVal">₺0</div>
+              </button>
+              <button type="button" class="hero-kpi" id="kpiMonthBtn" title="Bu ay nakit akışını gör">
+                <div class="l"><span>Bu Ay Akış</span><span>↗</span></div>
+                <div class="v num" id="kpiMonthVal">₺0</div>
+              </button>
+            </div>
+          </div>
+
+          <div class="card" id="breakdownCard"></div>
+        </div>
+
+        <div class="bento-2">
+          <div>
+            <div class="section-title">
+              <span>Gelir Kaynakları (Kumbaralar)</span>
+              <button type="button" class="icon-btn compact" id="addIncomeTypeQuickBtn" title="Yeni gelir kaynağı">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+              </button>
+            </div>
+            <div class="card-grid" id="potGrid"></div>
+
+            <div class="section-title">
+              <span>Borçlar & Kredi Kartları</span>
+              <button type="button" class="icon-btn compact" id="addDebtQuickBtn" title="Borç ekle">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+              </button>
+            </div>
+            <div class="card-grid" id="debtGrid"></div>
+          </div>
+
+          <div>
+            <div class="section-title">
+              <span>Son Hareketler</span>
+              <button type="button" class="chip" id="goAllRecordsBtn" style="min-height:30px;padding:4px 10px;font-size:11.5px;">Tümünü Gör</button>
+            </div>
+            <div class="card" style="padding:8px 14px;">
+              <div class="tx-list" id="recentList"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- HIZLI EKLE -->
+      <section id="view-ekle" class="view">
+        <div class="narrow-form">
+          <div class="section-title">Yeni İşlem</div>
+          <div class="segmented" id="addModeTabs">
+            <button type="button" data-mode="gider" class="active">Gider</button>
+            <button type="button" data-mode="gelir">Gelir</button>
+            <button type="button" data-mode="transfer">Transfer</button>
+          </div>
+
+          <form id="entryForm" autocomplete="off">
+            <div class="field">
+              <label for="f_amount">Tutar (₺)</label>
+              <input type="text" inputmode="decimal" id="f_amount" class="num-input hero-money-input" placeholder="0,00" required>
+              <div class="quick-amounts" id="quickAmounts">
+                <button type="button" class="quick-amt-btn" data-add="100">+100</button>
+                <button type="button" class="quick-amt-btn" data-add="250">+250</button>
+                <button type="button" class="quick-amt-btn" data-add="500">+500</button>
+                <button type="button" class="quick-amt-btn" data-add="1000">+1.000</button>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="f_person" id="f_person_label">Kimin Harcaması</label>
+              <select id="f_person"></select>
+            </div>
+
+            <div class="field" id="expenseCatField">
+              <label for="f_category">Gider Kategorisi</label>
+              <select id="f_category"></select>
+              <div class="add-row" style="margin-top:8px;">
+                <input type="text" id="qa_cat_input" placeholder="Yeni kategori ekle…">
+                <button type="button" id="qa_cat_btn">+ Ekle</button>
+              </div>
+            </div>
+
+            <div class="field" id="paidFromField">
+              <label for="f_paidfrom">Hangi Hesaptan / Kaynaktan Ödendi</label>
+              <select id="f_paidfrom"></select>
+              <div class="field-hint">Harcama seçtiğin hesabın nakit bakiyesinden düşülür; raporlarda kimin harcaması olduğu ayrıca korunur.</div>
+            </div>
+
+            <div class="field" id="incomeTypeField" style="display:none;">
+              <label for="f_incometype">Gelir Kaynağı</label>
+              <select id="f_incometype"></select>
+              <div class="add-row" style="margin-top:8px;">
+                <input type="text" id="qa_inc_input" placeholder="Yeni gelir kaynağı ekle…">
+                <button type="button" id="qa_inc_btn">+ Ekle</button>
+              </div>
+            </div>
+
+            <div id="transferFields" style="display:none;">
+              <div class="field">
+                <label for="f_tr_from">Çıkış Hesabı (Nakit Kaynağı)</label>
+                <select id="f_tr_from"></select>
+              </div>
+              <div class="field">
+                <label for="f_tr_to">Hedef Hesap (Nakit Kaynağı)</label>
+                <select id="f_tr_to"></select>
+                <div class="field-hint">Hesaplar arası transfer gelir veya gider toplamını değiştirmez, yalnızca bakiyeleri taşır.</div>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="f_date">Tarih</label>
+              <input type="date" id="f_date" required>
+            </div>
+
+            <div class="field">
+              <label for="f_note">Not (opsiyonel)</label>
+              <input type="text" id="f_note" placeholder="Örn: Market alışverişi">
+            </div>
+
+            <button type="submit" class="btn-primary expense" id="submitBtn">Gideri Kaydet</button>
+          </form>
+        </div>
+      </section>
+
+      <!-- BİRİKİM -->
+      <section id="view-birikim" class="view">
+        <div class="chips" id="birikimPersonChips"></div>
+        <div class="card" id="birikimOverviewCard" style="margin-top:12px;"></div>
+
+        <div class="segmented" id="birikimSubTabs" style="margin-top:14px;">
+          <button type="button" data-sub="metal" class="active">Kıymetli Maden</button>
+          <button type="button" data-sub="fund">Yatırım Fonları</button>
+        </div>
+
+        <div id="birikimMetalPane" style="margin-top:14px;">
+          <div class="stat-row">
+            <div class="stat-tile"><div class="l">Kalan Maliyet</div><div class="v num" id="bMaliyet">₺0,00</div></div>
+            <div class="stat-tile"><div class="l">Güncel Değer</div><div class="v num" id="bDeger">₺0,00</div></div>
+            <div class="stat-tile"><div class="l">Açık K/Z</div><div class="v num" id="bKar">₺0,00</div></div>
+            <div class="stat-tile"><div class="l">Gerçekleşen K/Z</div><div class="v num" id="bRealized">₺0,00</div></div>
+          </div>
+
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;">
+            <button type="button" class="btn-primary gold" id="addHoldingBtn" style="flex:1;margin-top:0;">+ Maden Alışı</button>
+            <button type="button" class="btn-ghost" id="addMetalSaleBtn" style="flex:1;">Maden Satışı</button>
+            <button type="button" class="btn-ghost" id="updatePricesBtn" style="flex:1;">Fiyat Güncelle</button>
+          </div>
+
+          <div class="bento-2">
+            <div>
+              <div class="section-title">Materyale Göre Dağılım</div>
+              <div class="card" id="materialBars"></div>
+            </div>
+            <div>
+              <div class="section-title">
+                <span>Varlıklarım</span>
+              </div>
+              <div class="chips" id="holdingsFilterChips" style="margin-bottom:10px;"></div>
+              <div class="card-grid" id="holdingsList"></div>
+              <div class="section-title" style="margin-top:18px;">Maden Satış Geçmişi</div>
+              <div class="card-grid" id="metalSalesList"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="birikimFundPane" style="display:none;margin-top:14px;">
+          <div class="stat-row">
+            <div class="stat-tile"><div class="l">Kalan Adet</div><div class="v num" id="fAdet">0</div></div>
+            <div class="stat-tile"><div class="l">Maliyet</div><div class="v num" id="fMaliyet">₺0,00</div></div>
+            <div class="stat-tile"><div class="l">Brüt Değer</div><div class="v num" id="fDeger">₺0,00</div></div>
+            <div class="stat-tile"><div class="l">Net Likidasyon</div><div class="v num" id="fNetLiq">₺0,00</div></div>
+            <div class="stat-tile"><div class="l">Gerçekleşen Net</div><div class="v num" id="fRealized">₺0,00</div></div>
+          </div>
+
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;">
+            <button type="button" class="btn-primary gold" id="addFundLotBtn" style="flex:1;margin-top:0;">+ Fon Alışı</button>
+            <button type="button" class="btn-ghost" id="addFundSaleBtn" style="flex:1;">Fon Satışı (FIFO)</button>
+            <button type="button" class="btn-ghost" id="updateFundPriceBtn" style="flex:1;">Fon Fiyatı Güncelle</button>
+          </div>
+
+          <div class="bento-2">
+            <div>
+              <div class="section-title">Fona Göre Dağılım & Stopaj Oranları</div>
+              <div class="card" id="fundBars"></div>
+            </div>
+            <div>
+              <div class="segmented" id="fundTxTabs" style="margin-bottom:10px;">
+                <button type="button" data-sub="lots" class="active">Alış Lotları</button>
+                <button type="button" data-sub="sales">Satışlar & Stopaj</button>
+              </div>
+              <div id="fundLotsList" class="card-grid"></div>
+              <div id="fundSalesList" class="card-grid" style="display:none;"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ANALİZ & RAPOR -->
+      <section id="view-analiz" class="view">
+        <div class="chips" id="raporPersonChips"></div>
+
+        <div class="section-title">Dönem & Kapsam</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between;">
+          <div class="chips" id="periodChips">
+            <button type="button" class="chip active" data-period="thisMonth">Bu Ay</button>
+            <button type="button" class="chip" data-period="lastMonth">Geçen Ay</button>
+            <button type="button" class="chip" data-period="thisYear">Bu Yıl</button>
+            <button type="button" class="chip" data-period="all">Tümü</button>
+          </div>
+          <div class="chips" id="scopeChips">
+            <button type="button" class="chip active" data-scope="spender">Kimin Harcaması</button>
+            <button type="button" class="chip" data-scope="account">Hesap Sahibi</button>
+          </div>
+        </div>
+
+        <div class="stat-row" style="margin-top:14px;">
+          <div class="stat-tile"><div class="l">Dönem Geliri</div><div class="v num income" id="repIncome">₺0,00</div></div>
+          <div class="stat-tile"><div class="l">Dönem Gideri</div><div class="v num expense" id="repExpense">₺0,00</div></div>
+          <div class="stat-tile"><div class="l">Net Akış</div><div class="v num" id="repNet">₺0,00</div></div>
+          <div class="stat-tile"><div class="l">6 Ay Tasarruf Oranı</div><div class="v num" id="anSavingsRate">%0</div></div>
+        </div>
+
+        <div class="bento-2">
+          <div class="card">
+            <div class="card-title">Son 6 Ay Nakit Akışı (Yatırım Transferi Hariç)</div>
+            <div id="monthlyTrendChart"></div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">
+              <span>Aylık Kapanış Mutabakatı</span>
+              <input type="month" id="monthlyClosePicker" style="border:1px solid var(--hairline);background:var(--surface-2);color:var(--ink);border-radius:8px;padding:4px 8px;font-size:12px;font-family:inherit;">
+            </div>
+            <div id="monthlyCloseBox"></div>
+          </div>
+        </div>
+
+        <div class="bento-2">
+          <div class="card">
+            <div class="card-title">Kategoriye Göre Harcamalar</div>
+            <div id="categoryBars"></div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">Bankaya Göre Kıymetli Maden (Normalize)</div>
+            <div id="bankBars"></div>
+          </div>
+        </div>
+
+        <div class="section-title">Kaynağa Göre Nakit & Hareketler</div>
+        <div class="card-grid" id="sourceCards"></div>
+
+        <div class="section-title">Kişi Karşılaştırması</div>
+        <div class="card-grid" id="personCompareGrid"></div>
+      </section>
+
+      <!-- KAYITLAR & EKSTRE -->
+      <section id="view-kayitlar" class="view">
+        <div class="chips" id="kayitlarPersonChips"></div>
+
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;align-items:center;">
+          <input type="search" id="recordSearchInput" placeholder="Not, kategori veya hesap ara…" style="flex:1;min-width:200px;min-height:44px;background:var(--surface);border:1px solid var(--hairline);border-radius:12px;padding:10px 14px;font-size:14px;color:var(--ink);font-family:inherit;">
+          <button type="button" class="btn-ghost" id="importCsvBtn" style="min-height:44px;padding:8px 14px;">CSV Ekstre Mutabakatı</button>
+          <button type="button" class="btn-ghost" id="exportCsvBtn" style="min-height:44px;padding:8px 14px;">CSV İndir</button>
+        </div>
+
+        <div class="chips" id="recordChips" style="margin-top:10px;">
+          <button type="button" class="chip active" data-rf="all">Tümü</button>
+          <button type="button" class="chip" data-rf="gelir">Gelir</button>
+          <button type="button" class="chip" data-rf="gider">Gider</button>
+          <button type="button" class="chip" data-rf="transfer">Transfer</button>
+        </div>
+
+        <div id="recordsList" style="margin-top:12px;"></div>
+      </section>
+    </main>
+
+    <!-- Mobil Alt Navigasyon + Ortada Hızlı Ekle FAB -->
+    <nav class="tabbar" aria-label="Alt navigasyon">
+      <button type="button" class="tab active" data-view="ozet">
+        <svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9.5h13V10"/><path d="M9.5 19.5v-6h5v6"/></svg>
+        <span>Özet</span>
+      </button>
+      <button type="button" class="tab" data-view="birikim">
+        <svg viewBox="0 0 24 24"><ellipse cx="12" cy="6.5" rx="7" ry="2.6"/><path d="M5 6.5v5.4c0 1.4 3.1 2.6 7 2.6s7-1.2 7-2.6V6.5"/><path d="M5 11.9v5.4c0 1.4 3.1 2.6 7 2.6s7-1.2 7-2.6v-5.4"/></svg>
+        <span>Birikim</span>
+      </button>
+      <button type="button" class="tab tab-fab" data-view="ekle" aria-label="Yeni işlem ekle">
+        <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+        <span>Ekle</span>
+      </button>
+      <button type="button" class="tab" data-view="analiz">
+        <svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg>
+        <span>Analiz</span>
+      </button>
+      <button type="button" class="tab" data-view="kayitlar">
+        <svg viewBox="0 0 24 24"><path d="M8 6h12M8 12h12M8 18h12"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/></svg>
+        <span>Kayıtlar</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- Bottom Sheet / Modal -->
+  <div class="overlay" id="sheetOverlay" role="dialog" aria-modal="true">
+    <div class="sheet" id="sheetContent"></div>
+  </div>
+
+  <!-- Opsiyonel PIN Kilidi -->
+  <div class="pin-lock" id="pinLockScreen">
+    <div class="pin-box">
+      <img src="./assets/icon-192.png" alt="KFT" class="brand-logo" style="width:52px;height:52px;margin:0 auto 12px;">
+      <div class="sheet-title">Kürşat Finans Kilitli</div>
+      <div class="field-hint" style="margin-bottom:14px;">Devam etmek için 4 haneli PIN kodunu gir.</div>
+      <input type="password" inputmode="numeric" maxlength="4" id="pinUnlockInput" class="num-input" placeholder="••••" style="width:100%;text-align:center;min-height:48px;border-radius:12px;border:1px solid var(--hairline);background:var(--bg);color:var(--ink);">
+      <div id="pinUnlockErr" style="color:var(--expense);font-size:12px;margin-top:8px;min-height:16px;"></div>
+      <button type="button" class="btn-primary" id="pinUnlockBtn">Kilidi Aç</button>
+    </div>
+  </div>
+
+  <div id="toast" role="status" aria-live="polite"></div>
+
+  <script type="module" src="./js/app.js"></script>
+</body>
+</html>
