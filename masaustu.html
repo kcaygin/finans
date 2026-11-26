@@ -872,9 +872,11 @@ if ('serviceWorker' in navigator && window.isSecureContext) {
     });
   };
   StoreLayer.prototype.transaction = function(change){
-    const operation = (this.pending || Promise.resolve()).then(async ()=>{
+    const write = async ()=>{
       if(this.readOnly){ toast('Bağlantı kurulana kadar değişiklik kaydedilemez.'); throw new Error('offline_read_only'); }
-      const draft = structuredClone(this.mem);
+      const latest = this.gh ? null : window.localStorage.getItem(LOCAL_PREFIX+'snapshot');
+      const draft = latest ? JSON.parse(latest) : structuredClone(this.mem);
+      if(!COLLECTIONS.every(name=>Array.isArray(draft[name]))) throw new Error('invalid_snapshot');
       const result = change(draft);
       if(this.gh){
         try {
@@ -892,6 +894,10 @@ if ('serviceWorker' in navigator && window.isSecureContext) {
       }
       this.mem = draft;
       return result;
+    };
+    const operation = (this.pending || Promise.resolve()).then(()=>{
+      const locks = globalThis.navigator?.locks;
+      return !this.gh && locks ? locks.request(LOCAL_PREFIX+'snapshot', write) : write();
     });
     this.pending = operation.catch(()=>{});
     return operation;
@@ -3391,7 +3397,12 @@ if ('serviceWorker' in navigator && window.isSecureContext) {
   }
 
   function start(){
-    boot();
+    boot().catch(error=>{
+      console.error('Uygulama açılamadı', error);
+      const banner = $('#dbBanner');
+      banner.textContent = 'Kayıtlar açılamadı. Tarayıcı verilerini silmeden önce yedeğini kontrol et.';
+      banner.classList.add('show');
+    });
   }
 
   if(document.readyState === 'loading'){
