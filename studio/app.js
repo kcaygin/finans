@@ -14,7 +14,8 @@ const blank = () => ({...Object.fromEntries(collections.map(name=>[name,[]])),tr
 function parse(raw){
   const result = JSON.parse(raw);
   if(!result || !collections.every(name=>Array.isArray(result[name]) && result[name].every(row=>row && typeof row==='object' && typeof row.id==='string'))) throw Error('Yedek biçimi geçersiz.');
-  if(result.transfers!==undefined && !Array.isArray(result.transfers)) throw Error('Transfer listesi geçersiz.');
+  if(result.transfers!==undefined && (!Array.isArray(result.transfers) || result.transfers.some(row=>!row || typeof row.id!=='string'))) throw Error('Transfer listesi geçersiz.');
+  if(result.budgets!==undefined && (!result.budgets || typeof result.budgets!=='object' || Array.isArray(result.budgets))) throw Error('Bütçe biçimi geçersiz.');
   return {...blank(),...result};
 }
 function load(){
@@ -36,7 +37,14 @@ function commit(change){
   };
   return navigator.locks ? navigator.locks.request(key,write) : Promise.resolve().then(write);
 }
-const nameOf = id => data.income_types.find(account=>account.id===id)?.name || 'Hesap belirtilmemiş';
+function accountName(account){
+  const person=data.people.find(row=>row.id===account.personId)?.name;
+  return person ? account.name+' · '+person : account.name;
+}
+const nameOf = id => {
+  const account=data.income_types.find(row=>row.id===id);
+  return account ? accountName(account) : 'Hesap belirtilmemiş';
+};
 const category = entry => entry.categoryName || 'Diğer';
 function balance(id){
   const deposits = data.income_entries.filter(x=>x.typeId===id).reduce((sum,x)=>sum+Number(x.amount),0);
@@ -88,7 +96,7 @@ function dashboard(){
   return '<section class="hero"><p class="pill">Nakit ve yatırımlar</p><strong>'+fmt(t.accounts+t.assets)+'</strong><p>Toplam izlenen varlık</p></section>'+
     '<section class="metrics">'+metric('Nakit',t.accounts)+metric('Yatırımlar',t.assets)+metric('Bu ay net akış',t.income-t.spending,'Gelir − gider')+'</section>'+
     '<div class="grid">'+card('Son hareketler',entries().slice(0,5).map(movement).join('')||empty('İlk hareketini ekleyerek başla.'))+
-    '<div>'+card('Bu ay nakit akışı',flow(t.income,t.spending))+card('Nakit hesapları',data.income_types.map(x=>row(x.name,x.archived?'Arşivde':'Bakiye',fmt(balance(x.id)))).join('')||'<p class="empty">Henüz nakit hesabı yok.</p><button class="secondary" data-action="account">Hesap oluştur</button>')+'</div></div>';
+    '<div>'+card('Bu ay nakit akışı',flow(t.income,t.spending))+card('Nakit hesapları',data.income_types.map(x=>row(accountName(x),x.archived?'Arşivde':'Bakiye',fmt(balance(x.id)))).join('')||'<p class="empty">Henüz nakit hesabı yok.</p><button class="secondary" data-action="account">Hesap oluştur</button>')+'</div></div>';
 }
 function movements(){
   return '<section class="card"><div class="toolbar"><input type="search" id="search" placeholder="İşlem ara" aria-label="İşlem ara"><select id="filter" aria-label="İşlem türüne göre filtrele">'+['Tümü','Gelir','Gider','Transfer','Yatırım alışı','Fon satışı'].map(x=>'<option>'+x+'</option>').join('')+'</select></div><div id="results"></div></section>';
@@ -150,7 +158,7 @@ const amountField = (label,name='amount',attrs='required')=>input(label,name,'in
 const select = (label,name,values,optional=false)=>'<label>'+label+'<select name="'+name+'" '+(optional?'':'required')+'><option value="">'+(optional?'Bağlama':'Seç')+'</option>'+values.map(x=>'<option value="'+escape(x.id)+'">'+escape(x.name)+'</option>').join('')+'</select></label>';
 function fields(){
   const kind=$('#kind').value;
-  const accounts=data.income_types.filter(x=>!x.archived);
+  const accounts=data.income_types.filter(x=>!x.archived).map(x=>({...x,name:accountName(x)}));
   $('#form-error').textContent='';
   if(kind==='price') return;
   const f=kind==='account'?input('Hesap adı','label','required maxlength="70"'):
