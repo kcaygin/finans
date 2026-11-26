@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kft-gemini-v1';
+const CACHE_NAME = 'kft-gemini-v2';
 const APP_SHELL = [
   './',
   './index.html',
@@ -33,7 +33,6 @@ self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
   if (event.request.method !== 'GET') return;
 
-  // GitHub API veya canlı fiyat dosyası için daima network-first
   if (url.hostname === 'api.github.com' || url.pathname.endsWith('prices.json')) {
     event.respondWith(
       fetch(event.request).catch(() => caches.match(event.request))
@@ -41,7 +40,6 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // Aynı origin uygulama kabuğu: stale-while-revalidate
   if (url.origin === self.location.origin) {
     event.respondWith(
       caches.match(event.request).then(cached => {
