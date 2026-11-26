@@ -48,6 +48,7 @@ const BROWSER_HEADERS = {
 
 async function fetchZiraat() {
   const res = await fetch('https://www.ziraatkatilim.com.tr/ajax/piyasalar', {
+    signal: AbortSignal.timeout(15000),
     headers: { 'User-Agent': 'Mozilla/5.0 (compatible; KFT-price-fetcher/1.0)' }
   });
   if (!res.ok) throw new Error('Ziraat Katılım isteği başarısız: HTTP ' + res.status);
@@ -71,6 +72,7 @@ async function fetchDunya() {
   // bu da GitHub Actions'tan çalışırken -- kullanıcının kendi tarayıcısından
   // farklı olarak -- satırların bulunamamasını açıklayabilir.
   const res = await fetch('https://dunyakatilim.com.tr/gunluk-kurlar', {
+    signal: AbortSignal.timeout(15000),
     headers: Object.assign({}, BROWSER_HEADERS, { 'Referer': 'https://dunyakatilim.com.tr/' })
   });
   if (!res.ok) throw new Error('Dünya Katılım isteği başarısız: HTTP ' + res.status);
@@ -113,20 +115,27 @@ async function fetchDunya() {
   };
 }
 
+function validatePrices(prices) {
+  if (Object.values(prices).some(value => !Number.isFinite(value) || value <= 0)) {
+    throw new Error('Geçersiz alış/satış fiyatı');
+  }
+  return { ...prices, fetchedAt: new Date().toISOString(), stale: false };
+}
+
 (async () => {
   const fs = await import('node:fs');
   const result = { updatedAt: new Date().toISOString() };
   let hadError = false;
 
   try {
-    result.ziraatKatilim = await fetchZiraat();
+    result.ziraatKatilim = validatePrices(await fetchZiraat());
   } catch (e) {
     console.error('Ziraat Katılım çekilemedi:', describeError(e));
     hadError = true;
   }
 
   try {
-    result.dunyaKatilim = await fetchDunya();
+    result.dunyaKatilim = validatePrices(await fetchDunya());
   } catch (e) {
     console.error('Dünya Katılım çekilemedi:', describeError(e));
     hadError = true;
@@ -136,8 +145,8 @@ async function fetchDunya() {
   if (result.ziraatKatilim || result.dunyaKatilim) {
     let previous = {};
     try { previous = JSON.parse(fs.readFileSync('prices.json', 'utf8')); } catch (e) {}
-    if (!result.ziraatKatilim && previous.ziraatKatilim) result.ziraatKatilim = previous.ziraatKatilim;
-    if (!result.dunyaKatilim && previous.dunyaKatilim) result.dunyaKatilim = previous.dunyaKatilim;
+    if (!result.ziraatKatilim && previous.ziraatKatilim) result.ziraatKatilim = { ...previous.ziraatKatilim, fetchedAt: previous.ziraatKatilim.fetchedAt ?? (previous.ziraatKatilim.stale ? null : previous.updatedAt) ?? null, stale: true };
+    if (!result.dunyaKatilim && previous.dunyaKatilim) result.dunyaKatilim = { ...previous.dunyaKatilim, fetchedAt: previous.dunyaKatilim.fetchedAt ?? (previous.dunyaKatilim.stale ? null : previous.updatedAt) ?? null, stale: true };
     fs.writeFileSync('prices.json', JSON.stringify(result, null, 2) + '\n');
     console.log(JSON.stringify(result, null, 2));
   } else {

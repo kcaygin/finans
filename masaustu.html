@@ -1,3 +1,7 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta charset="UTF-8">
 <title>Kürşat Finans Takip Uygulaması</title>
 <style>
@@ -439,6 +443,11 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
 .settings-subhead{font-size:12px;font-weight:700;color:var(--accent-ink);margin:14px 0 8px;}
 .settings-subhead:first-child{margin-top:0;}
 </style>
+<link rel="stylesheet" href="./refresh.css">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="apple-touch-icon" href="./assets/app-icon-192.png">
+</head>
+<body>
 
 <div id="app">
   <aside class="sidebar">
@@ -544,7 +553,7 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
 
         <div class="field">
           <label for="f_amount">Tutar (₺)</label>
-          <input type="number" inputmode="decimal" step="0.01" min="0" id="f_amount" class="num-input" placeholder="0,00" required>
+          <input type="text" inputmode="decimal" id="f_amount" class="num-input" placeholder="0,00" required>
         </div>
 
         <div class="field" id="expenseCatField">
@@ -749,6 +758,12 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
 
 <div id="toast"></div>
 
+<script src="./finance-core.js"></script>
+<script>
+if ('serviceWorker' in navigator && window.isSecureContext) {
+  navigator.serviceWorker.register('./sw.js').catch(error => console.error('Çevrimdışı arayüz kurulamadı', error));
+}
+</script>
 <script>
 (function(){
   "use strict";
@@ -832,6 +847,13 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
     this.gh = gh || null;
     this.mem = emptyMem();
     if(!this.gh){
+      const snapshot = window.localStorage.getItem(LOCAL_PREFIX+'snapshot');
+      if(snapshot){
+        const parsed = JSON.parse(snapshot);
+        if(!COLLECTIONS.every(name=>Array.isArray(parsed[name]))) throw new Error('invalid_snapshot');
+        this.mem = parsed;
+        return;
+      }
       var self = this;
       COLLECTIONS.forEach(function(col){
         try{
@@ -843,47 +865,64 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
   }
   StoreLayer.prototype.initFromGithub = async function(){
     const data = await this.gh.fetchData();
+    if(data) this.mem = {...data};
     var self = this;
     COLLECTIONS.forEach(function(col){
       self.mem[col] = (data && Array.isArray(data[col])) ? data[col] : [];
     });
   };
-  StoreLayer.prototype._persist = async function(col){
-    if(this.gh){
-      try{
-        await this.gh.saveData(this.mem);
-      }catch(e){
-        if(e && e.conflict){
-          toast('Başka bir cihazdan güncelleme geldi, senkronize ediliyor…');
-          try{ await this.initFromGithub(); await loadAll(); renderView(S.view); }catch(e2){}
-        } else {
-          console.error('github save failed', e);
-          toast('GitHub\'a kaydedilemedi — bağlantını kontrol et');
+  StoreLayer.prototype.transaction = function(change){
+    const operation = (this.pending || Promise.resolve()).then(async ()=>{
+      if(this.readOnly){ toast('Bağlantı kurulana kadar değişiklik kaydedilemez.'); throw new Error('offline_read_only'); }
+      const draft = structuredClone(this.mem);
+      const result = change(draft);
+      if(this.gh){
+        try {
+          await this.gh.saveData(draft);
+        } catch(error) {
+          if(error.conflict){
+            await this.initFromGithub();
+            await loadAll();
+            toast('Başka bir cihaz güncelledi. Kayıt uygulanmadı, bilgileri kontrol edip yeniden dene.');
+          }
+          throw error;
         }
-        throw e;
+      } else {
+        window.localStorage.setItem(LOCAL_PREFIX+'snapshot', JSON.stringify(draft));
       }
-      return;
-    }
-    try{ window.localStorage.setItem(LOCAL_PREFIX+col, JSON.stringify(this.mem[col])); }catch(e){ console.error('localStorage save failed', e); }
+      this.mem = draft;
+      return result;
+    });
+    this.pending = operation.catch(()=>{});
+    return operation;
   };
   StoreLayer.prototype.list = async function(col){
-    return this.mem[col].slice();
+    return structuredClone(this.mem[col]);
   };
-  StoreLayer.prototype.add = async function(col, data){
-    const body = Object.assign({}, data, {createdAt: new Date().toISOString()});
-    const id = 'm' + Date.now().toString(36) + Math.random().toString(36).slice(2,8);
-    const row = Object.assign({id}, body);
-    this.mem[col].push(row);
-    await this._persist(col);
-    return row;
+  StoreLayer.prototype.add = function(col, data){
+    return this.transaction(draft=>{
+      const row = Object.assign({}, data, {id:'m'+crypto.randomUUID(), createdAt:new Date().toISOString()});
+      draft[col].push(row);
+      return structuredClone(row);
+    });
   };
-  StoreLayer.prototype.update = async function(col, id, data){
-    const arr = this.mem[col]; const i = arr.findIndex(x=>x.id===id);
-    if(i>-1){ Object.assign(arr[i], data); await this._persist(col); }
+  StoreLayer.prototype.update = function(col, id, data){
+    return this.transaction(draft=>{
+      const row = draft[col].find(item=>item.id===id);
+      if(row) Object.assign(row, data);
+    });
   };
-  StoreLayer.prototype.remove = async function(col, id){
-    this.mem[col] = this.mem[col].filter(x=>x.id!==id);
-    await this._persist(col);
+  StoreLayer.prototype.remove = function(col, id){
+    return this.transaction(draft=>{
+      if(col==='income_types' && (draft.income_entries.some(row=>row.typeId===id)
+        || draft.expense_entries.some(row=>row.paidFromTypeId===id)
+        || [...draft.savings_holdings,...draft.fund_lots,...draft.fund_sales].some(row=>row.incomeTypeId===id || row.cashTypeId===id))){
+        throw new Error('linked_records');
+      }
+      if(col==='people' && ['income_types','income_entries','expense_entries','savings_holdings','fund_lots','fund_sales']
+        .some(name=>draft[name].some(row=>row.personId===id))) throw new Error('linked_records');
+      draft[col] = draft[col].filter(row=>row.id!==id);
+    });
   };
 
   // ---------- app state ----------
@@ -1020,7 +1059,7 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
   function potBalance(typeId){
     const income = S.incomeEntries.filter(e=>e.typeId===typeId).reduce((a,e)=>a+Number(e.amount||0),0);
     const spent = S.expenseEntries.filter(e=>e.paidFromTypeId===typeId).reduce((a,e)=>a+Number(e.amount||0),0);
-    return {income, spent, balance: income-spent};
+    return {income, spent, balance: FinanceCore.money(income-spent+FinanceCore.cashChange(S,typeId))};
   }
   function totalBalance(personFilter){
     let types = S.incomeTypes;
@@ -1028,7 +1067,7 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
     const ids = types.map(t=>t.id);
     const income = S.incomeEntries.filter(e=>ids.includes(e.typeId)).reduce((a,e)=>a+Number(e.amount||0),0);
     const expense = S.expenseEntries.filter(e=>ids.includes(e.paidFromTypeId)).reduce((a,e)=>a+Number(e.amount||0),0);
-    return {income, expense, balance: income-expense};
+    return {income, expense, balance: FinanceCore.money(income-expense+ids.reduce((sum,id)=>sum+FinanceCore.cashChange(S,id),0))};
   }
   // current value of every investment (precious-metal holding + remaining fund lot) owned by this person
   // (or everyone, when personFilter is 'all') -- used for the Özet hero's "Genel Toplam" (nakit + yatırım).
@@ -1163,7 +1202,7 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
   }
 
   // ---------- investment funds (FIFO + %17.5 stopaj) ----------
-  function fundKey(name){ return String(name||'').trim().toLowerCase(); }
+  function fundKey(name){ return String(name||'').trim().toLocaleLowerCase('tr-TR'); }
   function getFundPrice(fundName){
     const key = fundKey(fundName);
     const row = S.fundPrices.find(p=>fundKey(p.fundName)===key);
@@ -1436,61 +1475,31 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
   }
   // FIFO consumption: sells the oldest lots first for this person+fund, computes
   // cost basis / gross profit / %17.5 stopaj (only on positive profit) / net profit.
-  async function recordFundSale(personId, fundName, sellQty, salePrice, saleDate, note){
-    sellQty = Number(sellQty);
-    const lots = S.fundLots
-      .filter(l=>l.personId===personId && fundKey(l.fundName)===fundKey(fundName) && lotRemaining(l) > 1e-9)
-      .slice()
-      .sort(function(a,b){
-        if(a.purchaseDate !== b.purchaseDate) return a.purchaseDate < b.purchaseDate ? -1 : 1;
-        return (a.createdAt||'') < (b.createdAt||'') ? -1 : 1;
+  async function recordFundSale(personId, fundName, quantity, salePrice, saleDate, note, cashTypeId, actualTax){
+    const row = await S.store.transaction(draft=>{
+      if(draft.fund_sales.some(row=>row.personId===personId && fundKey(row.fundName)===fundKey(fundName) && row.saleDate>saleDate)) throw new Error('sale_history_locked');
+      const sale = FinanceCore.planSale(draft.fund_lots, {
+        id:'m'+crypto.randomUUID(), createdAt:new Date().toISOString(),
+        personId, fundName, quantity, salePrice, saleDate, note, cashTypeId, actualTax
       });
-    const totalAvailable = lots.reduce(function(s,l){ return s + lotRemaining(l); }, 0);
-    if(sellQty <= 0) throw new Error('invalid_qty');
-    if(sellQty > totalAvailable + 1e-9){
-      const err = new Error('insufficient_units');
-      err.available = totalAvailable;
-      throw err;
-    }
-    let toSell = sellQty;
-    let costBasis = 0;
-    const breakdown = [];
-    for(const lot of lots){
-      if(toSell <= 1e-9) break;
-      const avail = lotRemaining(lot);
-      const take = Math.min(avail, toSell);
-      costBasis += take * Number(lot.purchasePrice||0);
-      breakdown.push({lotId: lot.id, qty: take, purchasePrice: Number(lot.purchasePrice||0), purchaseDate: lot.purchaseDate});
-      const newRemaining = avail - take;
-      await S.store.update('fund_lots', lot.id, {remainingQuantity: newRemaining});
-      lot.remainingQuantity = newRemaining;
-      toSell -= take;
-    }
-    const proceeds = sellQty * Number(salePrice);
-    const grossProfit = proceeds - costBasis;
-    const stopaj = grossProfit > 0 ? grossProfit * 0.175 : 0;
-    const netProfit = grossProfit - stopaj;
-    const row = await S.store.add('fund_sales', {
-      personId, fundName, quantity: sellQty, salePrice: Number(salePrice), saleDate: saleDate || todayStr(),
-      note: note||'', costBasis, proceeds, grossProfit, stopaj, netProfit, lotBreakdown: breakdown
+      FinanceCore.applySale(draft.fund_lots, sale, -1);
+      draft.fund_sales.push(sale);
+      return sale;
     });
-    S.fundSales.push(row);
+    await loadAll();
     return row;
   }
-  // reverses a sale: restores remainingQuantity on every lot it consumed, then deletes the sale record.
+
   async function reverseFundSale(saleId){
-    const sale = S.fundSales.find(s=>s.id===saleId);
-    if(!sale) return;
-    const breakdown = sale.lotBreakdown || [];
-    for(const b of breakdown){
-      const lot = S.fundLots.find(l=>l.id===b.lotId);
-      if(!lot) continue;
-      const newRemaining = lotRemaining(lot) + Number(b.qty);
-      await S.store.update('fund_lots', lot.id, {remainingQuantity: newRemaining});
-      lot.remainingQuantity = newRemaining;
-    }
-    await S.store.remove('fund_sales', saleId);
-    S.fundSales = S.fundSales.filter(s=>s.id!==saleId);
+    await S.store.transaction(draft=>{
+      const sale = draft.fund_sales.find(row=>row.id===saleId);
+      if(!sale) return;
+      if(draft.fund_sales.some(row=>row.id!==saleId && (row.saleDate>sale.saleDate || (row.saleDate===sale.saleDate && row.createdAt>sale.createdAt)) && row.personId===sale.personId
+        && fundKey(row.fundName)===fundKey(sale.fundName))) throw new Error('sale_history_locked');
+      FinanceCore.applySale(draft.fund_lots, sale, 1);
+      draft.fund_sales = draft.fund_sales.filter(row=>row.id!==saleId);
+    });
+    await loadAll();
   }
 
   // ---------- which gelir kaynağı (income source) funded which investment ----------
@@ -1535,7 +1544,7 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
   // + o kaynağın fonladığı yatırımların maliyeti (+ hiçbir kaynağa bağlanmamış yatırımlar için bir satır),
   // böylece satırların toplamı her zaman Toplam Ana Para'ya tam eşit olur.
   function principalBySource(personFilter){
-    let types = S.incomeTypes.filter(t=>!t.archived);
+    let types = S.incomeTypes;
     if(personFilter && personFilter!=='all') types = types.filter(t=>t.personId===personFilter);
     const rows = types.map(function(t){
       const cash = potBalance(t.id).balance;
@@ -1644,7 +1653,7 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
 
     const donut = donutSvg(
       [{value:b.cash, color:'var(--cash)'}, {value:b.fundValue, color:'var(--accent)'}, {value:b.metalValue, color:'var(--gold)'}],
-      {centerLabel: fmtCompact(total), centerLabelSize: 13, centerSub: 'Toplam'}
+      {centerLabel: fmtCompact(b.grandTotal), centerLabelSize: 13, centerSub: 'Toplam'}
     );
     el.innerHTML =
       '<div class="card-title">Dağılım</div>'
@@ -1833,7 +1842,7 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
           renderOzet();
         } catch(e){
           console.error('income type delete failed', e);
-          toast('Silinemedi, tekrar dene');
+          toast(e.message==='linked_records' ? 'Bağlı hareketler var. Kaynağı arşivleyebilirsin.' : 'Silinemedi, tekrar dene');
         }
       });
     }
@@ -1904,8 +1913,8 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
 
   async function submitEntry(ev){
     ev.preventDefault();
-    const amount = parseFloat($('#f_amount').value);
-    if(!amount || amount<=0){ toast('Geçerli bir tutar gir'); return; }
+    const amount = Number($('#f_amount').value.trim().replace(',', '.'));
+    if(!Number.isFinite(amount) || amount<=0 || !/^\d+(?:[.,]\d{1,2})?$/.test($('#f_amount').value.trim())){ toast('Geçerli bir tutar gir'); return; }
     const date = $('#f_date').value || todayStr();
     const note = $('#f_note').value.trim();
     const person = S.people.find(p=>p.id===S.addPersonId);
@@ -2215,7 +2224,7 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
           + '<div class="holding-bottom source-grid" style="grid-template-columns:1fr 1fr 1fr 1fr;">'
           + '<div class="cell"><div class="l">Maliyet</div><div class="v num">'+fmt(s.costBasis)+'</div></div>'
           + '<div class="cell"><div class="l">Brüt Kâr</div><div class="v num">'+fmt(s.grossProfit)+'</div></div>'
-          + '<div class="cell"><div class="l">Stopaj (%17,5)</div><div class="v num">'+fmt(s.stopaj)+'</div></div>'
+          + '<div class="cell"><div class="l">'+(s.actualTax==null?'Tahmini kesinti':'Ekstre kesintisi')+'</div><div class="v num">'+fmt(s.stopaj)+'</div></div>'
           + '<div class="cell"><div class="l">Net Kâr</div><div class="v num">'+fmt(s.netProfit)+'</div></div>'
           + '</div>'
           + '</div>';
@@ -2241,6 +2250,7 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
       + '<div class="field"><label>Kişi</label><select id="h_person">'
         + persons.map(p=>'<option value="'+p.id+'"'+(p.id===h.personId?' selected':'')+'>'+esc(p.name)+'</option>').join('')
         + '</select></div>'
+      + '<label class="cash-toggle"><input type="checkbox" id="h_cash"'+(h.cashTypeId?' checked':'')+'> Alış tutarını seçilen nakit kaynağından düş</label>'
       + '<div class="field"><label>Gelir Kaynağı (opsiyonel)</label><select id="h_incometype">'+fundingIncomeTypeOptionsHtml(h.personId, h.incomeTypeId)+'</select>'
         + '<div class="field-hint" style="margin-top:6px;">Bu varlığı hangi gelir kaynağının parasıyla aldıysan seç — o kaynağın kartında bu yatırımın güncel değeri ve kâr/zararı da gösterilir.</div></div>'
       + '<div class="field"><label>Materyal</label><input type="text" id="h_material" list="materialOptions" value="'+esc(h.material)+'" placeholder="Örn: Gram Altın"></div>'
@@ -2248,7 +2258,7 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
       + '<div class="field"><label>Banka</label><input type="text" id="h_bank" value="'+esc(h.bank)+'" placeholder="Örn: İş Bankası"></div>'
       + '<div class="field"><label>Miktar</label><input type="number" step="0.0001" min="0" id="h_quantity" class="num-input" value="'+(h.quantity||'')+'"></div>'
       + '<div class="field"><label>Birim</label><select id="h_unit"><option value="gram"'+(h.unit==='gram'?' selected':'')+'>gram</option><option value="adet"'+(h.unit==='adet'?' selected':'')+'>adet</option></select></div>'
-      + '<div class="field"><label>Alış Fiyatı (birim başına, ₺)</label><input type="number" step="0.01" min="0" id="h_purchaseprice" class="num-input" value="'+(h.purchasePrice||'')+'"></div>'
+      + '<div class="field"><label>Alış Fiyatı (birim başına, ₺)</label><input type="number" step="0.01" min="0" id="h_purchaseprice" class="num-input" value="'+(h.purchasePrice??'')+'"></div>'
       + '<div class="field"><label>Alış Tarihi</label><input type="date" id="h_purchasedate" value="'+(h.purchaseDate||todayStr())+'"></div>'
       + '<div class="field"><label>Güncel Fiyat (birim başına, ₺)</label><input type="number" step="0.01" min="0" id="h_currentprice" class="num-input" value="'+(h.currentPrice||'')+'">'
         + '<div class="field-hint" id="h_price_hint" style="margin-top:6px;"></div></div>'
@@ -2282,6 +2292,8 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
     $('#h_save').addEventListener('click', async ()=>{
       const personId = $('#h_person').value;
       const incomeTypeId = $('#h_incometype').value || null;
+      const cashTypeId = $('#h_cash').checked ? incomeTypeId : null;
+      if($('#h_cash').checked && !cashTypeId){ toast('Nakit kaynağı seç'); return; }
       const material = $('#h_material').value.trim();
       const bank = $('#h_bank').value.trim();
       const quantity = parseFloat($('#h_quantity').value);
@@ -2292,8 +2304,8 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
       const note = $('#h_note').value.trim();
       if(!material){ toast('Materyal adı gir'); return; }
       if(!quantity || quantity<=0){ toast('Geçerli bir miktar gir'); return; }
-      if(!purchasePrice || purchasePrice<0){ toast('Geçerli bir alış fiyatı gir'); return; }
-      const data = {personId, personName: personName(personId), incomeTypeId, material, bank, quantity, unit, purchasePrice, purchaseDate, currentPrice, note};
+      if(!Number.isFinite(purchasePrice) || purchasePrice<0){ toast('Geçerli bir alış fiyatı gir'); return; }
+      const data = {personId, personName: personName(personId), incomeTypeId, cashTypeId, material, bank, quantity, unit, purchasePrice, purchaseDate, currentPrice, note};
       if(currentPrice > 0 && getGroupPrice(material, bank) == null){
         await setGroupPrice(material, bank, currentPrice);
       }
@@ -2408,8 +2420,7 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
           if(filled === 0){
             statusEl.textContent = 'Dosya okundu ama eşleşen materyal/banka bulunamadı (Gram Altın/Gümüş veya Fiziki Altın/Gümüş, Dünya Katılım/Ziraat Katılım banka adıyla olmalı).';
           } else {
-            const when = data.updatedAt ? new Date(data.updatedAt).toLocaleString('tr-TR') : '';
-            statusEl.textContent = filled + ' alan dolduruldu (kaynak güncellemesi: ' + when + '). Kontrol edip aşağıdaki tek "Kaydet" butonuna basman yeterli.';
+            statusEl.textContent = filled + ' alan dolduruldu. Her fiyatın tarihini ve makasını kontrol edip kaydet.';
           }
         } catch(e){
           console.error('fetch prices failed', e);
@@ -2441,7 +2452,14 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
       else if(/ziraat/.test(bank)) src = data.ziraatKatilim;
       if(!src) return;
       const val = isGold ? src.altinAlis : src.gumusAlis;
-      if(val == null || isNaN(val)) return;
+      if(!Number.isFinite(val) || val <= 0) return;
+      const date = src.fetchedAt || (!src.stale ? data.updatedAt : null);
+      const spread = ((isGold ? src.altinSatis : src.gumusSatis)/val-1)*100;
+      const info = document.createElement('small');
+      info.className = 'price-source';
+      info.textContent = (src.stale ? 'Son geçerli fiyat' : 'Banka alış fiyatı') + (date ? ' · '+new Date(date).toLocaleString('tr-TR') : '') + (Number.isFinite(spread) ? ' · Makas %'+spread.toFixed(1) : '');
+      if(input.nextElementSibling?.classList.contains('price-source')) input.nextElementSibling.remove();
+      input.after(info);
       input.value = Number(val).toFixed(2);
       input.style.outline = '2px solid var(--gold)';
       setTimeout(function(){ input.style.outline = ''; }, 2000);
@@ -2476,18 +2494,19 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
     content.innerHTML =
       '<div class="sheet-handle"></div>'
       + '<div class="sheet-title">'+(isNew?'Yeni Fon Alışı':'Fon Alışını Düzenle')+'</div>'
-      + (identityLocked ? '<div class="field-hint" style="margin-bottom:12px;">Bu alıştan '+fmtNum(consumed,4)+' adet satıldığı için kişi/fon adı değiştirilemez, ama adet/fiyat/tarih/not düzeltilebilir (adet en az '+fmtNum(consumed,4)+' olmalı).</div>' : '')
+      + (identityLocked ? '<div class="field-hint" style="margin-bottom:12px;">Bu alıştan '+fmtNum(consumed,4)+' adet satıldığı için kişi/fon adı değiştirilemez, geçmiş satış maliyeti korunur. Yalnızca kaynak, nakit bağlantısı ve not düzenlenebilir.</div>' : '')
       + '<div class="field"><label>Kişi</label><select id="fl_person"'+(identityLocked?' disabled':'')+'>'
         + persons.map(p=>'<option value="'+p.id+'"'+(p.id===l.personId?' selected':'')+'>'+esc(p.name)+'</option>').join('')
         + '</select></div>'
+      + '<label class="cash-toggle"><input type="checkbox" id="fl_cash"'+(l.cashTypeId?' checked':'')+'> Alış tutarını seçilen nakit kaynağından düş</label>'
       + '<div class="field"><label>Gelir Kaynağı (opsiyonel)</label><select id="fl_incometype">'+fundingIncomeTypeOptionsHtml(l.personId, l.incomeTypeId)+'</select>'
         + '<div class="field-hint" style="margin-top:6px;">Bu alışı hangi gelir kaynağının parasıyla yaptıysan seç — o kaynağın kartında bu yatırımın güncel değeri ve kâr/zararı da gösterilir.</div></div>'
       + '<div class="field"><label>Fon Adı</label><input type="text" id="fl_name" list="fundNameOptions" value="'+esc(l.fundName)+'" placeholder="Örn: EP1"'+(identityLocked?' disabled':'')+'></div>'
       + '<datalist id="fundNameOptions">' + fundNameOptionsHtml() + '</datalist>'
-      + '<div class="field"><label>Adet</label><input type="number" step="0.0001" min="0" id="fl_quantity" class="num-input" value="'+(l.quantity||'')+'"></div>'
-      + '<div class="field"><label>Alış Fiyatı (birim başına, ₺)</label><input type="number" step="0.0001" min="0" id="fl_price" class="num-input" value="'+(l.purchasePrice||'')+'"></div>'
+      + '<div class="field"><label>Adet</label><input type="number" step="0.0001" min="0" id="fl_quantity"'+(identityLocked?' disabled':'')+' class="num-input" value="'+(l.quantity||'')+'"></div>'
+      + '<div class="field"><label>Alış Fiyatı (birim başına, ₺)</label><input type="number" step="0.0001" min="0" id="fl_price"'+(identityLocked?' disabled':'')+' class="num-input" value="'+(l.purchasePrice??'')+'"></div>'
       + '<div class="field-hint" id="fl_total_hint" style="display:none;">Toplam tutar: <strong id="fl_total_val"></strong></div>'
-      + '<div class="field"><label>Alış Tarihi</label><input type="date" id="fl_date" value="'+(l.purchaseDate||todayStr())+'"></div>'
+      + '<div class="field"><label>Alış Tarihi</label><input type="date" id="fl_date"'+(identityLocked?' disabled':'')+' value="'+(l.purchaseDate||todayStr())+'"></div>'
       + '<div class="field"><label>Not</label><input type="text" id="fl_note" value="'+esc(l.note||'')+'"></div>'
       + '<div class="sheet-actions">'
       + (isNew ? '' : '<button type="button" class="btn-danger" id="fl_delete"'+(identityLocked?' disabled title="Bir kısmı satılmış, silinemez"':'')+'>Sil</button>')
@@ -2519,16 +2538,18 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
 
     $('#fl_save').addEventListener('click', async ()=>{
       const incomeTypeId = $('#fl_incometype').value || null;
+      const cashTypeId = $('#fl_cash').checked ? incomeTypeId : null;
+      if($('#fl_cash').checked && !cashTypeId){ toast('Nakit kaynağı seç'); return; }
       const quantity = parseFloat($('#fl_quantity').value);
       const purchasePrice = parseFloat($('#fl_price').value);
       const purchaseDate = $('#fl_date').value || todayStr();
       const note = $('#fl_note').value.trim();
       if(!quantity || quantity<=0){ toast('Geçerli bir adet gir'); return; }
-      if(!purchasePrice || purchasePrice<0){ toast('Geçerli bir alış fiyatı gir'); return; }
+      if(!Number.isFinite(purchasePrice) || purchasePrice<0){ toast('Geçerli bir alış fiyatı gir'); return; }
 
       if(identityLocked){
         if(quantity < consumed - 1e-9){ toast('Adet, zaten satılmış olan '+fmtNum(consumed,4)+' adetten az olamaz'); return; }
-        const data = {incomeTypeId, quantity, remainingQuantity: quantity - consumed, purchasePrice, purchaseDate, note};
+        const data = {incomeTypeId, cashTypeId, note};
         await S.store.update('fund_lots', l.id, data);
         Object.assign(l, data);
         toast('Güncellendi');
@@ -2540,7 +2561,7 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
       const personId = $('#fl_person').value;
       const fundName = $('#fl_name').value.trim();
       if(!fundName){ toast('Fon adı gir'); return; }
-      const data = {personId, incomeTypeId, fundName, quantity, remainingQuantity: quantity, purchasePrice, purchaseDate, note};
+      const data = {personId, incomeTypeId, cashTypeId, fundName, quantity, remainingQuantity: quantity, purchasePrice, purchaseDate, note};
       if(isNew){
         const row = await S.store.add('fund_lots', data);
         S.fundLots.push(row);
@@ -2587,7 +2608,7 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
     content.innerHTML =
       '<div class="sheet-handle"></div>'
       + '<div class="sheet-title">Fon Satışı Kaydet</div>'
-      + '<div class="field-hint" style="margin-bottom:12px;">Satış, en önce alınan lottan başlanarak (FIFO) düşülür. Kârdan otomatik %17,5 stopaj hesaplanır.</div>'
+      + '<div class="field-hint" style="margin-bottom:12px;">Satış, en önce alınan lottan başlanarak (FIFO) düşülür. Kesinti girilmezse %17,5 üzerinden tahmin gösterilir.</div>'
       + '<div class="field"><label>Kişi</label><select id="fs_person">'
         + persons.map(p=>'<option value="'+p.id+'"'+(p.id===defaultPerson?' selected':'')+'>'+esc(p.name)+'</option>').join('')
         + '</select></div>'
@@ -2597,6 +2618,8 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
       + '<div class="field"><label>Satış Adedi</label><input type="number" step="0.0001" min="0" id="fs_quantity" class="num-input"></div>'
       + '<div class="field"><label>Satış Fiyatı (birim başına, ₺)</label><input type="number" step="0.0001" min="0" id="fs_price" class="num-input"></div>'
       + '<div class="field"><label>Satış Tarihi</label><input type="date" id="fs_date" value="'+todayStr()+'"></div>'
+      + '<div class="field"><label for="fs_cash">Satış tutarını aktar</label><select id="fs_cash"></select></div>'
+      + '<div class="field"><label for="fs_tax">Ekstredeki kesinti (₺, isteğe bağlı)</label><input id="fs_tax" type="number" min="0" step="0.01" inputmode="decimal"></div>'
       + '<div class="field"><label>Not</label><input type="text" id="fs_note"></div>'
       + '<div class="field-hint" id="fs_preview_hint" style="margin-bottom:4px;"></div>'
       + '<div class="sheet-actions">'
@@ -2614,38 +2637,38 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
       hint.textContent = 'Elde kalan: '+fmtNum(avail,4)+' adet';
     }
     function updatePreview(){
-      const personId = $('#fs_person').value;
-      const fundName = $('#fs_name').value.trim();
-      const qty = parseFloat($('#fs_quantity').value);
-      const price = parseFloat($('#fs_price').value);
       const hint = $('#fs_preview_hint');
-      if(!fundName || !qty || qty<=0 || !price || price<=0){ hint.textContent = ''; return; }
-      const avail = availableFor(personId, fundName);
-      if(qty > avail + 1e-9){ hint.textContent = 'Yetersiz adet — elde sadece '+fmtNum(avail,4)+' var.'; return; }
-      // simulate FIFO without persisting, just for preview
-      const lots = S.fundLots
-        .filter(l=>l.personId===personId && fundKey(l.fundName)===fundKey(fundName) && lotRemaining(l) > 1e-9)
-        .slice()
-        .sort(function(a,b){ return (a.purchaseDate||'') < (b.purchaseDate||'') ? -1 : 1; });
-      let toSell = qty, costBasis = 0;
-      for(const lot of lots){
-        if(toSell<=1e-9) break;
-        const take = Math.min(lotRemaining(lot), toSell);
-        costBasis += take * Number(lot.purchasePrice||0);
-        toSell -= take;
+      const quantity = Number($('#fs_quantity').value);
+      const salePrice = Number($('#fs_price').value);
+      const rawTax = $('#fs_tax').value;
+      hint.textContent = '';
+      if(!quantity || !salePrice || !$('#fs_name').value.trim()) return;
+      try {
+        const sale = FinanceCore.planSale(S.fundLots, {
+          personId:$('#fs_person').value, fundName:$('#fs_name').value.trim(),
+          quantity, salePrice, saleDate:$('#fs_date').value || todayStr(),
+          actualTax:rawTax==='' ? undefined : Number(rawTax)
+        });
+        hint.textContent = 'Maliyet '+fmt(sale.costBasis)+' · '+(rawTax===''?'Tahmini kesinti ':'Kesinti ')
+          +fmt(sale.stopaj)+' · Net kâr '+fmt(sale.netProfit)+' · Net satış '+fmt(sale.proceeds-sale.stopaj);
+      } catch(error) {
+        hint.textContent = error.message==='insufficient_units' ? 'Satış tarihinde yeterli adet yok.' : 'Satış ve kesinti tutarını kontrol et.';
       }
-      const proceeds = qty*price;
-      const grossProfit = proceeds - costBasis;
-      const stopaj = grossProfit>0 ? grossProfit*0.175 : 0;
-      const netProfit = grossProfit - stopaj;
-      hint.textContent = 'Maliyet: '+fmt(costBasis)+' · Brüt Kâr: '+fmt(grossProfit)+' · Stopaj: '+fmt(stopaj)+' · Net Kâr: '+fmt(netProfit);
     }
-    $('#fs_person').addEventListener('change', ()=>{ updateAvailHint(); updatePreview(); });
-    $('#fs_name').addEventListener('input', ()=>{ updateAvailHint(); updatePreview(); });
+    function updateCashOptions(){
+      $('#fs_cash').innerHTML = fundingIncomeTypeOptionsHtml($('#fs_person').value, '');
+      $('#fs_cash').options[0].textContent = 'Nakit hesabına aktarma';
+    }
+    updateCashOptions();
+    $('#fs_person').addEventListener('change', updateCashOptions);
+    $('#fs_tax').addEventListener('input', updatePreview);
+    $('#fs_date').addEventListener('change', updatePreview);
     $('#fs_quantity').addEventListener('input', updatePreview);
     $('#fs_price').addEventListener('input', updatePreview);
 
-    $('#fs_save').addEventListener('click', async ()=>{
+    $('#fs_save').addEventListener('click', async event=>{
+      const button = event.currentTarget;
+      if(button.disabled) return;
       const personId = $('#fs_person').value;
       const fundName = $('#fs_name').value.trim();
       const quantity = parseFloat($('#fs_quantity').value);
@@ -2655,8 +2678,11 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
       if(!fundName){ toast('Fon adı gir'); return; }
       if(!quantity || quantity<=0){ toast('Geçerli bir satış adedi gir'); return; }
       if(!salePrice || salePrice<=0){ toast('Geçerli bir satış fiyatı gir'); return; }
+      button.disabled = true;
       try{
-        await recordFundSale(personId, fundName, quantity, salePrice, saleDate, note);
+        const rawTax = $('#fs_tax').value;
+        await recordFundSale(personId, fundName, quantity, salePrice, saleDate, note,
+          $('#fs_cash').value || null, rawTax==='' ? undefined : Number(rawTax));
         toast('Satış kaydedildi');
         closeSheet();
         renderFundView();
@@ -2665,9 +2691,9 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
           toast('Yetersiz adet — elde sadece '+fmtNum(e.available,4)+' var');
         } else {
           console.error('fund sale failed', e);
-          toast('Kaydedilemedi, tekrar dene');
+          toast(e.message==='sale_history_locked' ? 'Daha yeni satış var. Kronolojik sırayı kontrol et.' : 'Kaydedilemedi, tekrar dene');
         }
-      }
+      } finally { button.disabled = false; }
     });
   }
 
@@ -2691,16 +2717,20 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
   // applies an edit to an existing sale: undoes its old lot consumption, then re-applies FIFO
   // with the new numbers. Throws insufficient_units (without changing anything) if the new
   // quantity can't be covered once the old sale's units are given back.
-  async function updateFundSale(sale, newQuantity, newSalePrice, newSaleDate, newNote){
-    const virtualLots = lotsWithVirtualRestore(sale.personId, sale.fundName, sale);
-    const available = virtualLots.reduce(function(s,l){ return s+l.remaining; }, 0);
-    if(newQuantity > available + 1e-9){
-      const err = new Error('insufficient_units');
-      err.available = available;
-      throw err;
-    }
-    await reverseFundSale(sale.id);
-    return await recordFundSale(sale.personId, sale.fundName, newQuantity, newSalePrice, newSaleDate, newNote);
+  async function updateFundSale(sale, quantity, salePrice, saleDate, note){
+    const row = await S.store.transaction(draft=>{
+      const previous = draft.fund_sales.find(row=>row.id===sale.id);
+      if(!previous) throw new Error('missing_sale');
+      if(draft.fund_sales.some(row=>row.id!==sale.id && (row.saleDate>=saleDate || row.saleDate>=previous.saleDate) && row.personId===sale.personId
+        && fundKey(row.fundName)===fundKey(sale.fundName))) throw new Error('sale_history_locked');
+      FinanceCore.applySale(draft.fund_lots, previous, 1);
+      const updated = FinanceCore.planSale(draft.fund_lots, {...previous, quantity, salePrice, saleDate, note});
+      FinanceCore.applySale(draft.fund_lots, updated, -1);
+      Object.assign(previous, updated);
+      return updated;
+    });
+    await loadAll();
+    return row;
   }
 
   function openFundSaleDetailSheet(id){
@@ -2768,7 +2798,7 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
           toast('Yetersiz adet — geri alınca elde sadece '+fmtNum(e.available,4)+' olur');
         } else {
           console.error('fund sale update failed', e);
-          toast('Güncellenemedi, tekrar dene');
+          toast(e.message==='sale_history_locked' ? 'Daha yeni satış var. Kronolojik sırayı kontrol et.' : 'Güncellenemedi, tekrar dene');
         }
       }
     });
@@ -2780,7 +2810,8 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
         btn.textContent = 'Emin misin? Tekrar dokun';
         return;
       }
-      await reverseFundSale(s.id);
+      try { await reverseFundSale(s.id); }
+      catch(error) { toast(error.message==='sale_history_locked' ? 'Bir sonraki satış kaydı varken bu satış geri alınamaz.' : 'Satış geri alınamadı'); return; }
       closeSheet();
       toast('Satış geri alındı');
       renderFundView();
@@ -2930,16 +2961,17 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
     // bir değer olduğu için Dönem filtresinden değil, sadece kişi filtresinden etkilenir)
     let bankHoldings = S.savingsHoldings.slice();
     if(S.raporPerson!=='all') bankHoldings = bankHoldings.filter(h=>h.personId===S.raporPerson);
-    const byBank = {};
+    const byBank = Object.create(null);
     bankHoldings.forEach(function(h){
-      const key = h.bank || 'Banka belirtilmemiş';
+      const name = String(h.bank || '').trim() || 'Banka belirtilmemiş';
+      const key = name.toLocaleLowerCase('tr-TR');
       const m = holdingMetrics(h);
-      if(!byBank[key]) byBank[key] = {count:0, total:0, holdings:[]};
+      if(!byBank[key]) byBank[key] = {name,count:0, total:0, holdings:[]};
       byBank[key].count += 1;
       byBank[key].total += m.value;
       byBank[key].holdings.push(h);
     });
-    const bankArr = Object.keys(byBank).map(function(k){ return {name:k, count:byBank[k].count, total:byBank[k].total, holdings:byBank[k].holdings}; }).sort(function(a,b){ return b.total-a.total; });
+    const bankArr = Object.keys(byBank).map(function(k){ return {name:byBank[k].name, count:byBank[k].count, total:byBank[k].total, holdings:byBank[k].holdings}; }).sort(function(a,b){ return b.total-a.total; });
     const maxBank = bankArr.length ? bankArr[0].total : 0;
     const bankEl = $('#bankBars');
     if(bankArr.length===0){
@@ -3124,7 +3156,8 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
         }
         const arr = S[col];
         const dbCol = col==='people'?'people':(col==='incomeTypes'?'income_types':'expense_categories');
-        await S.store.remove(dbCol, id);
+        try { await S.store.remove(dbCol, id); }
+        catch(error) { toast(error.message==='linked_records' ? 'Bağlı hareketler var. Önce hareketleri başka bir kaynağa taşı.' : 'Silinemedi'); return; }
         const idx = arr.findIndex(x=>x.id===id);
         if(idx>-1) arr.splice(idx,1);
         toast('Silindi');
@@ -3184,8 +3217,18 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
     }
     html += '<div id="gh_err" class="lock-error"></div></div>';
 
+    html += '<div class="settings-section"><button type="button" class="btn-ghost" id="exportBackup">Veri yedeğini indir</button></div>';
     content.innerHTML = html;
 
+    $('#exportBackup').addEventListener('click', ()=>{
+      const blob = new Blob([JSON.stringify(S.store.mem, null, 2)], {type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'kelo-finans-'+todayStr()+'.json';
+      link.click();
+      setTimeout(()=>URL.revokeObjectURL(url), 1000);
+    });
     // bind Kişiler
     bindSettingsCatRows(content.querySelector('.settings-section'), 'people', renderSettingsSheet);
     $('#addPersonBtn').addEventListener('click', async ()=>{
@@ -3264,7 +3307,17 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
     $('#modeGiderBtn').addEventListener('click', ()=>{ S.addMode='gider'; applyMode(); });
     $('#modeGelirBtn').addEventListener('click', ()=>{ S.addMode='gelir'; applyMode(); });
     $('#f_person').addEventListener('change', (e)=>{ S.addPersonId = e.target.value; renderEkleOptions(); });
-    $('#entryForm').addEventListener('submit', submitEntry);
+    $('#entryForm').addEventListener('submit', async event=>{
+      event.preventDefault();
+      const form = event.currentTarget;
+      if(form.dataset.saving) return;
+      form.dataset.saving = 'true';
+      const button = form.querySelector('[type=submit]');
+      if(button) button.disabled = true;
+      try { await submitEntry(event); }
+      catch(error) { toast('Kayıt tamamlanamadı. Bilgilerin formda duruyor.'); }
+      finally { delete form.dataset.saving; if(button) button.disabled = false; }
+    });
 
     $$('[data-qa]').forEach(btn=>{
       btn.addEventListener('click', ()=>{
@@ -3317,7 +3370,8 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
       } catch(e){
         console.error('github init failed', e);
         S.store = new StoreLayer(null);
-        banner.textContent = 'GitHub\'a bağlanılamadı, bu cihazdaki yerel veriler kullanılıyor. Ayarlar\'dan bağlantıyı kontrol et.';
+        S.store.readOnly = true;
+        banner.textContent = 'GitHub\'a bağlanılamadı, bu cihazdaki yerel veriler yalnızca görüntüleniyor. Yeniden bağlanmak için sayfayı yenile.';
         banner.classList.add('show');
       }
     } else {
@@ -3326,8 +3380,10 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
     }
 
     await loadAll();
-    await seedIfNeeded();
-    await migrateMaterialPricesIfNeeded();
+    if(!S.store.readOnly){
+      await seedIfNeeded();
+      await migrateMaterialPricesIfNeeded();
+    }
 
     bindStatic();
     $('#f_date').value = todayStr();
@@ -3345,3 +3401,6 @@ input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
   }
 })();
 </script>
+
+</body>
+</html>

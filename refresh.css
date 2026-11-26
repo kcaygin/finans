@@ -1,0 +1,33 @@
+:root {
+  --bg:#eef3f2;
+  --surface:#fff;
+  --surface-2:#e5efed;
+  --ink:#102827;
+  --ink-soft:#415e5b;
+  --ink-faint:#52706c;
+  --accent:#087567;
+  --accent-ink:#075b51;
+  --accent-soft:#d9eeea;
+  --income:#07804d;
+  --gold:#ae7628;
+}
+.hero {
+  background: linear-gradient(90deg,#092f2d 8%,rgba(9,47,45,.86) 43%,rgba(9,47,45,.19)), url("./assets/portfolio-hero.jpg") right center / cover no-repeat, #0c3c38;
+  border:1px solid #3f7771;
+  box-shadow:0 19px 38px -26px #092f2d;
+}
+.hero::after { display:none; }
+.hero-amount { font-size:clamp(2rem,7vw,3.4rem); overflow-wrap:anywhere; }
+.hero-row { flex-wrap:wrap; }
+.hero-stat { background:rgba(6,34,33,.62); border:1px solid #ffffff24; }
+.topbar { padding-top:calc(12px + env(safe-area-inset-top, 0px)); }
+.topbar .icon-btn,.icon-btn,.chip-manage { min-width:44px; min-height:44px; }
+.sheet { max-height:86vh; max-height:86dvh; overscroll-behavior:contain; }
+body:has(.overlay.open) { overflow:hidden; }
+.cash-toggle { display:flex; align-items:center; gap:10px; padding:12px; margin-block:8px; border:1px solid var(--hairline); border-radius:12px; color:var(--ink); }
+.cash-toggle input { width:20px; height:20px; accent-color:var(--accent); }
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible { outline:2px solid var(--accent); outline-offset:3px; }
+button:disabled { opacity:.65; cursor:wait; }
+@media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:.01ms!important; transition-duration:.01ms!important; } }
+
+.price-source { display:block; color:var(--ink-soft); margin-block:4px 10px; }
