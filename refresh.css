@@ -31,3 +31,25 @@ button:disabled { opacity:.65; cursor:wait; }
 @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:.01ms!important; transition-duration:.01ms!important; } }
 
 .price-source { display:block; color:var(--ink-soft); margin-block:4px 10px; }
+
+:root[data-theme="dark"] {
+  --bg:#0c1719;
+  --surface:#142326;
+  --surface-2:#1c3032;
+  --ink:#e9f4f1;
+  --ink-soft:#b0c8c4;
+  --ink-faint:#8aa5a0;
+  --accent:#5ecdb9;
+  --accent-ink:#a1e6d7;
+  --accent-soft:#204440;
+}
+:root[data-theme="dark"] .brand-mark,
+:root[data-theme="dark"] .btn-primary { color:#082a25; }
+#app { width:100%; min-width:0; }
+.tabbar .tab { min-width:0; min-height:44px; }
+@media (max-width:360px) {
+  .topbar { padding-inline:12px; }
+  .topbar-actions { gap:4px; }
+  .brand-name { font-size:16px; }
+  .hero { padding-inline:16px; }
+}
